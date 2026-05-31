@@ -10,14 +10,15 @@ const buttonVariants = cva(
     {
         variants: {
             variant: {
-                default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
+                default:
+                    "relative bg-gradient-to-b from-primary/90 to-primary text-primary-foreground shadow-[0_0_12px_-3px] shadow-primary/40 ring-1 ring-inset ring-primary/60 before:absolute before:inset-x-0 before:top-0 before:h-px before:rounded-t-lg before:bg-white/25 hover:from-primary/80 hover:to-primary/95",
                 outline:
-                    "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+                    "relative bg-gradient-to-b from-background to-muted/50 text-foreground shadow-[0_0_8px_-3px] shadow-border/30 ring-1 ring-inset ring-border before:absolute before:inset-x-0 before:top-0 before:h-px before:rounded-t-lg before:bg-white/40 hover:from-muted/30 hover:to-muted/60 dark:from-input/30 dark:to-input/50 dark:ring-input dark:before:bg-white/10",
                 secondary:
-                    "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
-                ghost: "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
+                    "relative bg-gradient-to-b from-secondary/80 to-secondary text-secondary-foreground shadow-[0_0_8px_-3px] shadow-secondary/30 ring-1 ring-inset ring-secondary-foreground/10 before:absolute before:inset-x-0 before:top-0 before:h-px before:rounded-t-lg before:bg-white/30 hover:from-secondary/70 hover:to-secondary/90",
+                ghost: "relative hover:bg-gradient-to-b hover:from-muted/50 hover:to-muted hover:shadow-[0_0_6px_-3px] hover:shadow-border/20 hover:ring-1 hover:ring-inset hover:ring-border/50 aria-expanded:bg-muted dark:hover:from-muted/30 dark:hover:to-muted/50",
                 destructive:
-                    "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+                    "relative bg-gradient-to-b from-destructive/80 to-destructive text-white shadow-[0_0_12px_-3px] shadow-destructive/40 ring-1 ring-inset ring-destructive/60 before:absolute before:inset-x-0 before:top-0 before:h-px before:rounded-t-lg before:bg-white/20 hover:from-destructive/70 hover:to-destructive/90",
                 link: "text-primary underline-offset-4 hover:underline",
             },
             size: {

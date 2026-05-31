@@ -4,13 +4,17 @@ import { createRoot } from "react-dom/client";
 
 import { QueryProvider } from "@/providers/query";
 
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+
 import App from "./App.tsx";
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
-        <QueryProvider>
-            <App />
-        </QueryProvider>
+        <ErrorBoundary>
+            <QueryProvider>
+                <App />
+            </QueryProvider>
+        </ErrorBoundary>
     </StrictMode>,
 );

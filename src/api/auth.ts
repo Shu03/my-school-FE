@@ -6,22 +6,26 @@ import type {
     User,
 } from "@/types";
 
-import apiClient from "./client";
+import apiFetch from "./client";
 
 export async function login(data: LoginRequest): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>("/auth/login", data);
-    return response.data;
+    return apiFetch<LoginResponse>("/auth/login", {
+        method: "POST",
+        body: JSON.stringify(data),
+    });
 }
 
 export async function refreshToken(token: string): Promise<LoginSuccessResponse> {
-    const response = await apiClient.post<LoginSuccessResponse>("/auth/refresh", {
-        refreshToken: token,
+    return apiFetch<LoginSuccessResponse>("/auth/refresh", {
+        method: "POST",
+        body: JSON.stringify({ refreshToken: token }),
     });
-    return response.data;
 }
 
 export async function logout(): Promise<void> {
-    await apiClient.post("/auth/logout");
+    await apiFetch("/auth/logout", {
+        method: "POST",
+    });
 }
 
 export async function changePassword(
@@ -32,17 +36,22 @@ export async function changePassword(
     if (firstLoginToken) {
         headers.Authorization = `Bearer ${firstLoginToken}`;
     }
-    const response = await apiClient.post<LoginSuccessResponse>("/auth/change-password", data, {
+    return apiFetch<LoginSuccessResponse>("/auth/change-password", {
+        method: "POST",
+        body: JSON.stringify(data),
         headers,
     });
-    return response.data;
 }
 
 export async function resetPassword(userId: string): Promise<void> {
-    await apiClient.post("/auth/admin/reset-password", { userId });
+    await apiFetch("/auth/admin/reset-password", {
+        method: "POST",
+        body: JSON.stringify({ userId }),
+    });
 }
 
 export async function getMe(): Promise<User> {
-    const response = await apiClient.get<User>("/auth/me");
-    return response.data;
+    return apiFetch<User>("/auth/me", {
+        method: "GET",
+    });
 }

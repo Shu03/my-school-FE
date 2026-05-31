@@ -2,12 +2,8 @@ import { createBrowserRouter } from "react-router-dom";
 
 import { Role } from "@/types";
 
-import { ChangePasswordPage } from "@/features/auth/ChangePasswordPage";
-import { DashboardPage } from "@/features/auth/DashboardPage";
-import { LoginPage } from "@/features/auth/LoginPage";
-import { UsersPage } from "@/features/users/UsersPage";
-
 import { ProtectedRoute, PublicOnlyRoute, RoleGuard } from "./guards";
+import { ChangePasswordPage, DashboardPage, Lazy, LoginPage, UsersPage } from "./lazy";
 import { NotFoundPage } from "./NotFoundPage";
 
 export const router = createBrowserRouter([
@@ -17,7 +13,11 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: "/login",
-                element: <LoginPage />,
+                element: (
+                    <Lazy>
+                        <LoginPage />
+                    </Lazy>
+                ),
             },
         ],
     },
@@ -25,7 +25,11 @@ export const router = createBrowserRouter([
     // Semi-public: force password change (needs firstLoginToken, not full auth)
     {
         path: "/change-password",
-        element: <ChangePasswordPage />,
+        element: (
+            <Lazy>
+                <ChangePasswordPage />
+            </Lazy>
+        ),
     },
 
     // Protected routes
@@ -34,7 +38,11 @@ export const router = createBrowserRouter([
         children: [
             {
                 path: "/",
-                element: <DashboardPage />,
+                element: (
+                    <Lazy>
+                        <DashboardPage />
+                    </Lazy>
+                ),
             },
 
             // Admin-only routes
@@ -43,7 +51,11 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         path: "/users",
-                        element: <UsersPage />,
+                        element: (
+                            <Lazy>
+                                <UsersPage />
+                            </Lazy>
+                        ),
                     },
                 ],
             },
