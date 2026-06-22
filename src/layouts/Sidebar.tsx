@@ -4,11 +4,15 @@ import { NavLink } from "react-router-dom";
 
 import { LayoutDashboard, Users, GraduationCap, BookOpen, Settings } from "lucide-react";
 
+
+import { APP_BRAND } from "@constants/app.constants";
+import { ROUTES } from "@constants/routes.constants";
+
+import { Role } from "@/types/api";
+
+import { useAuthStore } from "@features/auth";
+
 import { cn } from "@/lib/utils";
-
-import { useAuthStore } from "@/stores/auth.store";
-
-import { Role } from "@/types";
 
 interface NavItem {
     label: string;
@@ -18,11 +22,11 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-    { label: "Dashboard", path: "/", icon: LayoutDashboard },
-    { label: "Users", path: "/users", icon: Users, roles: [Role.ADMIN] },
-    { label: "Students", path: "/students", icon: GraduationCap },
-    { label: "Classes", path: "/classes", icon: BookOpen },
-    { label: "Settings", path: "/settings", icon: Settings, roles: [Role.ADMIN] },
+    { label: "Dashboard", path: ROUTES.DASHBOARD, icon: LayoutDashboard },
+    { label: "Users", path: ROUTES.USERS, icon: Users, roles: [Role.ADMIN] },
+    { label: "Students", path: ROUTES.STUDENTS, icon: GraduationCap },
+    { label: "Classes", path: ROUTES.CLASSES, icon: BookOpen },
+    { label: "Settings", path: ROUTES.SETTINGS, icon: Settings, roles: [Role.ADMIN] },
 ];
 
 export function Sidebar(): JSX.Element {
@@ -37,7 +41,7 @@ export function Sidebar(): JSX.Element {
             {/* Brand */}
             <div className="flex h-16 items-center gap-2 px-6">
                 <GraduationCap className="text-sidebar-primary h-7 w-7" />
-                <span className="text-sidebar-foreground text-lg font-bold">MySchool</span>
+                <span className="text-sidebar-foreground text-lg font-bold">{APP_BRAND.NAME}</span>
             </div>
 
             {/* Navigation */}
@@ -46,7 +50,7 @@ export function Sidebar(): JSX.Element {
                     <NavLink
                         key={item.path}
                         to={item.path}
-                        end={item.path === "/"}
+                        end={item.path === ROUTES.DASHBOARD}
                         className={({ isActive }) =>
                             cn(
                                 "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200",
@@ -64,7 +68,7 @@ export function Sidebar(): JSX.Element {
 
             {/* Footer */}
             <div className="px-4 py-3">
-                <p className="text-sidebar-foreground/50 truncate text-xs">© 2026 MySchool</p>
+                <p className="text-sidebar-foreground/50 truncate text-xs">{APP_BRAND.COPYRIGHT}</p>
             </div>
         </aside>
     );

@@ -2,8 +2,10 @@ import type { JSX } from "react";
 
 import { LogOut, Bell } from "lucide-react";
 
-import { useAuthStore } from "@/stores/auth.store";
+import { useAuthStore } from "@features/auth";
+
 import { Button } from "@/components/ui/button";
+
 
 export function TopBar(): JSX.Element {
     const user = useAuthStore((s) => s.user);

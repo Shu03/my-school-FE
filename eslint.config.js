@@ -40,6 +40,25 @@ export default defineConfig([
                 },
             ],
             "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+            "no-restricted-imports": [
+                "error",
+                {
+                    patterns: [
+                        {
+                            group: [
+                                "@/app/*",
+                                "@/features/*",
+                                "@/layouts",
+                                "@/layouts/*",
+                                "@/constants/*",
+                                "@/config/*",
+                            ],
+                            message:
+                                "Use the dedicated alias (e.g. @features/*, @constants/*, @layouts) instead of @/*. The @/* alias is reserved for shadcn (@/components/ui, @/lib/utils).",
+                        },
+                    ],
+                },
+            ],
             "import/order": [
                 "error",
                 {
@@ -47,16 +66,16 @@ export default defineConfig([
                     pathGroups: [
                         { pattern: "react", group: "external", position: "before" },
                         { pattern: "react-*", group: "external", position: "before" },
+                        { pattern: "@config/**", group: "internal", position: "before" },
+                        { pattern: "@constants/**", group: "internal", position: "before" },
                         { pattern: "@/types/**", group: "internal", position: "before" },
-                        { pattern: "@/lib/**", group: "internal", position: "before" },
-                        { pattern: "@/api/**", group: "internal", position: "before" },
-                        { pattern: "@/stores/**", group: "internal", position: "before" },
-                        { pattern: "@/hooks/**", group: "internal", position: "before" },
-                        { pattern: "@/providers/**", group: "internal", position: "after" },
-                        { pattern: "@/routes/**", group: "internal", position: "after" },
-                        { pattern: "@/layouts/**", group: "internal", position: "after" },
-                        { pattern: "@/features/**", group: "internal", position: "after" },
-                        { pattern: "@/components/**", group: "internal", position: "after" },
+                        { pattern: "@lib/**", group: "internal", position: "before" },
+                        { pattern: "@features/**", group: "internal", position: "after" },
+                        { pattern: "@app/**", group: "internal", position: "after" },
+                        { pattern: "@layouts", group: "internal", position: "after" },
+                        { pattern: "@layouts/**", group: "internal", position: "after" },
+                        { pattern: "@components/**", group: "internal", position: "after" },
+                        { pattern: "@/**", group: "internal", position: "after" },
                     ],
                     pathGroupsExcludedImportTypes: ["react", "react-*"],
                     "newlines-between": "always",
