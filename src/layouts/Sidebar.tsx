@@ -2,8 +2,14 @@ import type { JSX } from "react";
 
 import { NavLink } from "react-router-dom";
 
-import { LayoutDashboard, Users, GraduationCap, BookOpen, Settings } from "lucide-react";
-
+import {
+    LayoutDashboard,
+    Users,
+    GraduationCap,
+    University,
+    BookOpen,
+    Settings,
+} from "lucide-react";
 
 import { APP_BRAND } from "@constants/app.constants";
 import { ROUTES } from "@constants/routes.constants";
@@ -37,11 +43,20 @@ export function Sidebar(): JSX.Element {
     );
 
     return (
-        <aside className="bg-sidebar flex h-full w-64 flex-col">
+        <aside className="text-sidebar-foreground flex h-full w-64 flex-col">
             {/* Brand */}
-            <div className="flex h-16 items-center gap-2 px-6">
-                <GraduationCap className="text-sidebar-primary h-7 w-7" />
-                <span className="text-sidebar-foreground text-lg font-bold">{APP_BRAND.NAME}</span>
+            <div className="flex h-16 items-center gap-3 px-5">
+                <div className="bg-sidebar-primary/15 ring-sidebar-primary/25 flex size-9 shrink-0 items-center justify-center rounded-xl shadow-sm ring-1 backdrop-blur-sm">
+                    <University className="text-sidebar-primary size-5" />
+                </div>
+                <div className="flex flex-col leading-none">
+                    <span className="text-sidebar-foreground text-base font-bold tracking-tight">
+                        {APP_BRAND.NAME}
+                    </span>
+                    <span className="text-sidebar-foreground/55 mt-1 text-[0.625rem] font-semibold tracking-[0.18em] uppercase">
+                        {APP_BRAND.SHORT_NAME}
+                    </span>
+                </div>
             </div>
 
             {/* Navigation */}
@@ -53,22 +68,41 @@ export function Sidebar(): JSX.Element {
                         end={item.path === ROUTES.DASHBOARD}
                         className={({ isActive }) =>
                             cn(
-                                "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200",
+                                "group nav-shine relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all duration-200 motion-reduce:hover:translate-x-0",
+                                "before:absolute before:inset-y-2 before:left-0 before:w-1 before:rounded-full before:transition-all before:duration-200",
                                 isActive
-                                    ? "bg-primary/8 text-primary before:bg-primary font-semibold before:absolute before:inset-y-1.5 before:left-0 before:w-1 before:rounded-full"
-                                    : "text-sidebar-foreground/60 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground font-medium",
+                                    ? "bg-sidebar-accent text-sidebar-foreground before:bg-sidebar-primary font-semibold before:scale-y-100"
+                                    : "text-sidebar-foreground/65 hover:text-sidebar-foreground font-medium before:scale-y-0 hover:translate-x-px",
                             )
                         }
                     >
-                        <item.icon className="h-4 w-4" />
-                        {item.label}
+                        {({ isActive }) => (
+                            <>
+                                <item.icon
+                                    className={cn(
+                                        "size-4 shrink-0 transition-all duration-200",
+                                        isActive
+                                            ? "text-sidebar-primary"
+                                            : "text-sidebar-foreground/70 group-hover:text-sidebar-foreground group-hover:scale-110 motion-reduce:group-hover:scale-100",
+                                    )}
+                                />
+                                <span
+                                    className={cn(
+                                        "transition-all duration-200",
+                                        isActive ? "text-sidebar-primary" : "text-current",
+                                    )}
+                                >
+                                    {item.label}
+                                </span>
+                            </>
+                        )}
                     </NavLink>
                 ))}
             </nav>
 
             {/* Footer */}
-            <div className="px-4 py-3">
-                <p className="text-sidebar-foreground/50 truncate text-xs">{APP_BRAND.COPYRIGHT}</p>
+            <div className="border-sidebar-border/60 border-t px-5 py-4">
+                <p className="text-sidebar-foreground/45 truncate text-xs">{APP_BRAND.COPYRIGHT}</p>
             </div>
         </aside>
     );

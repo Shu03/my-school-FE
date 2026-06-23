@@ -17,6 +17,12 @@ export const DashboardPage = lazy(() =>
 export const UsersPage = lazy(() =>
     import("@features/users/pages/UsersPage").then((m) => ({ default: m.UsersPage })),
 );
+export const UserCreatePage = lazy(() =>
+    import("@features/users/pages/UserCreatePage").then((m) => ({ default: m.UserCreatePage })),
+);
+export const UserEditPage = lazy(() =>
+    import("@features/users/pages/UserEditPage").then((m) => ({ default: m.UserEditPage })),
+);
 
 function PageLoader(): JSX.Element {
     return (

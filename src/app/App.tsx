@@ -4,12 +4,18 @@ import { RouterProvider } from "react-router-dom";
 
 import { AuthInitializer } from "@components/common/AuthInitializer";
 
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
 import { router } from "./router";
 
 export function App(): JSX.Element {
     return (
         <AuthInitializer>
-            <RouterProvider router={router} />
+            <TooltipProvider>
+                <RouterProvider router={router} />
+            </TooltipProvider>
+            <Toaster />
         </AuthInitializer>
     );
 }

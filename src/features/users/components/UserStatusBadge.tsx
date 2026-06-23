@@ -9,11 +9,11 @@ interface UserStatusBadgeProps {
 /** Visual indicator for a user's active/inactive account status. */
 export function UserStatusBadge({ isActive }: UserStatusBadgeProps): JSX.Element {
     return (
-        <Badge variant={isActive ? "secondary" : "outline"}>
+        <Badge variant={isActive ? "success" : "outline"}>
             <span
                 className={
                     isActive
-                        ? "bg-primary size-1.5 rounded-full"
+                        ? "bg-success size-1.5 rounded-full"
                         : "bg-muted-foreground size-1.5 rounded-full"
                 }
             />

@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 import type { JSX } from "react";
 
+import { useLocation, useNavigate } from "react-router-dom";
+
 import { AlertCircle } from "lucide-react";
 
+import { ROUTES, userEdit } from "@constants/routes.constants";
 import { USER_PAGINATION } from "@constants/users.constants";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 
-import { CreateUserDialog } from "../components/CreateUserDialog";
 import { DeactivateUserDialog } from "../components/DeactivateUserDialog";
-import { EditUserDialog } from "../components/EditUserDialog";
 import { TempPasswordDialog } from "../components/TempPasswordDialog";
 import { UserDetailsDialog } from "../components/UserDetailsDialog";
 import { UsersPagination } from "../components/UsersPagination";
@@ -26,7 +27,25 @@ import type { User, UserListParams } from "../types/user.types";
 
 const SEARCH_DEBOUNCE_MS = 350;
 
+/** Navigation state set by the create page after a user is created. */
+interface CreatedUserState {
+    createdUser: User;
+    tempPassword: string;
+}
+
+function isCreatedUserState(value: unknown): value is CreatedUserState {
+    return (
+        typeof value === "object" &&
+        value !== null &&
+        "createdUser" in value &&
+        "tempPassword" in value
+    );
+}
+
 export function UsersPage(): JSX.Element {
+    const navigate = useNavigate();
+    const location = useLocation();
+
     // Filters
     const [searchInput, setSearchInput] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -35,19 +54,30 @@ export function UsersPage(): JSX.Element {
     const [page, setPage] = useState<number>(USER_PAGINATION.DEFAULT_PAGE);
     const [limit, setLimit] = useState<number>(USER_PAGINATION.DEFAULT_LIMIT);
 
-    // Dialog state
-    const [createOpen, setCreateOpen] = useState(false);
-    const [tempPasswordOpen, setTempPasswordOpen] = useState(false);
-    const [createdUser, setCreatedUser] = useState<User | null>(null);
-    const [tempPassword, setTempPassword] = useState<string | null>(null);
-    const [editUser, setEditUser] = useState<User | null>(null);
-    const [editOpen, setEditOpen] = useState(false);
+    // Dialog state. The temp-password dialog is seeded from navigation state set by
+    // the create page (read once on mount) so it pops after a successful create.
+    const [tempPasswordOpen, setTempPasswordOpen] = useState(() =>
+        isCreatedUserState(location.state),
+    );
+    const [createdUser] = useState<User | null>(() =>
+        isCreatedUserState(location.state) ? location.state.createdUser : null,
+    );
+    const [tempPassword] = useState<string | null>(() =>
+        isCreatedUserState(location.state) ? location.state.tempPassword : null,
+    );
     const [viewUserId, setViewUserId] = useState<string | null>(null);
     const [viewOpen, setViewOpen] = useState(false);
     const [deactivateTarget, setDeactivateTarget] = useState<User | null>(null);
     const [deactivateOpen, setDeactivateOpen] = useState(false);
 
     const activateUser = useActivateUser();
+
+    // Clear the navigation state once consumed so a refresh doesn't reopen the dialog.
+    useEffect(() => {
+        if (isCreatedUserState(location.state)) {
+            navigate(ROUTES.USERS, { replace: true, state: null });
+        }
+    }, [location.state, navigate]);
 
     // Debounce search input; resetting to the first page happens here too.
     useEffect(() => {
@@ -85,16 +115,8 @@ export function UsersPage(): JSX.Element {
     const users = data?.data ?? [];
     const total = data?.total ?? 0;
 
-    function handleCreated(user: User, password: string): void {
-        setCreateOpen(false);
-        setCreatedUser(user);
-        setTempPassword(password);
-        setTempPasswordOpen(true);
-    }
-
     function handleEdit(user: User): void {
-        setEditUser(user);
-        setEditOpen(true);
+        navigate(userEdit(user.id));
     }
 
     function handleView(user: User): void {
@@ -113,13 +135,6 @@ export function UsersPage(): JSX.Element {
 
     return (
         <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-bold tracking-tight">Users</h1>
-                <p className="text-muted-foreground text-sm">
-                    Create and manage admin, teacher, and student accounts.
-                </p>
-            </div>
-
             <UsersToolbar
                 search={searchInput}
                 onSearchChange={setSearchInput}
@@ -127,7 +142,7 @@ export function UsersPage(): JSX.Element {
                 onRoleChange={handleRoleChange}
                 status={statusFilter}
                 onStatusChange={handleStatusChange}
-                onCreateClick={() => setCreateOpen(true)}
+                onCreateClick={() => navigate(ROUTES.USER_NEW)}
             />
 
             {isError ? (
@@ -165,18 +180,12 @@ export function UsersPage(): JSX.Element {
                 </>
             )}
 
-            <CreateUserDialog
-                open={createOpen}
-                onOpenChange={setCreateOpen}
-                onCreated={handleCreated}
-            />
             <TempPasswordDialog
                 open={tempPasswordOpen}
                 onOpenChange={setTempPasswordOpen}
                 user={createdUser}
                 tempPassword={tempPassword}
             />
-            <EditUserDialog open={editOpen} onOpenChange={setEditOpen} user={editUser} />
             <UserDetailsDialog open={viewOpen} onOpenChange={setViewOpen} userId={viewUserId} />
             <DeactivateUserDialog
                 open={deactivateOpen}

@@ -7,6 +7,8 @@ export const ROUTES = {
     CHANGE_PASSWORD: "/change-password",
     DASHBOARD: "/",
     USERS: "/users",
+    USER_NEW: "/users/new",
+    USER_EDIT: "/users/:id/edit",
     STUDENTS: "/students",
     CLASSES: "/classes",
     SETTINGS: "/settings",
@@ -14,3 +16,8 @@ export const ROUTES = {
 } as const;
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];
+
+/** Build the edit path for a specific user. */
+export function userEdit(id: string): string {
+    return `/users/${id}/edit`;
+}

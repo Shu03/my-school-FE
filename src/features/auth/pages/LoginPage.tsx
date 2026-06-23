@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertCircle, Eye, EyeOff, GraduationCap } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, University } from "lucide-react";
 
 import { APP_BRAND } from "@constants/app.constants";
 import { HTTP_STATUS } from "@constants/httpStatus.constants";
@@ -22,7 +22,6 @@ import { loginSchema } from "../schemas/login.schema";
 import type { LoginFormValues } from "../schemas/login.schema";
 import { useAuthStore } from "../store/auth.store";
 import { isForcePasswordChange } from "../types/auth.types";
-
 
 /**
  * Extract error message from API error response
@@ -108,7 +107,7 @@ export function LoginPage(): JSX.Element {
                 {/* Brand mark */}
                 <div className="mb-14 flex flex-col items-center gap-3">
                     <div className="bg-primary text-primary-foreground shadow-primary/50 flex size-12 items-center justify-center rounded-xl shadow-lg">
-                        <GraduationCap className="size-6" />
+                        <University className="size-6" />
                     </div>
                     <span className="text-xl font-bold tracking-tight">{APP_BRAND.SHORT_NAME}</span>
                 </div>

@@ -4,20 +4,21 @@
 @import "@fontsource-variable/nunito-sans";
 
 /**
- * Theme Color Palettes (Premium Minimal Design)
- * 
- * CURRENT: Copper (warm, reddish-brown, orange-brown hue ~28°)
- * - Primary: oklch(0.52 0.15 28) light mode, oklch(0.50 0.15 28) dark mode
- * - All semantic tokens (secondary, muted, accent, border) now inherit copper tones
- * - Status indicator (UserStatusBadge) uses primary copper instead of hardcoded green
- * - Password policy feedback uses primary copper instead of hardcoded green
- * 
- * ALTERNATIVE: Olive (earthy, warm, yellowish-brown hue ~93°)
- * To switch back to Olive, replace hue values from 28 → 93 in :root and .dark sections:
- * - Light mode primary: oklch(0.52 0.15 28) instead of oklch(0.62 0.11 93)
- * - Dark mode primary: oklch(0.50 0.15 28) instead of oklch(0.54 0.11 93)
- * - Adjust chroma values slightly: Copper uses ~0.15 for higher saturation
- * - Update all token definitions with new hue angle and chroma
+ * Theme Color System — Burnt Orange accent (hue ~40°)
+ *
+ * Brand ramp (sourced from brand palette, expressed in OKLCh):
+ *   50 #FEF5EE · 100 #FEE8D6 · 200 #FBCEAD · 300 #F79E63 · 400 #F47F43
+ *   500 #F15D1E · 600 #E24314 · 700 #BC3012 · 800 #952817 · 900 #782416 · 950 #410F09
+ *
+ * Accent discipline (one accent, locked across the whole app):
+ * - --primary is a tuned deep burnt-orange (~oklch 0.58) so WHITE --primary-foreground
+ *   clears WCAG AA 4.5:1 on solid button fills (text-sm font-medium). #F15D1E alone is
+ *   only ~3.2:1 with white, so the bright 500 shade is used for focus rings, the sidebar
+ *   active accent, charts, links and tinted backgrounds — never as a solid button fill.
+ * - Neutrals are warmed (low-chroma hue ~50-60) to harmonise with the orange.
+ *
+ * Semantic STATE tokens (not a second accent): --success (green), --warning (amber),
+ * --info (blue). These replace the previously hard-coded emerald / green values.
  */
 
 @custom-variant dark (&:is(.dark *));
@@ -25,6 +26,9 @@
 @theme inline {
     --font-heading: var(--font-sans);
     --font-sans: "Nunito Sans Variable", sans-serif;
+    --color-canvas: var(--canvas);
+    --color-sidebar-light: var(--sidebar-light);
+    --color-sidebar-dark: var(--sidebar-dark);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -42,6 +46,12 @@
     --color-input: var(--input);
     --color-border: var(--border);
     --color-destructive: var(--destructive);
+    --color-success: var(--success);
+    --color-success-foreground: var(--success-foreground);
+    --color-warning: var(--warning);
+    --color-warning-foreground: var(--warning-foreground);
+    --color-info: var(--info);
+    --color-info-foreground: var(--info-foreground);
     --color-accent-foreground: var(--accent-foreground);
     --color-accent: var(--accent);
     --color-muted-foreground: var(--muted-foreground);
@@ -67,73 +77,100 @@
 
 :root {
     --background: oklch(1 0 0);
-    --foreground: oklch(0.148 0.004 228.8);
+    --foreground: oklch(0.2 0.014 50);
+    /* App shell canvas — a soft warm off-white so the white content card lifts */
+    --canvas: oklch(0.97 0.012 60);
     --card: oklch(1 0 0);
-    --card-foreground: oklch(0.148 0.004 228.8);
+    --card-foreground: oklch(0.2 0.014 50);
     --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.148 0.004 228.8);
-    /* Olive palette (earthy, warm, yellowish-brown) */
-    --primary: oklch(0.62 0.11 93);
+    --popover-foreground: oklch(0.2 0.014 50);
+    /* Burnt orange — tuned deep shade so white foreground passes WCAG AA on solid fills */
+    --primary: oklch(0.58 0.19 40);
     --primary-foreground: oklch(1 0 0);
-    --secondary: oklch(0.95 0.01 93);
-    --secondary-foreground: oklch(0.26 0.004 93);
-    --muted: oklch(0.88 0.02 93);
-    --muted-foreground: oklch(0.45 0.02 93);
-    --accent: oklch(0.75 0.05 93);
-    --accent-foreground: oklch(0.26 0.004 93);
+    --secondary: oklch(0.955 0.012 60);
+    --secondary-foreground: oklch(0.3 0.02 45);
+    --muted: oklch(0.93 0.012 60);
+    --muted-foreground: oklch(0.5 0.025 48);
+    --accent: oklch(0.94 0.03 55);
+    --accent-foreground: oklch(0.32 0.05 42);
     --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.91 0.02 93);
-    --input: oklch(0.91 0.02 93);
-    --ring: oklch(0.75 0.04 93);
-    --chart-1: oklch(0.88 0.08 93); /* light olive */
-    --chart-2: oklch(0.72 0.09 93); /* medium olive */
-    --chart-3: oklch(0.62 0.11 93); /* primary olive */
-    --chart-4: oklch(0.5 0.08 93); /* deep olive */
-    --chart-5: oklch(0.4 0.06 93); /* muted olive */
+    --border: oklch(0.9 0.012 60);
+    --input: oklch(0.9 0.012 60);
+    /* Focus ring uses the bright brand 500 shade */
+    --ring: oklch(0.664 0.195 40);
+    /* Semantic state tokens (not a second accent) — dark enough to read on /12 tints */
+    --success: oklch(0.5 0.13 155);
+    --success-foreground: oklch(1 0 0);
+    --warning: oklch(0.55 0.13 65);
+    --warning-foreground: oklch(1 0 0);
+    --info: oklch(0.52 0.16 250);
+    --info-foreground: oklch(1 0 0);
+    --chart-1: oklch(0.8 0.09 50); /* light orange */
+    --chart-2: oklch(0.71 0.15 44); /* warm orange */
+    --chart-3: oklch(0.664 0.195 40); /* brand orange 500 */
+    --chart-4: oklch(0.525 0.182 35); /* deep orange 700 */
+    --chart-5: oklch(0.42 0.13 34); /* burnt orange 800 */
     --radius: 0.45rem;
-    --sidebar: oklch(0.96 0.01 93);
-    --sidebar-foreground: oklch(0.148 0.004 228.8);
-    --sidebar-primary: oklch(0.62 0.11 93);
+    /* Soft warm off-white chrome — low color contrast against the white content card */
+    --sidebar: oklch(0.96 0.014 58);
+    /* Gradient shades — lighter at the outer edge, a touch deeper toward the content */
+    --sidebar-light: oklch(0.975 0.01 60);
+    --sidebar-dark: oklch(0.945 0.016 56);
+    --sidebar-foreground: oklch(0.3 0.02 45);
+    --sidebar-primary: oklch(0.58 0.19 40);
     --sidebar-primary-foreground: oklch(1 0 0);
-    --sidebar-accent: oklch(0.88 0.02 93);
-    --sidebar-accent-foreground: oklch(0.26 0.004 93);
-    --sidebar-border: oklch(0.91 0.02 93);
-    --sidebar-ring: oklch(0.75 0.04 93);
+    --sidebar-accent: oklch(0.93 0.025 52);
+    --sidebar-accent-foreground: oklch(0.3 0.02 45);
+    --sidebar-border: oklch(0.2 0.02 50 / 10%);
+    --sidebar-ring: oklch(0.664 0.195 40);
 }
 
 .dark {
-    --background: oklch(0.148 0.004 228.8);
-    --foreground: oklch(0.987 0.002 197.1);
-    --card: oklch(0.218 0.008 223.9);
-    --card-foreground: oklch(0.987 0.002 197.1);
-    --popover: oklch(0.218 0.008 223.9);
-    --popover-foreground: oklch(0.987 0.002 197.1);
-    /* Olive palette (earthy, warm, yellowish-brown) */
-    --primary: oklch(0.54 0.11 93);
+    --background: oklch(0.16 0.008 50);
+    --foreground: oklch(0.97 0.005 60);
+    /* App shell canvas — darker than the card so the content panel lifts */
+    --canvas: oklch(0.13 0.008 45);
+    --card: oklch(0.21 0.01 45);
+    --card-foreground: oklch(0.97 0.005 60);
+    --popover: oklch(0.21 0.01 45);
+    --popover-foreground: oklch(0.97 0.005 60);
+    /* Burnt orange — same AA-safe deep shade as light mode for white foreground */
+    --primary: oklch(0.58 0.19 40);
     --primary-foreground: oklch(1 0 0);
-    --secondary: oklch(0.28 0.01 93);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.4 0.03 93);
-    --muted-foreground: oklch(0.7 0.03 93);
-    --accent: oklch(0.48 0.08 93);
-    --accent-foreground: oklch(0.987 0.002 197.1);
+    --secondary: oklch(0.27 0.012 45);
+    --secondary-foreground: oklch(0.97 0.005 60);
+    --muted: oklch(0.32 0.012 45);
+    --muted-foreground: oklch(0.72 0.02 55);
+    --accent: oklch(0.34 0.04 45);
+    --accent-foreground: oklch(0.97 0.005 60);
     --destructive: oklch(0.704 0.191 22.216);
     --border: oklch(1 0 0 / 10%);
     --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.6 0.04 93);
-    --chart-1: oklch(0.68 0.09 93); /* lighter olive for dark bg */
-    --chart-2: oklch(0.58 0.1 93); /* medium olive */
-    --chart-3: oklch(0.54 0.11 93); /* primary olive (matches --primary) */
-    --chart-4: oklch(0.44 0.08 93); /* deep olive */
-    --chart-5: oklch(0.32 0.06 93); /* muted olive */
-    --sidebar: oklch(0.218 0.008 223.9);
-    --sidebar-foreground: oklch(0.987 0.002 197.1);
-    --sidebar-primary: oklch(0.54 0.11 93);
-    --sidebar-primary-foreground: oklch(1 0 0);
-    --sidebar-accent: oklch(0.4 0.03 93);
-    --sidebar-accent-foreground: oklch(0.987 0.002 197.1);
+    --ring: oklch(0.62 0.17 42);
+    /* Semantic state tokens (not a second accent) */
+    --success: oklch(0.68 0.14 150);
+    --success-foreground: oklch(0.16 0.01 150);
+    --warning: oklch(0.78 0.14 75);
+    --warning-foreground: oklch(0.24 0.03 75);
+    --info: oklch(0.66 0.13 240);
+    --info-foreground: oklch(0.15 0.01 240);
+    --chart-1: oklch(0.8 0.1 50); /* light orange */
+    --chart-2: oklch(0.71 0.15 44); /* warm orange */
+    --chart-3: oklch(0.664 0.195 40); /* brand orange 500 */
+    --chart-4: oklch(0.55 0.17 36); /* deep orange */
+    --chart-5: oklch(0.45 0.14 34); /* burnt orange */
+    /* Brand-tinted sidebar — deep burnt-orange, distinct from the shell canvas */
+    --sidebar: oklch(0.24 0.05 40);
+    /* Gradient shades — lighter at the outer edge, darker toward the content */
+    --sidebar-light: oklch(0.3 0.055 42);
+    --sidebar-dark: oklch(0.17 0.045 38);
+    --sidebar-foreground: oklch(0.97 0.015 60);
+    --sidebar-primary: oklch(0.75 0.16 50);
+    --sidebar-primary-foreground: oklch(0.22 0.05 40);
+    --sidebar-accent: oklch(0.32 0.05 42);
+    --sidebar-accent-foreground: oklch(0.98 0.008 60);
     --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.6 0.04 93);
+    --sidebar-ring: oklch(0.76 0.13 48);
 }
 
 @layer base {
@@ -146,4 +183,58 @@
     html {
         @apply font-sans;
     }
+}
+
+/* ── Texture utilities ───────────────────────────────────────────────────
+ * Subtle, self-scaling surface treatments that read as tactile without
+ * fighting the flat token palette. Both layer OVER an element's existing
+ * background-color, so they compose with bg-card / bg-primary / etc.
+ */
+
+/* Fine fractal grain, blended soft-light so it only lifts/darkens a few % */
+@utility texture-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E");
+    background-size: 120px 120px;
+    background-blend-mode: soft-light;
+}
+
+/* Convex top highlight + base shade for solid (e.g. primary) surfaces */
+@utility texture-sheen {
+    background-image: linear-gradient(
+        to bottom,
+        color-mix(in oklch, white 16%, transparent),
+        transparent 48%,
+        color-mix(in oklch, black 8%, transparent)
+    );
+}
+
+/* Gradient "shine" border that fades in on hover (sidebar nav items).
+ * A 1px gradient ring drawn with a mask so only the border shows. */
+.nav-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+        135deg,
+        color-mix(in oklch, var(--sidebar-foreground) 45%, transparent),
+        transparent 45%,
+        transparent 55%,
+        color-mix(in oklch, var(--sidebar-foreground) 22%, transparent)
+    );
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 200ms ease;
+    pointer-events: none;
+}
+.nav-shine:hover::after {
+    opacity: 1;
 }

@@ -5,7 +5,15 @@ import { ROUTES } from "@constants/routes.constants";
 import { Role } from "@/types/api";
 
 import { ProtectedRoute, PublicOnlyRoute, RoleGuard, ChangePasswordRoute } from "./guards";
-import { ChangePasswordPage, DashboardPage, Lazy, LoginPage, UsersPage } from "./lazy";
+import {
+    ChangePasswordPage,
+    DashboardPage,
+    Lazy,
+    LoginPage,
+    UserCreatePage,
+    UserEditPage,
+    UsersPage,
+} from "./lazy";
 import { NotFoundPage } from "./NotFoundPage";
 
 export const router = createBrowserRouter([
@@ -61,6 +69,22 @@ export const router = createBrowserRouter([
                         element: (
                             <Lazy>
                                 <UsersPage />
+                            </Lazy>
+                        ),
+                    },
+                    {
+                        path: ROUTES.USER_NEW,
+                        element: (
+                            <Lazy>
+                                <UserCreatePage />
+                            </Lazy>
+                        ),
+                    },
+                    {
+                        path: ROUTES.USER_EDIT,
+                        element: (
+                            <Lazy>
+                                <UserEditPage />
                             </Lazy>
                         ),
                     },
