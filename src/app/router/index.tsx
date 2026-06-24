@@ -1,15 +1,25 @@
 import { createBrowserRouter } from "react-router-dom";
 
+import { PERMISSIONS } from "@constants/permissions.constants";
 import { ROUTES } from "@constants/routes.constants";
 
 import { Role } from "@/types/api";
 
-import { ProtectedRoute, PublicOnlyRoute, RoleGuard, ChangePasswordRoute } from "./guards";
+import {
+    ProtectedRoute,
+    PublicOnlyRoute,
+    RoleGuard,
+    ChangePasswordRoute,
+    RoleOrPermissionGuard,
+} from "./guards";
 import {
     ChangePasswordPage,
     DashboardPage,
     Lazy,
     LoginPage,
+    AcademicYearsPage,
+    AcademicYearTermsPage,
+    ClassesPage,
     UserCreatePage,
     UserEditPage,
     UsersPage,
@@ -85,6 +95,52 @@ export const router = createBrowserRouter([
                         element: (
                             <Lazy>
                                 <UserEditPage />
+                            </Lazy>
+                        ),
+                    },
+                ],
+            },
+            {
+                element: (
+                    <RoleOrPermissionGuard
+                        allowedRoles={[Role.ADMIN]}
+                        permissionRole={Role.TEACHER}
+                        requiredPermission={PERMISSIONS.ACADEMIC_YEAR_MANAGE}
+                    />
+                ),
+                children: [
+                    {
+                        path: ROUTES.ACADEMIC_YEARS,
+                        element: (
+                            <Lazy>
+                                <AcademicYearsPage />
+                            </Lazy>
+                        ),
+                    },
+                    {
+                        path: ROUTES.ACADEMIC_YEAR_TERMS,
+                        element: (
+                            <Lazy>
+                                <AcademicYearTermsPage />
+                            </Lazy>
+                        ),
+                    },
+                ],
+            },
+            {
+                element: (
+                    <RoleOrPermissionGuard
+                        allowedRoles={[Role.ADMIN]}
+                        permissionRole={Role.TEACHER}
+                        requiredPermission={PERMISSIONS.CLASS_MANAGE}
+                    />
+                ),
+                children: [
+                    {
+                        path: ROUTES.CLASSES,
+                        element: (
+                            <Lazy>
+                                <ClassesPage />
                             </Lazy>
                         ),
                     },

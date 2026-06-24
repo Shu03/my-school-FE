@@ -9,14 +9,17 @@ import {
     University,
     BookOpen,
     Settings,
+    CalendarRange,
 } from "lucide-react";
 
 import { APP_BRAND } from "@constants/app.constants";
+import { PERMISSIONS } from "@constants/permissions.constants";
 import { ROUTES } from "@constants/routes.constants";
 
 import { Role } from "@/types/api";
 
-import { useAuthStore } from "@features/auth";
+import type { User } from "@features/auth";
+import { hasPermission, useAuthStore } from "@features/auth";
 
 import { cn } from "@/lib/utils";
 
@@ -25,13 +28,48 @@ interface NavItem {
     path: string;
     icon: React.ComponentType<{ className?: string }>;
     roles?: Role[];
+    canView?: (user: User | null) => boolean;
+}
+
+function canAccessAcademicYears(user: User | null): boolean {
+    if (!user) {
+        return false;
+    }
+
+    return (
+        user.role === Role.ADMIN ||
+        (user.role === Role.TEACHER &&
+            hasPermission(user.permissions, PERMISSIONS.ACADEMIC_YEAR_MANAGE))
+    );
+}
+
+function canAccessClasses(user: User | null): boolean {
+    if (!user) {
+        return false;
+    }
+
+    return (
+        user.role === Role.ADMIN ||
+        (user.role === Role.TEACHER && hasPermission(user.permissions, PERMISSIONS.CLASS_MANAGE))
+    );
 }
 
 const navItems: NavItem[] = [
     { label: "Dashboard", path: ROUTES.DASHBOARD, icon: LayoutDashboard },
     { label: "Users", path: ROUTES.USERS, icon: Users, roles: [Role.ADMIN] },
+    {
+        label: "Academic Years",
+        path: ROUTES.ACADEMIC_YEARS,
+        icon: CalendarRange,
+        canView: canAccessAcademicYears,
+    },
     { label: "Students", path: ROUTES.STUDENTS, icon: GraduationCap },
-    { label: "Classes", path: ROUTES.CLASSES, icon: BookOpen },
+    {
+        label: "Classes",
+        path: ROUTES.CLASSES,
+        icon: BookOpen,
+        canView: canAccessClasses,
+    },
     { label: "Settings", path: ROUTES.SETTINGS, icon: Settings, roles: [Role.ADMIN] },
 ];
 
@@ -39,7 +77,9 @@ export function Sidebar(): JSX.Element {
     const user = useAuthStore((s) => s.user);
 
     const visibleItems = navItems.filter(
-        (item) => !item.roles || (user && item.roles.includes(user.role)),
+        (item) =>
+            (!item.roles || (user && item.roles.includes(user.role))) &&
+            (!item.canView || item.canView(user)),
     );
 
     return (

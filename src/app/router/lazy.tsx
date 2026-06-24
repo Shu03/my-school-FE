@@ -23,6 +23,21 @@ export const UserCreatePage = lazy(() =>
 export const UserEditPage = lazy(() =>
     import("@features/users/pages/UserEditPage").then((m) => ({ default: m.UserEditPage })),
 );
+export const AcademicYearsPage = lazy(() =>
+    import("@features/academic-years/pages/AcademicYearsPage").then((m) => ({
+        default: m.AcademicYearsPage,
+    })),
+);
+export const AcademicYearTermsPage = lazy(() =>
+    import("@features/academic-years/pages/AcademicYearTermsPage").then((m) => ({
+        default: m.AcademicYearTermsPage,
+    })),
+);
+export const ClassesPage = lazy(() =>
+    import("@features/classes/pages/ClassesPage").then((m) => ({
+        default: m.ClassesPage,
+    })),
+);
 
 function PageLoader(): JSX.Element {
     return (

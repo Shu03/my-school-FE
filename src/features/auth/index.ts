@@ -16,6 +16,9 @@ export { useAuthInitializer } from "./hooks/useAuthInitializer";
 export { useProactiveTokenRefresh } from "./hooks/useProactiveTokenRefresh";
 export { useSessionExpiredListener } from "./hooks/useSessionExpiredListener";
 
+// Permission helpers
+export { hasAnyPermission, hasPermission } from "./lib/permissions";
+
 // Domain types & guards
 export { isForcePasswordChange } from "./types/auth.types";
 export type {

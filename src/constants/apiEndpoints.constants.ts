@@ -19,4 +19,21 @@ export const API_ENDPOINTS = {
         activate: (id: string) => `/users/${id}/activate`,
         deactivate: (id: string) => `/users/${id}/deactivate`,
     },
+    ACADEMIC_YEARS: {
+        BASE: "/academic-years",
+        CURRENT: "/academic-years/current",
+        byId: (id: string) => `/academic-years/${id}`,
+        setCurrent: (id: string) => `/academic-years/${id}/set-current`,
+        terms: (id: string) => `/academic-years/${id}/terms`,
+        termById: (id: string, termId: string) => `/academic-years/${id}/terms/${termId}`,
+    },
+    CLASSES: {
+        BASE: "/classes",
+        byId: (id: string) => `/classes/${id}`,
+        assignTeacher: (id: string) => `/classes/${id}/assign-teacher`,
+        removeTeacher: (id: string) => `/classes/${id}/remove-teacher`,
+    },
+    TEACHERS: {
+        BASE: "/teachers",
+    },
 } as const;
