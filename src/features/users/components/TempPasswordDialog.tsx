@@ -23,6 +23,7 @@ interface TempPasswordDialogProps {
     onOpenChange: (open: boolean) => void;
     user: User | null;
     tempPassword: string | null;
+    mode?: "created" | "reset";
 }
 
 /**
@@ -34,6 +35,7 @@ export function TempPasswordDialog({
     onOpenChange,
     user,
     tempPassword,
+    mode = "created",
 }: TempPasswordDialogProps): JSX.Element | null {
     const [copied, setCopied] = useState(false);
 
@@ -60,11 +62,13 @@ export function TempPasswordDialog({
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <KeyRound className="size-4" />
-                        Account created
+                        {mode === "reset" ? "Password reset" : "Account created"}
                     </DialogTitle>
                     <DialogDescription>
-                        {ROLE_LABELS[user.role]} {user.firstName} {user.lastName} can sign in with
-                        their mobile number and this temporary password.
+                        {ROLE_LABELS[user.role]} {user.firstName} {user.lastName}
+                        {mode === "reset"
+                            ? " can sign in with their mobile number and this new temporary password."
+                            : " can sign in with their mobile number and this temporary password."}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -91,8 +95,9 @@ export function TempPasswordDialog({
 
                     <Alert>
                         <AlertDescription>
-                            This password is shown only once. Share it securely — the user will be
-                            asked to set a new password on first sign-in.
+                            {mode === "reset"
+                                ? "This password is shown only once. Share it securely — the user will be required to set a new password at next sign-in."
+                                : "This password is shown only once. Share it securely — the user will be asked to set a new password on first sign-in."}
                         </AlertDescription>
                     </Alert>
                 </div>

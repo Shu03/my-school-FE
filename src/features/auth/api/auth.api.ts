@@ -7,6 +7,7 @@ import type {
     LoginRequest,
     LoginResponse,
     LoginSuccessResponse,
+    ResetPasswordResponse,
     User,
 } from "../types/auth.types";
 
@@ -45,8 +46,8 @@ export async function changePassword(
     });
 }
 
-export async function resetPassword(userId: string): Promise<void> {
-    await apiFetch(API_ENDPOINTS.AUTH.RESET_PASSWORD, {
+export async function resetPassword(userId: string): Promise<ResetPasswordResponse> {
+    return apiFetch<ResetPasswordResponse>(API_ENDPOINTS.AUTH.RESET_PASSWORD, {
         method: "POST",
         body: JSON.stringify({ userId }),
     });

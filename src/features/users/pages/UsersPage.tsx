@@ -4,6 +4,7 @@ import type { JSX } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 
 import { ROUTES, userEdit } from "@constants/routes.constants";
 import { USER_PAGINATION } from "@constants/users.constants";
@@ -22,7 +23,8 @@ import {
     type RoleFilter,
     type StatusFilter,
 } from "../components/UsersToolbar";
-import { useActivateUser, useUsersList } from "../hooks/useUsers";
+import { useActivateUser, useResetUserPassword, useUsersList } from "../hooks/useUsers";
+import { getUserErrorMessage } from "../lib/errors";
 import type { User, UserListParams } from "../types/user.types";
 
 const SEARCH_DEBOUNCE_MS = 350;
@@ -69,8 +71,13 @@ export function UsersPage(): JSX.Element {
     const [viewOpen, setViewOpen] = useState(false);
     const [deactivateTarget, setDeactivateTarget] = useState<User | null>(null);
     const [deactivateOpen, setDeactivateOpen] = useState(false);
+    const [resetTarget, setResetTarget] = useState<User | null>(null);
+    const [resetTempPassword, setResetTempPassword] = useState<string | null>(null);
+    const [resetPasswordOpen, setResetPasswordOpen] = useState(false);
+    const [resetPasswordUserId, setResetPasswordUserId] = useState<string | null>(null);
 
     const activateUser = useActivateUser();
+    const resetUserPassword = useResetUserPassword();
 
     // Clear the navigation state once consumed so a refresh doesn't reopen the dialog.
     useEffect(() => {
@@ -133,6 +140,20 @@ export function UsersPage(): JSX.Element {
         activateUser.mutate(user.id);
     }
 
+    async function handleResetPassword(user: User): Promise<void> {
+        setResetPasswordUserId(user.id);
+        try {
+            const result = await resetUserPassword.mutateAsync({ userId: user.id });
+            setResetTarget(user);
+            setResetTempPassword(result.tempPassword);
+            setResetPasswordOpen(true);
+        } catch (error) {
+            toast.error(getUserErrorMessage(error));
+        } finally {
+            setResetPasswordUserId(null);
+        }
+    }
+
     return (
         <div className="flex flex-col gap-6">
             <UsersToolbar
@@ -165,10 +186,12 @@ export function UsersPage(): JSX.Element {
                     <UsersTable
                         users={users}
                         isLoading={isLoading}
+                        resetPasswordUserId={resetPasswordUserId}
                         onView={handleView}
                         onEdit={handleEdit}
                         onActivate={handleActivate}
                         onDeactivate={handleDeactivate}
+                        onResetPassword={(user) => void handleResetPassword(user)}
                     />
                     <UsersPagination
                         page={page}
@@ -186,7 +209,23 @@ export function UsersPage(): JSX.Element {
                 user={createdUser}
                 tempPassword={tempPassword}
             />
-            <UserDetailsDialog open={viewOpen} onOpenChange={setViewOpen} userId={viewUserId} />
+            <TempPasswordDialog
+                open={resetPasswordOpen}
+                onOpenChange={setResetPasswordOpen}
+                user={resetTarget}
+                tempPassword={resetTempPassword}
+                mode="reset"
+            />
+            <UserDetailsDialog
+                open={viewOpen}
+                onOpenChange={setViewOpen}
+                userId={viewUserId}
+                resetPasswordUserId={resetPasswordUserId}
+                onEdit={handleEdit}
+                onResetPassword={handleResetPassword}
+                onActivate={handleActivate}
+                onDeactivate={handleDeactivate}
+            />
             <DeactivateUserDialog
                 open={deactivateOpen}
                 onOpenChange={setDeactivateOpen}

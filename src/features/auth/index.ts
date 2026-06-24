@@ -8,6 +8,9 @@
 // Store
 export { useAuthStore } from "./store/auth.store";
 
+// API
+export { resetPassword } from "./api/auth.api";
+
 // App-shell bootstrap hooks
 export { useAuthInitializer } from "./hooks/useAuthInitializer";
 export { useProactiveTokenRefresh } from "./hooks/useProactiveTokenRefresh";
@@ -24,5 +27,6 @@ export type {
     RefreshRequest,
     RefreshResponse,
     ResetPasswordRequest,
+    ResetPasswordResponse,
     User,
 } from "./types/auth.types";

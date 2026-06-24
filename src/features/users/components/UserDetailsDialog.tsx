@@ -1,12 +1,13 @@
 import type { JSX, ReactNode } from "react";
 
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Ban, CheckCircle2, KeyRound, Pencil } from "lucide-react";
 
 import { ROLE_LABELS } from "@constants/users.constants";
 
 import { Role } from "@/types/api";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
@@ -15,10 +16,11 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { useUser } from "../hooks/useUsers";
 import { formatDate, formatDateTime } from "../lib/format";
-import type { UserWithProfiles } from "../types/user.types";
+import type { User, UserWithProfiles } from "../types/user.types";
 
 import { UserStatusBadge } from "./UserStatusBadge";
 
@@ -26,6 +28,11 @@ interface UserDetailsDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     userId: string | null;
+    resetPasswordUserId?: string | null;
+    onEdit?: (user: User) => void;
+    onResetPassword?: (user: User) => void;
+    onActivate?: (user: User) => void;
+    onDeactivate?: (user: User) => void;
 }
 
 function Field({
@@ -40,7 +47,7 @@ function Field({
     return (
         <div className={span ? "col-span-2" : undefined}>
             <dt className="text-muted-foreground text-xs">{label}</dt>
-            <dd className="mt-1 text-sm font-medium break-words">{children}</dd>
+            <dd className="wrap-break-words mt-1 text-sm font-medium">{children}</dd>
         </div>
     );
 }
@@ -63,6 +70,11 @@ export function UserDetailsDialog({
     open,
     onOpenChange,
     userId,
+    resetPasswordUserId,
+    onEdit,
+    onResetPassword,
+    onActivate,
+    onDeactivate,
 }: UserDetailsDialogProps): JSX.Element {
     const { data: user, isLoading, isError } = useUser(open ? userId : null);
 
@@ -91,13 +103,36 @@ export function UserDetailsDialog({
                     </div>
                 )}
 
-                {user && <UserDetailsBody user={user} />}
+                {user && (
+                    <UserDetailsBody
+                        user={user}
+                        resetPasswordUserId={resetPasswordUserId}
+                        onEdit={onEdit}
+                        onResetPassword={onResetPassword}
+                        onActivate={onActivate}
+                        onDeactivate={onDeactivate}
+                    />
+                )}
             </DialogContent>
         </Dialog>
     );
 }
 
-function UserDetailsBody({ user }: { user: UserWithProfiles }): JSX.Element {
+function UserDetailsBody({
+    user,
+    resetPasswordUserId,
+    onEdit,
+    onResetPassword,
+    onActivate,
+    onDeactivate,
+}: {
+    user: UserWithProfiles;
+    resetPasswordUserId?: string | null;
+    onEdit?: (user: User) => void;
+    onResetPassword?: (user: User) => void;
+    onActivate?: (user: User) => void;
+    onDeactivate?: (user: User) => void;
+}): JSX.Element {
     const subtitle = user.email ?? user.mobileNumber;
 
     return (
@@ -169,6 +204,84 @@ function UserDetailsBody({ user }: { user: UserWithProfiles }): JSX.Element {
                     <p className="text-muted-foreground text-sm">Full administrative access.</p>
                 )}
             </div>
+
+            {/* Action Footer */}
+            {(onEdit || onResetPassword || onActivate || onDeactivate) && (
+                <div className="border-border/60 bg-muted/20 flex items-center justify-end gap-2 border-t px-6 py-4">
+                    {onResetPassword && (
+                        <Tooltip>
+                            <TooltipTrigger asChild className="cursor-pointer">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    disabled={resetPasswordUserId === user.id}
+                                    aria-label={`Reset password for ${user.firstName} ${user.lastName}`}
+                                    className="text-warning hover:bg-warning/10 hover:text-warning"
+                                    onClick={() => onResetPassword(user)}
+                                >
+                                    {resetPasswordUserId === user.id ? (
+                                        <Spinner className="size-4" />
+                                    ) : (
+                                        <KeyRound className="size-4" />
+                                    )}
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Reset password</TooltipContent>
+                        </Tooltip>
+                    )}
+
+                    {onEdit && (
+                        <Tooltip>
+                            <TooltipTrigger asChild className="cursor-pointer">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    aria-label={`Edit ${user.firstName} ${user.lastName}`}
+                                    className="text-info hover:bg-info/10 hover:text-info"
+                                    onClick={() => onEdit(user)}
+                                >
+                                    <Pencil className="size-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Edit</TooltipContent>
+                        </Tooltip>
+                    )}
+
+                    {user.isActive
+                        ? onDeactivate && (
+                              <Tooltip>
+                                  <TooltipTrigger asChild className="cursor-pointer">
+                                      <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          aria-label={`Deactivate ${user.firstName} ${user.lastName}`}
+                                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                          onClick={() => onDeactivate(user)}
+                                      >
+                                          <Ban className="size-4" />
+                                      </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Deactivate</TooltipContent>
+                              </Tooltip>
+                          )
+                        : onActivate && (
+                              <Tooltip>
+                                  <TooltipTrigger asChild>
+                                      <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          aria-label={`Activate ${user.firstName} ${user.lastName}`}
+                                          className="text-success hover:bg-success/10 hover:text-success"
+                                          onClick={() => onActivate(user)}
+                                      >
+                                          <CheckCircle2 className="size-4" />
+                                      </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Activate</TooltipContent>
+                              </Tooltip>
+                          )}
+                </div>
+            )}
         </>
     );
 }

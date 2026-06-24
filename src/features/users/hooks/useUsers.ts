@@ -6,6 +6,9 @@ import {
     type UseQueryResult,
 } from "@tanstack/react-query";
 
+import { resetPassword as resetUserPassword } from "@features/auth";
+import type { ResetPasswordResponse } from "@features/auth";
+
 import {
     activateUser,
     createAdmin,
@@ -129,6 +132,21 @@ export function useDeactivateUser(): UseMutationResult<User, Error, string> {
         onSuccess: (user) => {
             void queryClient.invalidateQueries({ queryKey: usersKeys.lists() });
             void queryClient.invalidateQueries({ queryKey: usersKeys.detail(user.id) });
+        },
+    });
+}
+
+export function useResetUserPassword(): UseMutationResult<
+    ResetPasswordResponse,
+    Error,
+    { userId: string }
+> {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ userId }) => resetUserPassword(userId),
+        onSuccess: (_response, variables) => {
+            void queryClient.invalidateQueries({ queryKey: usersKeys.lists() });
+            void queryClient.invalidateQueries({ queryKey: usersKeys.detail(variables.userId) });
         },
     });
 }

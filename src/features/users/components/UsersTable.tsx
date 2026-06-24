@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 
-import { Ban, CheckCircle2, Pencil } from "lucide-react";
+import { Ban, CheckCircle2, KeyRound, Pencil } from "lucide-react";
 
 import { ROLE_LABELS } from "@constants/users.constants";
 
@@ -26,19 +26,23 @@ import { UserStatusBadge } from "./UserStatusBadge";
 interface UsersTableProps {
     users: User[];
     isLoading: boolean;
+    resetPasswordUserId: string | null;
     onView: (user: User) => void;
     onEdit: (user: User) => void;
     onActivate: (user: User) => void;
     onDeactivate: (user: User) => void;
+    onResetPassword: (user: User) => void;
 }
 
 export function UsersTable({
     users,
     isLoading,
+    resetPasswordUserId,
     onView,
     onEdit,
     onActivate,
     onDeactivate,
+    onResetPassword,
 }: UsersTableProps): JSX.Element {
     return (
         <div className="bg-card overflow-hidden rounded-xl border shadow-sm">
@@ -130,16 +134,37 @@ export function UsersTable({
                                     className="text-right"
                                     onClick={(event) => event.stopPropagation()}
                                 >
-                                    <div className="flex items-center justify-end gap-1">
+                                    <div className="flex items-center justify-end gap-2">
                                         <Tooltip>
-                                            <TooltipTrigger asChild>
+                                            <TooltipTrigger asChild className="cursor-pointer">
                                                 <Button
                                                     variant="ghost"
-                                                    size="icon-sm"
+                                                    size="icon"
+                                                    disabled={resetPasswordUserId === user.id}
+                                                    aria-label={`Reset password for ${user.firstName} ${user.lastName}`}
+                                                    className="text-warning hover:bg-warning/10 hover:text-warning"
+                                                    onClick={() => onResetPassword(user)}
+                                                >
+                                                    {resetPasswordUserId === user.id ? (
+                                                        <Spinner className="size-4" />
+                                                    ) : (
+                                                        <KeyRound className="size-4" />
+                                                    )}
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>Reset password</TooltipContent>
+                                        </Tooltip>
+
+                                        <Tooltip>
+                                            <TooltipTrigger asChild className="cursor-pointer">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
                                                     aria-label={`Edit ${user.firstName} ${user.lastName}`}
+                                                    className="text-info hover:bg-info/10 hover:text-info"
                                                     onClick={() => onEdit(user)}
                                                 >
-                                                    <Pencil />
+                                                    <Pencil className="size-4" />
                                                 </Button>
                                             </TooltipTrigger>
                                             <TooltipContent>Edit</TooltipContent>
@@ -147,29 +172,30 @@ export function UsersTable({
 
                                         {user.isActive ? (
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTrigger asChild className="cursor-pointer">
                                                     <Button
                                                         variant="ghost"
-                                                        size="icon-sm"
+                                                        size="icon"
                                                         aria-label={`Deactivate ${user.firstName} ${user.lastName}`}
-                                                        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                                                         onClick={() => onDeactivate(user)}
                                                     >
-                                                        <Ban />
+                                                        <Ban className="size-4" />
                                                     </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>Deactivate</TooltipContent>
                                             </Tooltip>
                                         ) : (
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
+                                                <TooltipTrigger asChild className="cursor-pointer">
                                                     <Button
                                                         variant="ghost"
-                                                        size="icon-sm"
+                                                        size="icon"
                                                         aria-label={`Activate ${user.firstName} ${user.lastName}`}
+                                                        className="text-success hover:bg-success/10 hover:text-success"
                                                         onClick={() => onActivate(user)}
                                                     >
-                                                        <CheckCircle2 />
+                                                        <CheckCircle2 className="size-4" />
                                                     </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>Activate</TooltipContent>

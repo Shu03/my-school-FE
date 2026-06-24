@@ -43,6 +43,10 @@ export interface ResetPasswordRequest {
     userId: string;
 }
 
+export interface ResetPasswordResponse {
+    tempPassword: string;
+}
+
 export function isForcePasswordChange(
     response: LoginResponse,
 ): response is ForcePasswordChangeResponse {
