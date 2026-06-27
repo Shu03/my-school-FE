@@ -48,6 +48,19 @@ export const assignClassTeacherSchema = z.object({
     teacherId: z.string().trim().min(1, "Teacher is required"),
 });
 
+export const editClassSchema = z.object({
+    name: z
+        .string()
+        .trim()
+        .min(1, "Class name is required")
+        .max(
+            CLASS_VALIDATION.NAME_MAX,
+            `Class name must be at most ${CLASS_VALIDATION.NAME_MAX} characters`,
+        ),
+    gradeLevel: gradeLevelSchema,
+});
+
 export type CreateClassFormValues = z.infer<typeof createClassSchema>;
 export type UpdateClassFormValues = z.infer<typeof updateClassSchema>;
+export type EditClassFormValues = z.infer<typeof editClassSchema>;
 export type AssignClassTeacherFormValues = z.infer<typeof assignClassTeacherSchema>;

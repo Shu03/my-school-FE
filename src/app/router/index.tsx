@@ -18,6 +18,7 @@ import {
     Lazy,
     LoginPage,
     AcademicYearsPage,
+    ManageAcademicYearsPage,
     AcademicYearTermsPage,
     ClassesPage,
     UserCreatePage,
@@ -114,6 +115,14 @@ export const router = createBrowserRouter([
                         element: (
                             <Lazy>
                                 <AcademicYearsPage />
+                            </Lazy>
+                        ),
+                    },
+                    {
+                        path: ROUTES.ACADEMIC_YEARS_MANAGE,
+                        element: (
+                            <Lazy>
+                                <ManageAcademicYearsPage />
                             </Lazy>
                         ),
                     },

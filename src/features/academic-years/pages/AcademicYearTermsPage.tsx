@@ -122,11 +122,11 @@ export function AcademicYearTermsPage(): JSX.Element {
     return (
         <div className="flex flex-col gap-6">
             <Link
-                to={ROUTES.ACADEMIC_YEARS}
+                to={ROUTES.ACADEMIC_YEARS_MANAGE}
                 className="text-muted-foreground hover:text-foreground group inline-flex w-fit items-center gap-1.5 text-sm font-medium transition-colors"
             >
                 <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-0.5" />
-                Back to academic years
+                Back to manage academic years
             </Link>
 
             <div className="bg-card text-card-foreground ring-foreground/10 overflow-hidden rounded-xl shadow-sm ring-1">
@@ -141,10 +141,18 @@ export function AcademicYearTermsPage(): JSX.Element {
                                 {formatDate(year.endDate)}
                             </p>
                         </div>
-                        <Button onClick={handleCreateTerm}>
-                            <Plus className="size-4" />
-                            Add term
-                        </Button>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={() => navigate(ROUTES.ACADEMIC_YEARS_MANAGE)}
+                            >
+                                Manage academic years
+                            </Button>
+                            <Button onClick={handleCreateTerm}>
+                                <Plus className="size-4" />
+                                Add term
+                            </Button>
+                        </div>
                     </div>
                 </div>
                 <div className="px-6 py-6">

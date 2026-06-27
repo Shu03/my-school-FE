@@ -9,10 +9,8 @@ import { useAcademicYearsList, useCurrentAcademicYear } from "@features/academic
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 
-import { AssignTeacherDialog } from "../components/AssignTeacherDialog";
-import { ClassesTable } from "../components/ClassesTable";
+import { ClassesGrid } from "../components/ClassesGrid";
 import { ClassesToolbar } from "../components/ClassesToolbar";
-import { ClassFormDialog } from "../components/ClassFormDialog";
 import {
     useAssignableTeachers,
     useAssignClassTeacher,
@@ -22,16 +20,12 @@ import {
     useUpdateClass,
 } from "../hooks/useClasses";
 import { getClassErrorMessage } from "../lib/errors";
-import type { CreateClassFormValues } from "../schemas/class.schema";
-import type { SchoolClass, TeacherOption } from "../types/class.types";
+import type { TeacherOption } from "../types/class.types";
 
 export function ClassesPage(): JSX.Element {
     const [selectedAcademicYearId, setSelectedAcademicYearId] = useState<string | null>(null);
     const [gradeLevelFilter, setGradeLevelFilter] = useState("");
-    const [formOpen, setFormOpen] = useState(false);
-    const [editingClass, setEditingClass] = useState<SchoolClass | null>(null);
-    const [teacherDialogOpen, setTeacherDialogOpen] = useState(false);
-    const [teacherTargetClass, setTeacherTargetClass] = useState<SchoolClass | null>(null);
+    const [isCreating, setIsCreating] = useState(false);
 
     const { data: years = [] } = useAcademicYearsList();
     const { data: currentYear } = useCurrentAcademicYear();
@@ -105,82 +99,71 @@ export function ClassesPage(): JSX.Element {
         [classesData],
     );
 
-    function handleCreateClick(): void {
-        setEditingClass(null);
-        setFormOpen(true);
-    }
-
-    function handleEditClick(schoolClass: SchoolClass): void {
-        setEditingClass(schoolClass);
-        setFormOpen(true);
-    }
-
-    function handleManageTeacherClick(schoolClass: SchoolClass): void {
-        setTeacherTargetClass(schoolClass);
-        setTeacherDialogOpen(true);
-    }
-
-    async function handleClassSubmit(values: CreateClassFormValues): Promise<void> {
+    async function handleCreateSubmit(values: {
+        name: string;
+        gradeLevel: number;
+        academicYearId: string;
+    }): Promise<boolean> {
         try {
-            if (editingClass) {
-                await updateClassMutation.mutateAsync({
-                    id: editingClass.id,
-                    data: {
-                        name: values.name,
-                        gradeLevel: values.gradeLevel,
-                    },
-                });
-                toast.success("Class updated successfully.");
-            } else {
-                await createClassMutation.mutateAsync({
-                    name: values.name,
-                    gradeLevel: values.gradeLevel,
-                    academicYearId: values.academicYearId,
-                });
-                toast.success("Class created successfully.");
-            }
-
-            setFormOpen(false);
-            setEditingClass(null);
+            await createClassMutation.mutateAsync({
+                name: values.name,
+                gradeLevel: values.gradeLevel,
+                academicYearId: values.academicYearId,
+            });
+            toast.success("Class created successfully.");
+            setIsCreating(false);
+            return true;
         } catch (error) {
             toast.error(getClassErrorMessage(error));
+            return false;
         }
     }
 
-    async function handleAssignTeacher(teacherId: string): Promise<void> {
-        if (!teacherTargetClass) {
-            return;
-        }
-
+    async function handleUpdate(
+        id: string,
+        data: { name: string; gradeLevel: number },
+    ): Promise<boolean> {
         try {
-            await assignTeacherMutation.mutateAsync({ id: teacherTargetClass.id, teacherId });
+            await updateClassMutation.mutateAsync({ id, data });
+            toast.success("Class updated successfully.");
+            return true;
+        } catch (error) {
+            toast.error(getClassErrorMessage(error));
+            return false;
+        }
+    }
+
+    async function handleAssignTeacher(id: string, teacherId: string): Promise<boolean> {
+        try {
+            await assignTeacherMutation.mutateAsync({ id, teacherId });
             toast.success("Class teacher assigned successfully.");
-            setTeacherDialogOpen(false);
-            setTeacherTargetClass(null);
+            return true;
         } catch (error) {
             toast.error(getClassErrorMessage(error));
+            return false;
         }
     }
 
-    async function handleRemoveTeacher(): Promise<void> {
-        if (!teacherTargetClass) {
-            return;
-        }
-
+    async function handleRemoveTeacher(id: string): Promise<boolean> {
         try {
-            await removeTeacherMutation.mutateAsync({ id: teacherTargetClass.id });
+            await removeTeacherMutation.mutateAsync({ id });
             toast.success("Class teacher removed successfully.");
-            setTeacherDialogOpen(false);
-            setTeacherTargetClass(null);
+            return true;
         } catch (error) {
             toast.error(getClassErrorMessage(error));
+            return false;
         }
     }
 
-    const teacherActionLoadingClassId =
-        assignTeacherMutation.isPending || removeTeacherMutation.isPending
-            ? (teacherTargetClass?.id ?? null)
-            : null;
+    const updatingClassId = updateClassMutation.isPending
+        ? (updateClassMutation.variables?.id ?? null)
+        : null;
+    const assigningClassId = assignTeacherMutation.isPending
+        ? (assignTeacherMutation.variables?.id ?? null)
+        : null;
+    const removingClassId = removeTeacherMutation.isPending
+        ? (removeTeacherMutation.variables?.id ?? null)
+        : null;
 
     return (
         <div className="flex flex-col gap-6">
@@ -190,7 +173,6 @@ export function ClassesPage(): JSX.Element {
                 gradeLevelFilter={gradeLevelFilter}
                 onAcademicYearChange={(value) => setSelectedAcademicYearId(value)}
                 onGradeLevelFilterChange={setGradeLevelFilter}
-                onCreateClick={handleCreateClick}
             />
 
             {teachersError && (
@@ -219,38 +201,30 @@ export function ClassesPage(): JSX.Element {
                     </AlertDescription>
                 </Alert>
             ) : (
-                <ClassesTable
+                <ClassesGrid
                     classes={sortedClasses}
                     isLoading={classesLoading}
                     yearNameById={yearNameById}
                     teacherNameById={teacherNameById}
-                    teacherActionLoadingClassId={teacherActionLoadingClassId}
-                    onEdit={handleEditClick}
-                    onManageTeacher={handleManageTeacherClick}
+                    teacherOptions={teacherOptions}
+                    isTeachersLoading={teachersLoading}
+                    teacherLoadError={teachersError}
+                    isCreating={isCreating}
+                    createAcademicYearId={effectiveAcademicYearId}
+                    createAcademicYearName={yearNameById[effectiveAcademicYearId] ?? ""}
+                    canCreate={Boolean(effectiveAcademicYearId)}
+                    isCreateSubmitting={createClassMutation.isPending}
+                    updatingClassId={updatingClassId}
+                    assigningClassId={assigningClassId}
+                    removingClassId={removingClassId}
+                    onStartCreate={() => setIsCreating(true)}
+                    onCancelCreate={() => setIsCreating(false)}
+                    onCreateSubmit={handleCreateSubmit}
+                    onUpdate={handleUpdate}
+                    onAssignTeacher={handleAssignTeacher}
+                    onRemoveTeacher={handleRemoveTeacher}
                 />
             )}
-
-            <ClassFormDialog
-                open={formOpen}
-                schoolClass={editingClass}
-                academicYears={years}
-                defaultAcademicYearId={effectiveAcademicYearId}
-                isSubmitting={createClassMutation.isPending || updateClassMutation.isPending}
-                onOpenChange={setFormOpen}
-                onSubmit={handleClassSubmit}
-            />
-
-            <AssignTeacherDialog
-                open={teacherDialogOpen}
-                schoolClass={teacherTargetClass}
-                teachers={teacherOptions}
-                isLoadingTeachers={teachersLoading}
-                teacherLoadError={teachersError}
-                isSubmitting={assignTeacherMutation.isPending || removeTeacherMutation.isPending}
-                onOpenChange={setTeacherDialogOpen}
-                onAssign={handleAssignTeacher}
-                onRemove={handleRemoveTeacher}
-            />
         </div>
     );
 }

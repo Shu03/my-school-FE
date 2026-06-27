@@ -10,6 +10,7 @@ export const ROUTES = {
     USER_NEW: "/users/new",
     USER_EDIT: "/users/:id/edit",
     ACADEMIC_YEARS: "/academic-years",
+    ACADEMIC_YEARS_MANAGE: "/academic-years/manage",
     ACADEMIC_YEAR_TERMS: "/academic-years/:id/terms",
     STUDENTS: "/students",
     CLASSES: "/classes",

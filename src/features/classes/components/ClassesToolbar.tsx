@@ -1,8 +1,5 @@
 import type { JSX } from "react";
 
-import { Plus } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
     Select,
@@ -23,7 +20,6 @@ interface ClassesToolbarProps {
     gradeLevelFilter: string;
     onAcademicYearChange: (academicYearId: string) => void;
     onGradeLevelFilterChange: (value: string) => void;
-    onCreateClick: () => void;
 }
 
 export function ClassesToolbar({
@@ -32,40 +28,32 @@ export function ClassesToolbar({
     gradeLevelFilter,
     onAcademicYearChange,
     onGradeLevelFilterChange,
-    onCreateClick,
 }: ClassesToolbarProps): JSX.Element {
     return (
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-center gap-2">
-                <Select value={selectedAcademicYearId} onValueChange={onAcademicYearChange}>
-                    <SelectTrigger className="w-44" aria-label="Select academic year">
-                        <SelectValue placeholder="Academic year" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {years.map((year) => (
-                            <SelectItem key={year.id} value={year.id}>
-                                {year.name}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+        <div className="flex flex-wrap items-center gap-2">
+            <Select value={selectedAcademicYearId} onValueChange={onAcademicYearChange}>
+                <SelectTrigger className="w-44" aria-label="Select academic year">
+                    <SelectValue placeholder="Academic year" />
+                </SelectTrigger>
+                <SelectContent>
+                    {years.map((year) => (
+                        <SelectItem key={year.id} value={year.id}>
+                            {year.name}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
 
-                <Input
-                    type="number"
-                    inputMode="numeric"
-                    min={1}
-                    max={99}
-                    placeholder="Filter grade"
-                    className="w-34"
-                    value={gradeLevelFilter}
-                    onChange={(event) => onGradeLevelFilterChange(event.target.value)}
-                />
-            </div>
-
-            <Button type="button" onClick={onCreateClick}>
-                <Plus />
-                Create class
-            </Button>
+            <Input
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={99}
+                placeholder="Filter grade"
+                className="w-34"
+                value={gradeLevelFilter}
+                onChange={(event) => onGradeLevelFilterChange(event.target.value)}
+            />
         </div>
     );
 }

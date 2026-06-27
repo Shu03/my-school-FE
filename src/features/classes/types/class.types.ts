@@ -4,6 +4,10 @@ export interface SchoolClass {
     gradeLevel: number;
     academicYearId: string;
     classTeacherId: string | null;
+    /** Enrollment stats — optional until the backend exposes them. */
+    studentCount?: number;
+    boysCount?: number;
+    girlsCount?: number;
     createdAt: string;
     updatedAt: string;
 }

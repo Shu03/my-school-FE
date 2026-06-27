@@ -28,6 +28,11 @@ export const AcademicYearsPage = lazy(() =>
         default: m.AcademicYearsPage,
     })),
 );
+export const ManageAcademicYearsPage = lazy(() =>
+    import("@features/academic-years/pages/ManageAcademicYearsPage").then((m) => ({
+        default: m.ManageAcademicYearsPage,
+    })),
+);
 export const AcademicYearTermsPage = lazy(() =>
     import("@features/academic-years/pages/AcademicYearTermsPage").then((m) => ({
         default: m.AcademicYearTermsPage,
