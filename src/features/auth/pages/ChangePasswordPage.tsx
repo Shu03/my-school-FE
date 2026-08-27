@@ -1,7 +1,7 @@
 import type { JSX } from "react";
 import { useState, useEffect } from "react";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -59,7 +59,7 @@ export function ChangePasswordPage(): JSX.Element {
     const {
         register,
         handleSubmit,
-        watch,
+        control,
         formState: { errors, isSubmitting },
     } = useForm<FirstLoginPasswordChangeValues | VoluntaryPasswordChangeValues>({
         resolver: zodResolver(schema),
@@ -73,8 +73,8 @@ export function ChangePasswordPage(): JSX.Element {
     });
 
     // Watch for password changes to update feedback
-    const newPassword = watch("newPassword");
-    const currentPassword = watch("currentPassword");
+    const newPassword = useWatch({ control, name: "newPassword" });
+    const currentPassword = useWatch({ control, name: "currentPassword" });
 
     // Update password feedback when new password changes
     useEffect(() => {

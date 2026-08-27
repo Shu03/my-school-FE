@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { JSX } from "react";
 
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -52,7 +52,6 @@ export function AssignmentFormDialog({
     const {
         control,
         handleSubmit,
-        watch,
         reset,
         formState: { errors },
     } = useForm<AssignmentFormValues>({
@@ -60,8 +59,8 @@ export function AssignmentFormDialog({
         defaultValues: { classId: "", role: "SUBJECT_TEACHER", subjectId: "" },
     });
 
-    const classId = watch("classId");
-    const role = watch("role");
+    const classId = useWatch({ control, name: "classId" });
+    const role = useWatch({ control, name: "role" });
 
     const selectedClass = useMemo(
         () => classes.find((item) => item.id === classId) ?? null,

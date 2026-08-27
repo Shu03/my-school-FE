@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import type { JSX } from "react";
 
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -61,7 +61,7 @@ export function HomeworkFormDialog({
         control,
         register,
         handleSubmit,
-        watch,
+        // watch,
         reset,
         formState: { errors },
     } = useForm<HomeworkFormValues>({
@@ -69,7 +69,7 @@ export function HomeworkFormDialog({
         defaultValues: { title: "", description: "", classId: "", subjectId: "", dueDate: "" },
     });
 
-    const classId = watch("classId");
+    const classId = useWatch({ control, name: "classId" });
 
     const selectedClass = useMemo(
         () => classes.find((item) => item.id === classId) ?? null,
