@@ -21,9 +21,17 @@ import {
     ManageAcademicYearsPage,
     AcademicYearTermsPage,
     ClassesPage,
+    SubjectsPage,
+    TeachersPage,
+    TeacherDetailPage,
+    StudentsPage,
+    StudentDetailPage,
     UserCreatePage,
     UserEditPage,
     UsersPage,
+    AttendancePage,
+    HomeworkPage,
+    AnnouncementsPage,
 } from "./lazy";
 import { NotFoundPage } from "./NotFoundPage";
 
@@ -71,6 +79,42 @@ export const router = createBrowserRouter([
                 ),
             },
 
+            {
+                path: ROUTES.TEACHER_DETAIL,
+                element: (
+                    <Lazy>
+                        <TeacherDetailPage />
+                    </Lazy>
+                ),
+            },
+
+            {
+                path: ROUTES.STUDENT_DETAIL,
+                element: (
+                    <Lazy>
+                        <StudentDetailPage />
+                    </Lazy>
+                ),
+            },
+
+            {
+                path: ROUTES.HOMEWORK,
+                element: (
+                    <Lazy>
+                        <HomeworkPage />
+                    </Lazy>
+                ),
+            },
+
+            {
+                path: ROUTES.ANNOUNCEMENTS,
+                element: (
+                    <Lazy>
+                        <AnnouncementsPage />
+                    </Lazy>
+                ),
+            },
+
             // Admin-only routes
             {
                 element: <RoleGuard allowedRoles={[Role.ADMIN]} />,
@@ -96,6 +140,37 @@ export const router = createBrowserRouter([
                         element: (
                             <Lazy>
                                 <UserEditPage />
+                            </Lazy>
+                        ),
+                    },
+                    {
+                        path: ROUTES.TEACHERS,
+                        element: (
+                            <Lazy>
+                                <TeachersPage />
+                            </Lazy>
+                        ),
+                    },
+                ],
+            },
+
+            // Admin and teacher (teacher list is scoped by the backend)
+            {
+                element: <RoleGuard allowedRoles={[Role.ADMIN, Role.TEACHER]} />,
+                children: [
+                    {
+                        path: ROUTES.STUDENTS,
+                        element: (
+                            <Lazy>
+                                <StudentsPage />
+                            </Lazy>
+                        ),
+                    },
+                    {
+                        path: ROUTES.ATTENDANCE,
+                        element: (
+                            <Lazy>
+                                <AttendancePage />
                             </Lazy>
                         ),
                     },
@@ -150,6 +225,25 @@ export const router = createBrowserRouter([
                         element: (
                             <Lazy>
                                 <ClassesPage />
+                            </Lazy>
+                        ),
+                    },
+                ],
+            },
+            {
+                element: (
+                    <RoleOrPermissionGuard
+                        allowedRoles={[Role.ADMIN]}
+                        permissionRole={Role.TEACHER}
+                        requiredPermission={PERMISSIONS.SUBJECT_MANAGE}
+                    />
+                ),
+                children: [
+                    {
+                        path: ROUTES.SUBJECTS,
+                        element: (
+                            <Lazy>
+                                <SubjectsPage />
                             </Lazy>
                         ),
                     },

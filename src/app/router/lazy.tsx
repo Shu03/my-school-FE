@@ -43,6 +43,47 @@ export const ClassesPage = lazy(() =>
         default: m.ClassesPage,
     })),
 );
+export const SubjectsPage = lazy(() =>
+    import("@features/subjects/pages/SubjectsPage").then((m) => ({
+        default: m.SubjectsPage,
+    })),
+);
+export const TeachersPage = lazy(() =>
+    import("@features/teachers/pages/TeachersPage").then((m) => ({
+        default: m.TeachersPage,
+    })),
+);
+export const TeacherDetailPage = lazy(() =>
+    import("@features/teachers/pages/TeacherDetailPage").then((m) => ({
+        default: m.TeacherDetailPage,
+    })),
+);
+export const StudentsPage = lazy(() =>
+    import("@features/students/pages/StudentsPage").then((m) => ({
+        default: m.StudentsPage,
+    })),
+);
+export const StudentDetailPage = lazy(() =>
+    import("@features/students/pages/StudentDetailPage").then((m) => ({
+        default: m.StudentDetailPage,
+    })),
+);
+
+export const AttendancePage = lazy(() =>
+    import("@features/attendance/pages/AttendancePage").then((m) => ({
+        default: m.AttendancePage,
+    })),
+);
+export const HomeworkPage = lazy(() =>
+    import("@features/homework/pages/HomeworkPage").then((m) => ({
+        default: m.HomeworkPage,
+    })),
+);
+export const AnnouncementsPage = lazy(() =>
+    import("@features/announcements/pages/AnnouncementsPage").then((m) => ({
+        default: m.AnnouncementsPage,
+    })),
+);
 
 function PageLoader(): JSX.Element {
     return (

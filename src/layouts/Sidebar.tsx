@@ -5,11 +5,15 @@ import { NavLink } from "react-router-dom";
 import {
     LayoutDashboard,
     Users,
-    GraduationCap,
     University,
     BookOpen,
-    Settings,
+    BookText,
     CalendarRange,
+    GraduationCap,
+    UserRound,
+    ClipboardCheck,
+    NotebookPen,
+    Megaphone,
 } from "lucide-react";
 
 import { APP_BRAND } from "@constants/app.constants";
@@ -54,23 +58,53 @@ function canAccessClasses(user: User | null): boolean {
     );
 }
 
+function canAccessSubjects(user: User | null): boolean {
+    if (!user) {
+        return false;
+    }
+
+    return (
+        user.role === Role.ADMIN ||
+        (user.role === Role.TEACHER && hasPermission(user.permissions, PERMISSIONS.SUBJECT_MANAGE))
+    );
+}
+
 const navItems: NavItem[] = [
     { label: "Dashboard", path: ROUTES.DASHBOARD, icon: LayoutDashboard },
     { label: "Users", path: ROUTES.USERS, icon: Users, roles: [Role.ADMIN] },
+    { label: "Teachers", path: ROUTES.TEACHERS, icon: UserRound, roles: [Role.ADMIN] },
+    {
+        label: "Students",
+        path: ROUTES.STUDENTS,
+        icon: GraduationCap,
+        roles: [Role.ADMIN, Role.TEACHER],
+    },
     {
         label: "Academic Years",
         path: ROUTES.ACADEMIC_YEARS,
         icon: CalendarRange,
         canView: canAccessAcademicYears,
     },
-    { label: "Students", path: ROUTES.STUDENTS, icon: GraduationCap },
     {
         label: "Classes",
         path: ROUTES.CLASSES,
         icon: BookOpen,
         canView: canAccessClasses,
     },
-    { label: "Settings", path: ROUTES.SETTINGS, icon: Settings, roles: [Role.ADMIN] },
+    {
+        label: "Subjects",
+        path: ROUTES.SUBJECTS,
+        icon: BookText,
+        canView: canAccessSubjects,
+    },
+    {
+        label: "Attendance",
+        path: ROUTES.ATTENDANCE,
+        icon: ClipboardCheck,
+        roles: [Role.ADMIN, Role.TEACHER],
+    },
+    { label: "Homework", path: ROUTES.HOMEWORK, icon: NotebookPen },
+    { label: "Announcements", path: ROUTES.ANNOUNCEMENTS, icon: Megaphone },
 ];
 
 export function Sidebar(): JSX.Element {

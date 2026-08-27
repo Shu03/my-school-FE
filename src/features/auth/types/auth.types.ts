@@ -6,6 +6,20 @@ export interface User {
     lastName: string;
     role: Role;
     permissions?: string[];
+    isActive?: boolean;
+    teacherProfileId?: string;
+    studentProfileId?: string;
+}
+
+export interface MeResponse {
+    id: string;
+    firstName: string;
+    lastName: string;
+    role: Role;
+    isActive: boolean;
+    isFirstLogin: boolean;
+    teacherProfile?: { id: string } | null;
+    studentProfile?: { id: string } | null;
 }
 
 export interface LoginRequest {
