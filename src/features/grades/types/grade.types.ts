@@ -26,7 +26,7 @@ export interface GradeStudent {
 
 export interface Grade {
     id: string;
-    examId: string;
+    examSubjectId: string;
     studentId: string;
     marksObtained: number;
     remarks: string | null;
@@ -49,6 +49,7 @@ export interface BulkEnterGradesRequest {
 export interface BulkGradeResult {
     entered: number;
     examId: string;
+    subjectId: string;
 }
 
 export interface ExamGradeStudentSummary {
@@ -61,6 +62,8 @@ export interface ExamGradeStudentSummary {
 export interface ExamGradesSummary {
     examId: string;
     examName: string;
+    subjectId: string;
+    subjectName: string;
     totalMarks: number;
     classAverage: number | null;
     highest: number | null;
@@ -71,6 +74,7 @@ export interface ExamGradesSummary {
 export interface StudentGradeHistoryEntry {
     examId: string;
     examName: string;
+    subjectId: string;
     subjectName: string;
     type: ExamType;
     marksObtained: number;

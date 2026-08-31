@@ -2,12 +2,14 @@ import { useState } from "react";
 import type { JSX } from "react";
 
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarRange, Check, GraduationCap, Pencil, X } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 import { CLASS_VALIDATION } from "@constants/classes.constants";
+import { classDetail } from "@constants/routes.constants";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -33,6 +35,7 @@ export function ClassCard({
     isUpdating,
     onUpdate,
 }: ClassCardProps): JSX.Element {
+    const navigate = useNavigate();
     const reduceMotion = useReducedMotion();
     const [isEditing, setIsEditing] = useState(false);
 
@@ -58,7 +61,7 @@ export function ClassCard({
         <Card
             className={cn(
                 "relative gap-0 overflow-hidden py-0 transition-shadow",
-                isEditing && "ring-primary/40 ring-2",
+                isEditing ? "ring-primary/40 ring-2" : "hover:shadow-md",
             )}
         >
             <AnimatePresence mode="wait" initial={false}>
@@ -78,7 +81,21 @@ export function ClassCard({
                         />
                     </motion.div>
                 ) : (
-                    <motion.div key="view" {...swap} className="flex flex-col">
+                    <motion.div
+                        key="view"
+                        {...swap}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`View ${schoolClass.name}`}
+                        className="focus-visible:ring-ring/60 flex cursor-pointer flex-col outline-none focus-visible:ring-2"
+                        onClick={() => navigate(classDetail(schoolClass.id))}
+                        onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                                event.preventDefault();
+                                navigate(classDetail(schoolClass.id));
+                            }
+                        }}
+                    >
                         <div className="border-border/60 relative overflow-hidden border-b px-5 py-4">
                             <div className="from-primary/8 pointer-events-none absolute inset-0 bg-linear-to-br via-transparent to-transparent" />
                             <div className="relative flex items-start justify-between gap-3">
@@ -102,7 +119,10 @@ export function ClassCard({
                                             size="icon"
                                             className="-mt-1 -mr-1 shrink-0"
                                             aria-label={`Edit ${schoolClass.name}`}
-                                            onClick={() => setIsEditing(true)}
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                setIsEditing(true);
+                                            }}
                                         >
                                             <Pencil className="size-4" />
                                         </Button>

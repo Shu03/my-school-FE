@@ -23,6 +23,7 @@ import { PaymentHistoryTable } from "../components/PaymentHistoryTable";
 import { RecordPaymentDialog } from "../components/RecordPaymentDialog";
 import { useFeeRecord, useRecordPayment } from "../hooks/useFees";
 import { getFeeErrorMessage } from "../lib/errors";
+import { printFeeReceipt } from "../lib/receipt";
 import type { PaymentFormValues } from "../schemas/payment.schema";
 
 export function FeeRecordDetailPage(): JSX.Element {
@@ -115,7 +116,11 @@ export function FeeRecordDetailPage(): JSX.Element {
                     <CardTitle>Payment history</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <PaymentHistoryTable payments={record.payments} isLoading={false} />
+                    <PaymentHistoryTable
+                        payments={record.payments}
+                        isLoading={false}
+                        onPrintReceipt={(payment) => printFeeReceipt(record, payment)}
+                    />
                 </CardContent>
             </Card>
 

@@ -1,9 +1,10 @@
 import { useEffect, useMemo } from "react";
 import type { JSX } from "react";
 
-import { Controller, useForm, useWatch } from "react-hook-form";
+import { Controller, useFieldArray, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus, Trash2 } from "lucide-react";
 
 import { EXAM_TYPE_LABELS, EXAM_TYPE_LIST } from "@constants/exams.constants";
 
@@ -31,7 +32,6 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 
-import { toDateInputValue } from "../lib/format";
 import { examSchema, type ExamFormValues } from "../schemas/exam.schema";
 import type { Exam } from "../types/exam.types";
 
@@ -42,6 +42,8 @@ interface ExamFormDialogProps {
     onOpenChange: (open: boolean) => void;
     onSubmit: (values: ExamFormValues) => Promise<void>;
 }
+
+const EMPTY_SUBJECT = { subjectId: "", totalMarks: 100, date: "" };
 
 export function ExamFormDialog({
     open,
@@ -70,11 +72,11 @@ export function ExamFormDialog({
             name: "",
             type: EXAM_TYPE_LIST[0],
             classId: "",
-            subjectId: "",
-            totalMarks: 100,
-            date: "",
+            subjects: [EMPTY_SUBJECT],
         },
     });
+
+    const { fields, append, remove } = useFieldArray({ control, name: "subjects" });
 
     const classId = useWatch({ control, name: "classId" });
 
@@ -85,6 +87,12 @@ export function ExamFormDialog({
 
     const { data: subjects = [] } = useSubjectsList({ gradeLevel: selectedClass?.gradeLevel });
 
+    const watchedSubjects = useWatch({ control, name: "subjects" });
+    const selectedSubjectIds = (watchedSubjects ?? [])
+        .map((row) => row?.subjectId)
+        .filter((value): value is string => Boolean(value));
+    const allSubjectsAdded = subjects.length > 0 && selectedSubjectIds.length >= subjects.length;
+
     useEffect(() => {
         if (!open) {
             return;
@@ -94,21 +102,22 @@ export function ExamFormDialog({
             name: exam?.name ?? "",
             type: exam?.type ?? EXAM_TYPE_LIST[0],
             classId: exam?.classId ?? "",
-            subjectId: exam?.subjectId ?? "",
-            totalMarks: exam?.totalMarks ?? 100,
-            date: toDateInputValue(exam?.date ?? ""),
+            subjects: [EMPTY_SUBJECT],
         });
     }, [open, exam, reset]);
 
+    const subjectsError =
+        typeof errors.subjects?.message === "string" ? errors.subjects.message : null;
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>{isEdit ? "Edit exam" : "Create exam"}</DialogTitle>
                     <DialogDescription>
                         {isEdit
-                            ? "Update the exam details. Class and subject cannot be changed."
-                            : "Schedule an exam for a class and subject."}
+                            ? "Update the exam name and type. Manage subjects from the exam detail page."
+                            : "Schedule an exam for a class with one or more subjects."}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -148,22 +157,6 @@ export function ExamFormDialog({
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="totalMarks">Total marks</Label>
-                            <Input
-                                id="totalMarks"
-                                type="number"
-                                {...register("totalMarks", { valueAsNumber: true })}
-                            />
-                            {errors.totalMarks && (
-                                <p className="text-destructive text-xs">
-                                    {errors.totalMarks.message}
-                                </p>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div className="space-y-2">
                             <Label>Class</Label>
                             <Controller
                                 control={control}
@@ -191,46 +184,157 @@ export function ExamFormDialog({
                                 <p className="text-destructive text-xs">{errors.classId.message}</p>
                             )}
                         </div>
+                    </div>
 
-                        <div className="space-y-2">
-                            <Label>Subject</Label>
-                            <Controller
-                                control={control}
-                                name="subjectId"
-                                render={({ field }) => (
-                                    <Select
-                                        value={field.value}
-                                        onValueChange={field.onChange}
-                                        disabled={isEdit || !selectedClass}
-                                    >
-                                        <SelectTrigger aria-label="Subject">
-                                            <SelectValue placeholder="Select subject" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {subjects.map((item) => (
-                                                <SelectItem key={item.id} value={item.id}>
-                                                    {item.name} ({item.code})
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                )}
-                            />
-                            {errors.subjectId && (
-                                <p className="text-destructive text-xs">
-                                    {errors.subjectId.message}
-                                </p>
+                    {!isEdit && (
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                                <div className="space-y-0.5">
+                                    <Label>Subjects</Label>
+                                    <p className="text-muted-foreground text-xs">
+                                        {selectedClass
+                                            ? `${fields.length} added`
+                                            : "Select a class to add subjects"}
+                                    </p>
+                                </div>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={!selectedClass || allSubjectsAdded}
+                                    onClick={() => append({ ...EMPTY_SUBJECT })}
+                                >
+                                    <Plus className="size-4" />
+                                    Add subject
+                                </Button>
+                            </div>
+
+                            {subjectsError && (
+                                <p className="text-destructive text-xs">{subjectsError}</p>
+                            )}
+
+                            {!selectedClass ? (
+                                <div className="border-border/60 text-muted-foreground rounded-lg border border-dashed px-4 py-8 text-center text-sm">
+                                    Pick a class first, then add the subjects to be examined.
+                                </div>
+                            ) : (
+                                <div className="flex flex-col gap-3">
+                                    {fields.map((row, index) => {
+                                        const currentValue = selectedSubjectIds[index];
+                                        const availableSubjects = subjects.filter(
+                                            (item) =>
+                                                item.id === currentValue ||
+                                                !selectedSubjectIds.includes(item.id),
+                                        );
+
+                                        return (
+                                            <div
+                                                key={row.id}
+                                                className="bg-muted/30 border-border/60 rounded-lg border p-3"
+                                            >
+                                                <div className="mb-2 flex items-center justify-between">
+                                                    <span className="text-muted-foreground text-xs font-medium">
+                                                        Subject {index + 1}
+                                                    </span>
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="text-muted-foreground hover:text-destructive size-7"
+                                                        aria-label="Remove subject"
+                                                        disabled={fields.length === 1}
+                                                        onClick={() => remove(index)}
+                                                    >
+                                                        <Trash2 className="size-4" />
+                                                    </Button>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_7rem_9rem] sm:items-end">
+                                                    <div className="space-y-1.5">
+                                                        <Label className="text-xs">Subject</Label>
+                                                        <Controller
+                                                            control={control}
+                                                            name={`subjects.${index}.subjectId`}
+                                                            render={({ field }) => (
+                                                                <Select
+                                                                    value={field.value}
+                                                                    onValueChange={field.onChange}
+                                                                >
+                                                                    <SelectTrigger aria-label="Subject">
+                                                                        <SelectValue placeholder="Select" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        {availableSubjects.map(
+                                                                            (item) => (
+                                                                                <SelectItem
+                                                                                    key={item.id}
+                                                                                    value={item.id}
+                                                                                >
+                                                                                    {item.name} (
+                                                                                    {item.code})
+                                                                                </SelectItem>
+                                                                            ),
+                                                                        )}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            )}
+                                                        />
+                                                        {errors.subjects?.[index]?.subjectId && (
+                                                            <p className="text-destructive text-xs">
+                                                                {
+                                                                    errors.subjects[index]
+                                                                        ?.subjectId?.message
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="space-y-1.5">
+                                                        <Label className="text-xs">Marks</Label>
+                                                        <Input
+                                                            type="number"
+                                                            aria-label="Total marks"
+                                                            {...register(
+                                                                `subjects.${index}.totalMarks`,
+                                                                {
+                                                                    valueAsNumber: true,
+                                                                },
+                                                            )}
+                                                        />
+                                                        {errors.subjects?.[index]?.totalMarks && (
+                                                            <p className="text-destructive text-xs">
+                                                                {
+                                                                    errors.subjects[index]
+                                                                        ?.totalMarks?.message
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="space-y-1.5">
+                                                        <Label className="text-xs">Date</Label>
+                                                        <Input
+                                                            type="date"
+                                                            aria-label="Date"
+                                                            {...register(`subjects.${index}.date`)}
+                                                        />
+                                                        {errors.subjects?.[index]?.date && (
+                                                            <p className="text-destructive text-xs">
+                                                                {
+                                                                    errors.subjects[index]?.date
+                                                                        ?.message
+                                                                }
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             )}
                         </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="date">Date</Label>
-                        <Input id="date" type="date" {...register("date")} />
-                        {errors.date && (
-                            <p className="text-destructive text-xs">{errors.date.message}</p>
-                        )}
-                    </div>
+                    )}
 
                     <DialogFooter>
                         <Button

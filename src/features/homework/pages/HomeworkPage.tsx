@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 
 import { HomeworkFormDialog } from "../components/HomeworkFormDialog";
-import { HomeworkTable } from "../components/HomeworkTable";
+import { HomeworkList } from "../components/HomeworkList";
 import {
     useCreateHomework,
     useDeleteHomework,
@@ -178,7 +178,7 @@ export function HomeworkPage(): JSX.Element {
                             </AlertDescription>
                         </Alert>
                     ) : (
-                        <HomeworkTable
+                        <HomeworkList
                             homework={homework}
                             isLoading={isLoading}
                             canManage={canManage}

@@ -1,8 +1,10 @@
+import { useMemo, useState } from "react";
 import type { JSX } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 
-import { AlertCircle, ArrowLeft, CalendarDays } from "lucide-react";
+import { AlertCircle, ArrowLeft, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 import { EXAM_STATUS, EXAM_TYPE_LABELS } from "@constants/exams.constants";
 import { PERMISSIONS } from "@constants/permissions.constants";
@@ -11,50 +13,23 @@ import { ROUTES } from "@constants/routes.constants";
 import { Role } from "@/types/api";
 
 import { hasPermission, useAuthStore } from "@features/auth";
-import { ExamGradesSummarySection, GradeEntrySection, useExamGrades } from "@features/grades";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 
-import { useExam } from "../hooks/useExams";
-import { formatDate, formatMarks } from "../lib/format";
-
-function StudentGradeCard({
-    examId,
-    totalMarks,
-}: {
-    examId: string;
-    totalMarks: number;
-}): JSX.Element {
-    const { data: grades = [], isLoading } = useExamGrades(examId);
-    const grade = grades[0] ?? null;
-
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center gap-2 py-6">
-                <Spinner />
-            </div>
-        );
-    }
-
-    if (!grade) {
-        return (
-            <p className="text-muted-foreground py-4 text-center text-sm">
-                Your grade has not been published yet.
-            </p>
-        );
-    }
-
-    return (
-        <p className="text-2xl font-semibold tabular-nums">
-            {grade.marksObtained}{" "}
-            <span className="text-muted-foreground text-base">/ {totalMarks}</span>
-        </p>
-    );
-}
+import { ExamSubjectFormDialog } from "../components/ExamSubjectFormDialog";
+import { ExamSubjectPanel } from "../components/ExamSubjectPanel";
+import {
+    useAddExamSubject,
+    useExam,
+    useRemoveExamSubject,
+    useUpdateExamSubject,
+} from "../hooks/useExams";
+import { getExamErrorMessage } from "../lib/errors";
+import type { ExamSubjectFormValues } from "../schemas/exam.schema";
+import type { ExamSubject, ExamSubjectSummary } from "../types/exam.types";
 
 export function ExamDetailPage(): JSX.Element {
     const { id = "" } = useParams();
@@ -67,6 +42,21 @@ export function ExamDetailPage(): JSX.Element {
     const canReadSummary = isAdmin || hasPermission(user?.permissions, PERMISSIONS.GRADES_READ);
 
     const { data: exam, isLoading, isError } = useExam(id);
+
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [editing, setEditing] = useState<ExamSubject | null>(null);
+
+    const addSubjectMutation = useAddExamSubject(id);
+    const updateSubjectMutation = useUpdateExamSubject(id);
+    const removeSubjectMutation = useRemoveExamSubject(id);
+
+    const summaryBySubjectId = useMemo(() => {
+        const map = new Map<string, ExamSubjectSummary>();
+        for (const summary of exam?.subjectSummaries ?? []) {
+            map.set(summary.subjectId, summary);
+        }
+        return map;
+    }, [exam]);
 
     if (isLoading) {
         return (
@@ -88,6 +78,51 @@ export function ExamDetailPage(): JSX.Element {
 
     const isActive = exam.status === EXAM_STATUS.ACTIVE;
     const canEnterGrades = canWrite && isActive && !exam.isFinalized;
+    const canManageSubjects = canWrite && isActive && !exam.isFinalized;
+    const canRemoveSubject = exam.examSubjects.length > 1;
+
+    const excludeSubjectIds = exam.examSubjects.map((examSubject) => examSubject.subjectId);
+
+    const handleAddClick = (): void => {
+        setEditing(null);
+        setDialogOpen(true);
+    };
+
+    const handleEditClick = (examSubject: ExamSubject): void => {
+        setEditing(examSubject);
+        setDialogOpen(true);
+    };
+
+    const handleRemove = async (examSubject: ExamSubject): Promise<void> => {
+        try {
+            await removeSubjectMutation.mutateAsync({ subjectId: examSubject.subjectId });
+            toast.success("Subject removed.");
+        } catch (error) {
+            toast.error(getExamErrorMessage(error));
+        }
+    };
+
+    const handleSubmit = async (values: ExamSubjectFormValues): Promise<void> => {
+        try {
+            if (editing) {
+                await updateSubjectMutation.mutateAsync({
+                    subjectId: editing.subjectId,
+                    data: { totalMarks: values.totalMarks, date: values.date },
+                });
+                toast.success("Subject updated.");
+            } else {
+                await addSubjectMutation.mutateAsync({
+                    subjectId: values.subjectId,
+                    totalMarks: values.totalMarks,
+                    date: values.date,
+                });
+                toast.success("Subject added.");
+            }
+            setDialogOpen(false);
+        } catch (error) {
+            toast.error(getExamErrorMessage(error));
+        }
+    };
 
     return (
         <div className="flex flex-col gap-6">
@@ -115,13 +150,9 @@ export function ExamDetailPage(): JSX.Element {
                                         {exam.class.name} (Grade {exam.class.gradeLevel})
                                     </span>
                                     <span>·</span>
-                                    <Badge variant="secondary" className="font-mono">
-                                        {exam.subject.code}
-                                    </Badge>
-                                    <span>·</span>
-                                    <span className="inline-flex items-center gap-1">
-                                        <CalendarDays className="size-3.5" />
-                                        {formatDate(exam.date)}
+                                    <span>
+                                        {exam.examSubjects.length} subject
+                                        {exam.examSubjects.length === 1 ? "" : "s"}
                                     </span>
                                 </div>
                             </div>
@@ -136,63 +167,43 @@ export function ExamDetailPage(): JSX.Element {
                             </div>
                         </div>
                     </div>
-
-                    <div className="grid grid-cols-3 gap-3 px-6 py-5">
-                        <div>
-                            <p className="text-muted-foreground text-xs">Total marks</p>
-                            <p className="text-lg font-semibold tabular-nums">{exam.totalMarks}</p>
-                        </div>
-                        <div>
-                            <p className="text-muted-foreground text-xs">Graded</p>
-                            <p className="text-lg font-semibold tabular-nums">{exam.gradeCount}</p>
-                        </div>
-                        <div>
-                            <p className="text-muted-foreground text-xs">Average</p>
-                            <p className="text-lg font-semibold tabular-nums">
-                                {formatMarks(exam.averageMarks)}
-                            </p>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            {isStudent && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Your grade</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <StudentGradeCard examId={exam.id} totalMarks={exam.totalMarks} />
-                    </CardContent>
-                </Card>
+            {canManageSubjects && (
+                <div className="flex justify-end">
+                    <Button size="sm" onClick={handleAddClick}>
+                        <Plus className="size-4" />
+                        Add subject
+                    </Button>
+                </div>
             )}
 
-            {canEnterGrades && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Enter grades</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <GradeEntrySection
-                            examId={exam.id}
-                            classId={exam.classId}
-                            academicYearId={exam.academicYearId}
-                            totalMarks={exam.totalMarks}
-                        />
-                    </CardContent>
-                </Card>
-            )}
+            {exam.examSubjects.map((examSubject) => (
+                <ExamSubjectPanel
+                    key={examSubject.id}
+                    exam={exam}
+                    examSubject={examSubject}
+                    summary={summaryBySubjectId.get(examSubject.subjectId)}
+                    isStudent={isStudent}
+                    canEnterGrades={canEnterGrades}
+                    canReadSummary={canReadSummary}
+                    canManageSubjects={canManageSubjects}
+                    onEdit={handleEditClick}
+                    onRemove={handleRemove}
+                    canRemove={canRemoveSubject}
+                />
+            ))}
 
-            {canReadSummary && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Grades summary</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <ExamGradesSummarySection examId={exam.id} enabled={canReadSummary} />
-                    </CardContent>
-                </Card>
-            )}
+            <ExamSubjectFormDialog
+                open={dialogOpen}
+                gradeLevel={exam.class.gradeLevel}
+                excludeSubjectIds={excludeSubjectIds}
+                editing={editing}
+                isSubmitting={addSubjectMutation.isPending || updateSubjectMutation.isPending}
+                onOpenChange={setDialogOpen}
+                onSubmit={handleSubmit}
+            />
         </div>
     );
 }

@@ -70,13 +70,17 @@ export const API_ENDPOINTS = {
     EXAMS: {
         BASE: "/exams",
         byId: (id: string) => `/exams/${id}`,
+        subjects: (id: string) => `/exams/${id}/subjects`,
+        subjectById: (id: string, subjectId: string) => `/exams/${id}/subjects/${subjectId}`,
         finalize: (id: string) => `/exams/${id}/finalize`,
         unlock: (id: string) => `/exams/${id}/unlock`,
         discard: (id: string) => `/exams/${id}/discard`,
     },
     GRADES: {
-        examGrades: (examId: string) => `/exams/${examId}/grades`,
-        examSummary: (examId: string) => `/exams/${examId}/grades/summary`,
+        examSubjectGrades: (examId: string, subjectId: string) =>
+            `/exams/${examId}/subjects/${subjectId}/grades`,
+        examSubjectSummary: (examId: string, subjectId: string) =>
+            `/exams/${examId}/subjects/${subjectId}/grades/summary`,
         studentHistory: (studentId: string) => `/grades/student/${studentId}`,
     },
     HOMEWORK: {

@@ -46,6 +46,11 @@ export const ClassesPage = lazy(() =>
         default: m.ClassesPage,
     })),
 );
+export const ClassDetailPage = lazy(() =>
+    import("@features/classes/pages/ClassDetailPage").then((m) => ({
+        default: m.ClassDetailPage,
+    })),
+);
 export const SubjectsPage = lazy(() =>
     import("@features/subjects/pages/SubjectsPage").then((m) => ({
         default: m.SubjectsPage,

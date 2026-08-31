@@ -16,6 +16,7 @@ export const ROUTES = {
     STUDENTS: "/students",
     STUDENT_DETAIL: "/students/:id",
     CLASSES: "/classes",
+    CLASS_DETAIL: "/classes/:id",
     SUBJECTS: "/subjects",
     TEACHERS: "/teachers",
     TEACHER_DETAIL: "/teachers/:id",
@@ -51,6 +52,11 @@ export function teacherDetail(id: string): string {
 /** Build the detail path for a specific student. */
 export function studentDetail(id: string): string {
     return `/students/${id}`;
+}
+
+/** Build the detail path for a specific class. */
+export function classDetail(id: string): string {
+    return `/classes/${id}`;
 }
 
 /** Build the detail path for a specific exam. */

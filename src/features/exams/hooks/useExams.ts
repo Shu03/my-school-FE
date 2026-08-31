@@ -7,21 +7,27 @@ import {
 } from "@tanstack/react-query";
 
 import {
+    addExamSubject,
     createExam,
     discardExam,
     finalizeExam,
     getExamById,
     listExams,
+    removeExamSubject,
     unlockExam,
     updateExam,
+    updateExamSubject,
 } from "../api/exams.api";
 import type {
+    AddExamSubjectRequest,
     CreateExamRequest,
     Exam,
     ExamsListParams,
     ExamsListResponse,
+    ExamSubject,
     ExamWithSummary,
     UpdateExamRequest,
+    UpdateExamSubjectRequest,
 } from "../types/exam.types";
 
 /** Query-key factory for the exams feature. */
@@ -69,6 +75,45 @@ export function useUpdateExam(): UseMutationResult<
         onSuccess: (exam) => {
             void queryClient.invalidateQueries({ queryKey: examsKeys.lists() });
             void queryClient.invalidateQueries({ queryKey: examsKeys.detail(exam.id) });
+        },
+    });
+}
+
+export function useAddExamSubject(
+    examId: string,
+): UseMutationResult<ExamSubject, Error, AddExamSubjectRequest> {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data) => addExamSubject(examId, data),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({ queryKey: examsKeys.detail(examId) });
+            void queryClient.invalidateQueries({ queryKey: examsKeys.lists() });
+        },
+    });
+}
+
+export function useUpdateExamSubject(
+    examId: string,
+): UseMutationResult<ExamSubject, Error, { subjectId: string; data: UpdateExamSubjectRequest }> {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ subjectId, data }) => updateExamSubject(examId, subjectId, data),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({ queryKey: examsKeys.detail(examId) });
+            void queryClient.invalidateQueries({ queryKey: examsKeys.lists() });
+        },
+    });
+}
+
+export function useRemoveExamSubject(
+    examId: string,
+): UseMutationResult<void, Error, { subjectId: string }> {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ subjectId }) => removeExamSubject(examId, subjectId),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({ queryKey: examsKeys.detail(examId) });
+            void queryClient.invalidateQueries({ queryKey: examsKeys.lists() });
         },
     });
 }

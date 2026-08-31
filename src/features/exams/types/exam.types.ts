@@ -10,7 +10,8 @@ export interface ExamClass {
     updatedAt: string;
 }
 
-export interface ExamSubject {
+/** The subject entity attached to an exam-subject row. */
+export interface ExamSubjectDetail {
     id: string;
     name: string;
     code: string;
@@ -18,6 +19,18 @@ export interface ExamSubject {
     description: string | null;
     createdAt: string;
     updatedAt: string;
+}
+
+/** A subject scheduled within an exam (the exam_subjects join row). */
+export interface ExamSubject {
+    id: string;
+    examId: string;
+    subjectId: string;
+    totalMarks: number;
+    date: string;
+    createdAt: string;
+    updatedAt: string;
+    subject: ExamSubjectDetail;
 }
 
 export interface ExamAcademicYear {
@@ -35,24 +48,30 @@ export interface Exam {
     name: string;
     type: ExamType;
     classId: string;
-    subjectId: string;
     academicYearId: string;
     termId: string | null;
-    totalMarks: number;
-    date: string;
     isFinalized: boolean;
     status: ExamStatus;
     createdById: string | null;
     createdAt: string;
     updatedAt: string;
     class: ExamClass;
-    subject: ExamSubject;
     academicYear: ExamAcademicYear;
+    examSubjects: ExamSubject[];
+}
+
+export interface ExamSubjectSummary {
+    examSubjectId: string;
+    subjectId: string;
+    subjectName: string;
+    totalMarks: number;
+    date: string;
+    gradeCount: number;
+    averageMarks: number | null;
 }
 
 export interface ExamWithSummary extends Exam {
-    gradeCount: number;
-    averageMarks: number | null;
+    subjectSummaries: ExamSubjectSummary[];
 }
 
 export interface ExamsListParams {
@@ -72,21 +91,34 @@ export interface ExamsListResponse {
     limit: number;
 }
 
+export interface ExamSubjectInput {
+    subjectId: string;
+    totalMarks: number;
+    date: string;
+}
+
 export interface CreateExamRequest {
     name: string;
     type: ExamType;
     classId: string;
-    subjectId: string;
     academicYearId?: string;
     termId?: string;
-    totalMarks: number;
-    date: string;
+    subjects: ExamSubjectInput[];
 }
 
 export interface UpdateExamRequest {
     name?: string;
     type?: ExamType;
+    termId?: string;
+}
+
+export interface AddExamSubjectRequest {
+    subjectId: string;
+    totalMarks: number;
+    date: string;
+}
+
+export interface UpdateExamSubjectRequest {
     totalMarks?: number;
     date?: string;
-    termId?: string;
 }

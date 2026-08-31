@@ -13,22 +13,26 @@ import type {
 
 export async function enterGrades(
     examId: string,
+    subjectId: string,
     data: BulkEnterGradesRequest,
 ): Promise<BulkGradeResult> {
-    return apiFetch<BulkGradeResult>(API_ENDPOINTS.GRADES.examGrades(examId), {
+    return apiFetch<BulkGradeResult>(API_ENDPOINTS.GRADES.examSubjectGrades(examId, subjectId), {
         method: "POST",
         body: JSON.stringify(data),
     });
 }
 
-export async function getExamGrades(examId: string): Promise<Grade[]> {
-    return apiFetch<Grade[]>(API_ENDPOINTS.GRADES.examGrades(examId), {
+export async function getExamSubjectGrades(examId: string, subjectId: string): Promise<Grade[]> {
+    return apiFetch<Grade[]>(API_ENDPOINTS.GRADES.examSubjectGrades(examId, subjectId), {
         method: "GET",
     });
 }
 
-export async function getExamSummary(examId: string): Promise<ExamGradesSummary> {
-    return apiFetch<ExamGradesSummary>(API_ENDPOINTS.GRADES.examSummary(examId), {
+export async function getExamSubjectSummary(
+    examId: string,
+    subjectId: string,
+): Promise<ExamGradesSummary> {
+    return apiFetch<ExamGradesSummary>(API_ENDPOINTS.GRADES.examSubjectSummary(examId, subjectId), {
         method: "GET",
     });
 }

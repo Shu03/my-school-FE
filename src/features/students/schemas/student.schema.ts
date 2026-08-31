@@ -13,7 +13,6 @@ const dateOfBirth = z
 const rollNumber = z
     .string()
     .trim()
-    .min(1, "Roll number is required")
     .max(
         STUDENT_VALIDATION.ROLL_NUMBER_MAX,
         `Roll number must be at most ${STUDENT_VALIDATION.ROLL_NUMBER_MAX} characters`,

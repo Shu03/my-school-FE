@@ -14,7 +14,6 @@ import { HolidaysWidget } from "@features/holidays";
 
 import { Stagger, StaggerItem } from "@components/common/Motion";
 
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 

@@ -10,10 +10,11 @@ import {
     TableRow,
 } from "@/components/ui/table";
 
-import { useExamSummary } from "../hooks/useGrades";
+import { useExamSubjectSummary } from "../hooks/useGrades";
 
 interface ExamGradesSummarySectionProps {
     examId: string;
+    subjectId: string;
     enabled: boolean;
 }
 
@@ -23,9 +24,10 @@ function formatValue(value: number | null): string {
 
 export function ExamGradesSummarySection({
     examId,
+    subjectId,
     enabled,
 }: ExamGradesSummarySectionProps): JSX.Element {
-    const { data: summary, isLoading } = useExamSummary(examId, enabled);
+    const { data: summary, isLoading } = useExamSubjectSummary(examId, subjectId, enabled);
 
     if (isLoading) {
         return (

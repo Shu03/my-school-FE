@@ -9,7 +9,6 @@ import {
     BookOpen,
     BookText,
     CalendarRange,
-    GraduationCap,
     UserRound,
     ClipboardCheck,
     ClipboardList,
@@ -86,12 +85,6 @@ const navItems: NavItem[] = [
     { label: "Dashboard", path: ROUTES.DASHBOARD, icon: LayoutDashboard },
     { label: "Users", path: ROUTES.USERS, icon: Users, roles: [Role.ADMIN] },
     { label: "Teachers", path: ROUTES.TEACHERS, icon: UserRound, roles: [Role.ADMIN] },
-    {
-        label: "Students",
-        path: ROUTES.STUDENTS,
-        icon: GraduationCap,
-        roles: [Role.ADMIN, Role.TEACHER],
-    },
     {
         label: "Academic Years",
         path: ROUTES.ACADEMIC_YEARS,

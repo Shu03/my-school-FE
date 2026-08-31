@@ -150,8 +150,6 @@ export function ExamsPage(): JSX.Element {
                     data: {
                         name: values.name,
                         type: values.type,
-                        totalMarks: values.totalMarks,
-                        date: values.date,
                     },
                 });
                 toast.success("Exam updated successfully.");
@@ -160,10 +158,8 @@ export function ExamsPage(): JSX.Element {
                     name: values.name,
                     type: values.type,
                     classId: values.classId,
-                    subjectId: values.subjectId,
                     academicYearId: currentYear?.id,
-                    totalMarks: values.totalMarks,
-                    date: values.date,
+                    subjects: values.subjects,
                 });
                 toast.success("Exam created successfully.");
             }

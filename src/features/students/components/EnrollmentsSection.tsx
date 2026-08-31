@@ -2,6 +2,8 @@ import type { JSX } from "react";
 
 import { Pencil, Plus } from "lucide-react";
 
+import { ENROLLMENT_STATUS } from "@constants/students.constants";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
@@ -25,11 +27,15 @@ export function EnrollmentsSection({
     onEnroll,
     onEdit,
 }: EnrollmentsSectionProps): JSX.Element {
+    const hasActiveEnrollment = enrollments.some(
+        (enrollment) => enrollment.status === ENROLLMENT_STATUS.ACTIVE,
+    );
+
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-base">Enrollments</CardTitle>
-                {canManage && (
+                {canManage && !hasActiveEnrollment && (
                     <Button size="sm" onClick={onEnroll}>
                         <Plus className="size-4" />
                         Enroll

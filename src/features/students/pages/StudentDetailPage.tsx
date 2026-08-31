@@ -7,7 +7,6 @@ import { AlertCircle, ArrowLeft, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 import { PERMISSIONS } from "@constants/permissions.constants";
-import { ROUTES } from "@constants/routes.constants";
 
 import { Role } from "@/types/api";
 
@@ -130,14 +129,9 @@ export function StudentDetailPage(): JSX.Element {
     return (
         <div className="flex flex-col gap-6">
             {isAdmin && (
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-fit"
-                    onClick={() => navigate(ROUTES.STUDENTS)}
-                >
+                <Button variant="ghost" size="sm" className="w-fit" onClick={() => navigate(-1)}>
                     <ArrowLeft className="size-4" />
-                    Back to students
+                    Back
                 </Button>
             )}
 

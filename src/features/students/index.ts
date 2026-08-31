@@ -15,6 +15,10 @@ export {
     usePromoteStudents,
 } from "./hooks/useStudents";
 
+export { EnrollStudentDialog } from "./components/EnrollStudentDialog";
+
+export type { EnrollStudentFormValues } from "./schemas/student.schema";
+
 export type {
     EnrollStudentRequest,
     EnrollmentAcademicYear,

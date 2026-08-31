@@ -1,8 +1,8 @@
 export {
     gradesKeys,
     useEnterGrades,
-    useExamGrades,
-    useExamSummary,
+    useExamSubjectGrades,
+    useExamSubjectSummary,
     useStudentGradeHistory,
 } from "./hooks/useGrades";
 export { GradeEntrySection } from "./components/GradeEntrySection";

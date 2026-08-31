@@ -2,7 +2,12 @@
  * Public API of the holidays feature.
  */
 
-export { holidaysKeys, useHolidaysList, useCreateHoliday, useDeleteHoliday } from "./hooks/useHolidays";
+export {
+    holidaysKeys,
+    useHolidaysList,
+    useCreateHoliday,
+    useDeleteHoliday,
+} from "./hooks/useHolidays";
 export { HolidaysTable } from "./components/HolidaysTable";
 export { HolidayFormDialog } from "./components/HolidayFormDialog";
 export { HolidaysWidget } from "./components/HolidaysWidget";

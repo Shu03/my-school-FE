@@ -3,12 +3,15 @@ import { API_ENDPOINTS } from "@constants/apiEndpoints.constants";
 import apiFetch from "@lib/api/client";
 
 import type {
+    AddExamSubjectRequest,
     CreateExamRequest,
     Exam,
     ExamsListParams,
     ExamsListResponse,
+    ExamSubject,
     ExamWithSummary,
     UpdateExamRequest,
+    UpdateExamSubjectRequest,
 } from "../types/exam.types";
 
 export async function listExams(params: ExamsListParams): Promise<ExamsListResponse> {
@@ -47,6 +50,33 @@ export async function updateExam(id: string, data: UpdateExamRequest): Promise<E
     return apiFetch<Exam>(API_ENDPOINTS.EXAMS.byId(id), {
         method: "PATCH",
         body: JSON.stringify(data),
+    });
+}
+
+export async function addExamSubject(
+    examId: string,
+    data: AddExamSubjectRequest,
+): Promise<ExamSubject> {
+    return apiFetch<ExamSubject>(API_ENDPOINTS.EXAMS.subjects(examId), {
+        method: "POST",
+        body: JSON.stringify(data),
+    });
+}
+
+export async function updateExamSubject(
+    examId: string,
+    subjectId: string,
+    data: UpdateExamSubjectRequest,
+): Promise<ExamSubject> {
+    return apiFetch<ExamSubject>(API_ENDPOINTS.EXAMS.subjectById(examId, subjectId), {
+        method: "PATCH",
+        body: JSON.stringify(data),
+    });
+}
+
+export async function removeExamSubject(examId: string, subjectId: string): Promise<void> {
+    return apiFetch<void>(API_ENDPOINTS.EXAMS.subjectById(examId, subjectId), {
+        method: "DELETE",
     });
 }
 

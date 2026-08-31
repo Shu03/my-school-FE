@@ -8,8 +8,8 @@ import {
 
 import {
     enterGrades,
-    getExamGrades,
-    getExamSummary,
+    getExamSubjectGrades,
+    getExamSubjectSummary,
     getStudentGradeHistory,
 } from "../api/grades.api";
 import type {
@@ -24,28 +24,35 @@ import type {
 /** Query-key factory for the grades feature. */
 export const gradesKeys = {
     all: ["grades"] as const,
-    examGrades: (examId: string) => [...gradesKeys.all, "exam", examId] as const,
-    examSummary: (examId: string) => [...gradesKeys.all, "exam", examId, "summary"] as const,
+    examSubjectGrades: (examId: string, subjectId: string) =>
+        [...gradesKeys.all, "exam", examId, "subject", subjectId] as const,
+    examSubjectSummary: (examId: string, subjectId: string) =>
+        [...gradesKeys.all, "exam", examId, "subject", subjectId, "summary"] as const,
     studentHistory: (studentId: string, params: StudentGradesParams) =>
         [...gradesKeys.all, "student", studentId, params] as const,
 };
 
-export function useExamGrades(examId: string | null, enabled = true): UseQueryResult<Grade[]> {
+export function useExamSubjectGrades(
+    examId: string | null,
+    subjectId: string | null,
+    enabled = true,
+): UseQueryResult<Grade[]> {
     return useQuery({
-        queryKey: gradesKeys.examGrades(examId ?? ""),
-        queryFn: () => getExamGrades(examId as string),
-        enabled: Boolean(examId) && enabled,
+        queryKey: gradesKeys.examSubjectGrades(examId ?? "", subjectId ?? ""),
+        queryFn: () => getExamSubjectGrades(examId as string, subjectId as string),
+        enabled: Boolean(examId) && Boolean(subjectId) && enabled,
     });
 }
 
-export function useExamSummary(
+export function useExamSubjectSummary(
     examId: string | null,
+    subjectId: string | null,
     enabled = true,
 ): UseQueryResult<ExamGradesSummary> {
     return useQuery({
-        queryKey: gradesKeys.examSummary(examId ?? ""),
-        queryFn: () => getExamSummary(examId as string),
-        enabled: Boolean(examId) && enabled,
+        queryKey: gradesKeys.examSubjectSummary(examId ?? "", subjectId ?? ""),
+        queryFn: () => getExamSubjectSummary(examId as string, subjectId as string),
+        enabled: Boolean(examId) && Boolean(subjectId) && enabled,
     });
 }
 
@@ -63,13 +70,18 @@ export function useStudentGradeHistory(
 
 export function useEnterGrades(
     examId: string,
+    subjectId: string,
 ): UseMutationResult<BulkGradeResult, Error, BulkEnterGradesRequest> {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data) => enterGrades(examId, data),
+        mutationFn: (data) => enterGrades(examId, subjectId, data),
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: gradesKeys.examGrades(examId) });
-            void queryClient.invalidateQueries({ queryKey: gradesKeys.examSummary(examId) });
+            void queryClient.invalidateQueries({
+                queryKey: gradesKeys.examSubjectGrades(examId, subjectId),
+            });
+            void queryClient.invalidateQueries({
+                queryKey: gradesKeys.examSubjectSummary(examId, subjectId),
+            });
         },
     });
 }

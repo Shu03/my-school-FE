@@ -1,10 +1,16 @@
+import { useState } from "react";
 import type { JSX, ReactNode } from "react";
 
-import { AlertCircle, Ban, CheckCircle2, KeyRound, Pencil } from "lucide-react";
+import { AlertCircle, Ban, CheckCircle2, GraduationCap, KeyRound, Pencil } from "lucide-react";
+import { toast } from "sonner";
 
+import { ENROLLMENT_STATUS } from "@constants/students.constants";
 import { ROLE_LABELS } from "@constants/users.constants";
 
 import { Role } from "@/types/api";
+
+import { EnrollStudentDialog, useEnrollStudent, useStudentEnrollments } from "@features/students";
+import type { EnrollStudentFormValues } from "@features/students";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -135,6 +141,35 @@ function UserDetailsBody({
 }): JSX.Element {
     const subtitle = user.email ?? user.mobileNumber;
 
+    const [enrollOpen, setEnrollOpen] = useState(false);
+    const enrollStudentMutation = useEnrollStudent();
+
+    const studentProfileId = user.role === Role.STUDENT ? (user.studentProfile?.id ?? null) : null;
+    const { data: enrollments = [] } = useStudentEnrollments(studentProfileId);
+    const isEnrolled = enrollments.some((item) => item.status === ENROLLMENT_STATUS.ACTIVE);
+    const canEnroll = studentProfileId !== null && !isEnrolled;
+
+    async function handleEnrollSubmit(values: EnrollStudentFormValues): Promise<void> {
+        if (!studentProfileId) {
+            return;
+        }
+
+        try {
+            await enrollStudentMutation.mutateAsync({
+                id: studentProfileId,
+                data: {
+                    classId: values.classId,
+                    academicYearId: values.academicYearId || undefined,
+                    rollNumber: values.rollNumber?.trim() || undefined,
+                },
+            });
+            toast.success("Student enrolled successfully.");
+            setEnrollOpen(false);
+        } catch {
+            toast.error("Could not enroll this student. Please try again.");
+        }
+    }
+
     return (
         <>
             {/* Banner */}
@@ -206,8 +241,20 @@ function UserDetailsBody({
             </div>
 
             {/* Action Footer */}
-            {(onEdit || onResetPassword || onActivate || onDeactivate) && (
+            {(canEnroll || onEdit || onResetPassword || onActivate || onDeactivate) && (
                 <div className="border-border/60 bg-muted/20 flex items-center justify-end gap-2 border-t px-6 py-4">
+                    {canEnroll && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="mr-auto"
+                            onClick={() => setEnrollOpen(true)}
+                        >
+                            <GraduationCap className="size-4" />
+                            Enroll in class
+                        </Button>
+                    )}
+
                     {onResetPassword && (
                         <Tooltip>
                             <TooltipTrigger asChild className="cursor-pointer">
@@ -281,6 +328,15 @@ function UserDetailsBody({
                               </Tooltip>
                           )}
                 </div>
+            )}
+
+            {canEnroll && (
+                <EnrollStudentDialog
+                    open={enrollOpen}
+                    isSubmitting={enrollStudentMutation.isPending}
+                    onOpenChange={setEnrollOpen}
+                    onSubmit={handleEnrollSubmit}
+                />
             )}
         </>
     );

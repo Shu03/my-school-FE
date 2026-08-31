@@ -16,7 +16,6 @@ import {
     TableRow,
 } from "@/components/ui/table";
 
-import { formatDate } from "../lib/format";
 import type { Exam } from "../types/exam.types";
 
 interface ExamsTableProps {
@@ -52,9 +51,7 @@ export function ExamsTable({
                         <TableHead>Name</TableHead>
                         <TableHead>Type</TableHead>
                         <TableHead>Class</TableHead>
-                        <TableHead>Subject</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead className="text-right">Marks</TableHead>
+                        <TableHead>Subjects</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead className="w-40 text-right">
                             <span className="sr-only">Actions</span>
@@ -64,7 +61,7 @@ export function ExamsTable({
                 <TableBody>
                     {isLoading && (
                         <TableRow>
-                            <TableCell colSpan={8}>
+                            <TableCell colSpan={6}>
                                 <div className="flex items-center justify-center gap-2 py-10">
                                     <Spinner />
                                     <span className="text-muted-foreground text-sm">
@@ -77,7 +74,7 @@ export function ExamsTable({
 
                     {!isLoading && exams.length === 0 && (
                         <TableRow>
-                            <TableCell colSpan={8}>
+                            <TableCell colSpan={6}>
                                 <div className="text-muted-foreground py-10 text-center text-sm">
                                     No exams found.
                                 </div>
@@ -111,15 +108,23 @@ export function ExamsTable({
                                         {exam.class.name} (Grade {exam.class.gradeLevel})
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant="secondary" className="font-mono">
-                                            {exam.subject.code}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-muted-foreground">
-                                        {formatDate(exam.date)}
-                                    </TableCell>
-                                    <TableCell className="text-right tabular-nums">
-                                        {exam.totalMarks}
+                                        <div className="flex flex-wrap gap-1">
+                                            {exam.examSubjects.length === 0 ? (
+                                                <span className="text-muted-foreground text-sm">
+                                                    —
+                                                </span>
+                                            ) : (
+                                                exam.examSubjects.map((examSubject) => (
+                                                    <Badge
+                                                        key={examSubject.id}
+                                                        variant="secondary"
+                                                        className="font-mono"
+                                                    >
+                                                        {examSubject.subject.code}
+                                                    </Badge>
+                                                ))
+                                            )}
+                                        </div>
                                     </TableCell>
                                     <TableCell>
                                         {exam.status === EXAM_STATUS.DISCARDED ? (

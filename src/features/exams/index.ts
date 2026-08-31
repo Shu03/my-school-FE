@@ -1,18 +1,26 @@
 export {
     examsKeys,
+    useAddExamSubject,
     useCreateExam,
     useDiscardExam,
     useExam,
     useExamsList,
     useFinalizeExam,
+    useRemoveExamSubject,
     useUnlockExam,
     useUpdateExam,
+    useUpdateExamSubject,
 } from "./hooks/useExams";
 export type {
     Exam,
+    ExamSubject,
+    ExamSubjectDetail,
+    ExamSubjectSummary,
     ExamsListParams,
     ExamsListResponse,
     ExamWithSummary,
     CreateExamRequest,
     UpdateExamRequest,
+    AddExamSubjectRequest,
+    UpdateExamSubjectRequest,
 } from "./types/exam.types";

@@ -19,11 +19,12 @@ import {
     TableRow,
 } from "@/components/ui/table";
 
-import { useEnterGrades, useExamGrades } from "../hooks/useGrades";
+import { useEnterGrades, useExamSubjectGrades } from "../hooks/useGrades";
 import { getGradeErrorMessage } from "../lib/errors";
 
 interface GradeEntrySectionProps {
     examId: string;
+    subjectId: string;
     classId: string;
     academicYearId: string;
     totalMarks: number;
@@ -31,6 +32,7 @@ interface GradeEntrySectionProps {
 
 export function GradeEntrySection({
     examId,
+    subjectId,
     classId,
     academicYearId,
     totalMarks,
@@ -45,9 +47,12 @@ export function GradeEntrySection({
     });
     const students = studentsData?.data ?? [];
 
-    const { data: existingGrades = [], isLoading: isLoadingGrades } = useExamGrades(examId);
+    const { data: existingGrades = [], isLoading: isLoadingGrades } = useExamSubjectGrades(
+        examId,
+        subjectId,
+    );
 
-    const enterMutation = useEnterGrades(examId);
+    const enterMutation = useEnterGrades(examId, subjectId);
 
     // Prefill marks from existing grades whenever the roster or grade set changes (render-time sync).
     const dataKey = `${students.map((student) => student.id).join(",")}|${existingGrades

@@ -123,9 +123,7 @@ export function AcademicYearsPage(): JSX.Element {
     }
 
     async function handleDeleteHoliday(holiday: Holiday): Promise<void> {
-        const confirmed = window.confirm(
-            `Delete ${holiday.name}? This action cannot be undone.`,
-        );
+        const confirmed = window.confirm(`Delete ${holiday.name}? This action cannot be undone.`);
         if (!confirmed) {
             return;
         }

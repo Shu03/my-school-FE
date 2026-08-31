@@ -22,6 +22,7 @@ import {
     ManageAcademicYearsPage,
     AcademicYearTermsPage,
     ClassesPage,
+    ClassDetailPage,
     SubjectsPage,
     TeachersPage,
     TeacherDetailPage,
@@ -276,6 +277,14 @@ export const router = createBrowserRouter([
                         element: (
                             <Lazy>
                                 <ClassesPage />
+                            </Lazy>
+                        ),
+                    },
+                    {
+                        path: ROUTES.CLASS_DETAIL,
+                        element: (
+                            <Lazy>
+                                <ClassDetailPage />
                             </Lazy>
                         ),
                     },
