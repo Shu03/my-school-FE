@@ -11,11 +11,7 @@ import { ROUTES } from "@constants/routes.constants";
 import { Role } from "@/types/api";
 
 import { hasPermission, useAuthStore } from "@features/auth";
-import {
-    ExamGradesSummarySection,
-    GradeEntrySection,
-    useExamGrades,
-} from "@features/grades";
+import { ExamGradesSummarySection, GradeEntrySection, useExamGrades } from "@features/grades";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +22,13 @@ import { Spinner } from "@/components/ui/spinner";
 import { useExam } from "../hooks/useExams";
 import { formatDate, formatMarks } from "../lib/format";
 
-function StudentGradeCard({ examId, totalMarks }: { examId: string; totalMarks: number }): JSX.Element {
+function StudentGradeCard({
+    examId,
+    totalMarks,
+}: {
+    examId: string;
+    totalMarks: number;
+}): JSX.Element {
     const { data: grades = [], isLoading } = useExamGrades(examId);
     const grade = grades[0] ?? null;
 
@@ -108,9 +110,7 @@ export function ExamDetailPage(): JSX.Element {
                                     {exam.name}
                                 </h1>
                                 <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-2 text-sm">
-                                    <Badge variant="secondary">
-                                        {EXAM_TYPE_LABELS[exam.type]}
-                                    </Badge>
+                                    <Badge variant="secondary">{EXAM_TYPE_LABELS[exam.type]}</Badge>
                                     <span>
                                         {exam.class.name} (Grade {exam.class.gradeLevel})
                                     </span>

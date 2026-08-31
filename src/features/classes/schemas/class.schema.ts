@@ -5,8 +5,8 @@ import { CLASS_VALIDATION } from "@constants/classes.constants";
 const gradeLevelSchema = z
     .number({ error: "Grade level is required" })
     .int("Grade level must be a whole number")
-    .min(CLASS_VALIDATION.GRADE_MIN, "Grade level must be at least 1")
-    .max(CLASS_VALIDATION.GRADE_MAX, "Grade level must be at most 99");
+    .min(CLASS_VALIDATION.GRADE_MIN, `Grade level must be at least ${CLASS_VALIDATION.GRADE_MIN}`)
+    .max(CLASS_VALIDATION.GRADE_MAX, `Grade level must be at most ${CLASS_VALIDATION.GRADE_MAX}`);
 
 export const createClassSchema = z.object({
     name: z
@@ -44,10 +44,6 @@ export const updateClassSchema = z
         }
     });
 
-export const assignClassTeacherSchema = z.object({
-    teacherId: z.string().trim().min(1, "Teacher is required"),
-});
-
 export const editClassSchema = z.object({
     name: z
         .string()
@@ -63,4 +59,3 @@ export const editClassSchema = z.object({
 export type CreateClassFormValues = z.infer<typeof createClassSchema>;
 export type UpdateClassFormValues = z.infer<typeof updateClassSchema>;
 export type EditClassFormValues = z.infer<typeof editClassSchema>;
-export type AssignClassTeacherFormValues = z.infer<typeof assignClassTeacherSchema>;

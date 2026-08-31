@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarRange, Check, Plus, X } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
+import { CLASS_VALIDATION } from "@constants/classes.constants";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -156,8 +158,8 @@ function CreateClassForm({
                         <Input
                             id="new-class-grade"
                             type="number"
-                            min={1}
-                            max={99}
+                            min={CLASS_VALIDATION.GRADE_MIN}
+                            max={CLASS_VALIDATION.GRADE_MAX}
                             className="w-20"
                             {...register("gradeLevel", { valueAsNumber: true })}
                         />

@@ -17,6 +17,7 @@ import {
     DashboardPage,
     Lazy,
     LoginPage,
+    ProfilePage,
     AcademicYearsPage,
     ManageAcademicYearsPage,
     AcademicYearTermsPage,
@@ -34,6 +35,9 @@ import {
     AnnouncementsPage,
     ExamsPage,
     ExamDetailPage,
+    FeesPage,
+    FeeRecordDetailPage,
+    MyFeesPage,
 } from "./lazy";
 import { NotFoundPage } from "./NotFoundPage";
 
@@ -77,6 +81,15 @@ export const router = createBrowserRouter([
                 element: (
                     <Lazy>
                         <DashboardPage />
+                    </Lazy>
+                ),
+            },
+
+            {
+                path: ROUTES.PROFILE,
+                element: (
+                    <Lazy>
+                        <ProfilePage />
                     </Lazy>
                 ),
             },
@@ -131,6 +144,24 @@ export const router = createBrowserRouter([
                 element: (
                     <Lazy>
                         <ExamDetailPage />
+                    </Lazy>
+                ),
+            },
+
+            {
+                path: ROUTES.FEE_DETAIL,
+                element: (
+                    <Lazy>
+                        <FeeRecordDetailPage />
+                    </Lazy>
+                ),
+            },
+
+            {
+                path: ROUTES.MY_FEES,
+                element: (
+                    <Lazy>
+                        <MyFeesPage />
                     </Lazy>
                 ),
             },
@@ -264,6 +295,25 @@ export const router = createBrowserRouter([
                         element: (
                             <Lazy>
                                 <SubjectsPage />
+                            </Lazy>
+                        ),
+                    },
+                ],
+            },
+            {
+                element: (
+                    <RoleOrPermissionGuard
+                        allowedRoles={[Role.ADMIN]}
+                        permissionRole={Role.TEACHER}
+                        requiredPermission={PERMISSIONS.FEES_MANAGE}
+                    />
+                ),
+                children: [
+                    {
+                        path: ROUTES.FEES,
+                        element: (
+                            <Lazy>
+                                <FeesPage />
                             </Lazy>
                         ),
                     },

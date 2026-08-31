@@ -6,6 +6,7 @@ export const ROUTES = {
     LOGIN: "/login",
     CHANGE_PASSWORD: "/change-password",
     DASHBOARD: "/",
+    PROFILE: "/profile",
     USERS: "/users",
     USER_NEW: "/users/new",
     USER_EDIT: "/users/:id/edit",
@@ -23,6 +24,9 @@ export const ROUTES = {
     ANNOUNCEMENTS: "/announcements",
     EXAMS: "/exams",
     EXAM_DETAIL: "/exams/:id",
+    FEES: "/fees",
+    FEE_DETAIL: "/fees/records/:id",
+    MY_FEES: "/my-fees",
     SETTINGS: "/settings",
     NOT_FOUND: "*",
 } as const;
@@ -52,4 +56,9 @@ export function studentDetail(id: string): string {
 /** Build the detail path for a specific exam. */
 export function examDetail(id: string): string {
     return `/exams/${id}`;
+}
+
+/** Build the detail path for a specific fee record. */
+export function feeDetail(id: string): string {
+    return `/fees/records/${id}`;
 }

@@ -11,16 +11,8 @@ import { Button } from "@/components/ui/button";
 
 import { ClassesGrid } from "../components/ClassesGrid";
 import { ClassesToolbar } from "../components/ClassesToolbar";
-import {
-    useAssignableTeachers,
-    useAssignClassTeacher,
-    useClassesList,
-    useCreateClass,
-    useRemoveClassTeacher,
-    useUpdateClass,
-} from "../hooks/useClasses";
+import { useClassesList, useCreateClass, useUpdateClass } from "../hooks/useClasses";
 import { getClassErrorMessage } from "../lib/errors";
-import type { TeacherOption } from "../types/class.types";
 
 export function ClassesPage(): JSX.Element {
     const [selectedAcademicYearId, setSelectedAcademicYearId] = useState<string | null>(null);
@@ -49,34 +41,6 @@ export function ClassesPage(): JSX.Element {
 
     const createClassMutation = useCreateClass();
     const updateClassMutation = useUpdateClass();
-    const assignTeacherMutation = useAssignClassTeacher();
-    const removeTeacherMutation = useRemoveClassTeacher();
-
-    const {
-        data: teacherProfiles,
-        isLoading: teachersLoading,
-        isError: teachersError,
-    } = useAssignableTeachers();
-
-    const teacherOptions = useMemo<TeacherOption[]>(
-        () =>
-            (teacherProfiles ?? [])
-                .filter((teacher) => teacher.user.isActive)
-                .map((teacher) => ({
-                    id: teacher.id,
-                    label: `${teacher.user.firstName} ${teacher.user.lastName} (${teacher.employeeCode})`,
-                })),
-        [teacherProfiles],
-    );
-
-    const teacherNameById = useMemo<Record<string, string>>(
-        () =>
-            teacherOptions.reduce<Record<string, string>>((acc, teacher) => {
-                acc[teacher.id] = teacher.label;
-                return acc;
-            }, {}),
-        [teacherOptions],
-    );
 
     const yearNameById = useMemo<Record<string, string>>(
         () =>
@@ -133,36 +97,8 @@ export function ClassesPage(): JSX.Element {
         }
     }
 
-    async function handleAssignTeacher(id: string, teacherId: string): Promise<boolean> {
-        try {
-            await assignTeacherMutation.mutateAsync({ id, teacherId });
-            toast.success("Class teacher assigned successfully.");
-            return true;
-        } catch (error) {
-            toast.error(getClassErrorMessage(error));
-            return false;
-        }
-    }
-
-    async function handleRemoveTeacher(id: string): Promise<boolean> {
-        try {
-            await removeTeacherMutation.mutateAsync({ id });
-            toast.success("Class teacher removed successfully.");
-            return true;
-        } catch (error) {
-            toast.error(getClassErrorMessage(error));
-            return false;
-        }
-    }
-
     const updatingClassId = updateClassMutation.isPending
         ? (updateClassMutation.variables?.id ?? null)
-        : null;
-    const assigningClassId = assignTeacherMutation.isPending
-        ? (assignTeacherMutation.variables?.id ?? null)
-        : null;
-    const removingClassId = removeTeacherMutation.isPending
-        ? (removeTeacherMutation.variables?.id ?? null)
         : null;
 
     return (
@@ -174,16 +110,6 @@ export function ClassesPage(): JSX.Element {
                 onAcademicYearChange={(value) => setSelectedAcademicYearId(value)}
                 onGradeLevelFilterChange={setGradeLevelFilter}
             />
-
-            {teachersError && (
-                <Alert>
-                    <AlertCircle />
-                    <AlertDescription>
-                        Teacher options are currently unavailable. Assignment actions may be
-                        limited.
-                    </AlertDescription>
-                </Alert>
-            )}
 
             {classesError ? (
                 <Alert variant="destructive">
@@ -205,24 +131,16 @@ export function ClassesPage(): JSX.Element {
                     classes={sortedClasses}
                     isLoading={classesLoading}
                     yearNameById={yearNameById}
-                    teacherNameById={teacherNameById}
-                    teacherOptions={teacherOptions}
-                    isTeachersLoading={teachersLoading}
-                    teacherLoadError={teachersError}
                     isCreating={isCreating}
                     createAcademicYearId={effectiveAcademicYearId}
                     createAcademicYearName={yearNameById[effectiveAcademicYearId] ?? ""}
                     canCreate={Boolean(effectiveAcademicYearId)}
                     isCreateSubmitting={createClassMutation.isPending}
                     updatingClassId={updatingClassId}
-                    assigningClassId={assigningClassId}
-                    removingClassId={removingClassId}
                     onStartCreate={() => setIsCreating(true)}
                     onCancelCreate={() => setIsCreating(false)}
                     onCreateSubmit={handleCreateSubmit}
                     onUpdate={handleUpdate}
-                    onAssignTeacher={handleAssignTeacher}
-                    onRemoveTeacher={handleRemoveTeacher}
                 />
             )}
         </div>

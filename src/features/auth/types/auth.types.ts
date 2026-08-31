@@ -22,6 +22,39 @@ export interface MeResponse {
     studentProfile?: { id: string } | null;
 }
 
+export interface ProfileTeacher {
+    id: string;
+    employeeCode: string;
+    joiningDate: string | null;
+    presetId: string | null;
+    permissionOverrides: string[];
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface ProfileStudent {
+    id: string;
+    admissionNumber: string;
+    dateOfBirth: string | null;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface Profile {
+    id: string;
+    mobileNumber: string;
+    firstName: string;
+    lastName: string;
+    email: string | null;
+    role: Role;
+    isActive: boolean;
+    isFirstLogin: boolean;
+    createdAt: string;
+    updatedAt: string;
+    teacherProfile: ProfileTeacher | null;
+    studentProfile: ProfileStudent | null;
+}
+
 export interface LoginRequest {
     mobileNumber: string;
     password: string;

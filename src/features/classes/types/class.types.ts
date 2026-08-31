@@ -3,7 +3,6 @@ export interface SchoolClass {
     name: string;
     gradeLevel: number;
     academicYearId: string;
-    classTeacherId: string | null;
     /** Enrollment stats — optional until the backend exposes them. */
     studentCount?: number;
     boysCount?: number;
@@ -45,21 +44,6 @@ export interface CreateClassRequest {
 export interface UpdateClassRequest {
     name?: string;
     gradeLevel?: number;
-}
-
-export interface AssignClassTeacherRequest {
-    teacherId: string;
-}
-
-export interface TeacherProfileSummary {
-    id: string;
-    employeeCode: string;
-    user: {
-        id: string;
-        firstName: string;
-        lastName: string;
-        isActive: boolean;
-    };
 }
 
 export interface TeacherOption {

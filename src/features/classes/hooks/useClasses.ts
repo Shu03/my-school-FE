@@ -6,21 +6,12 @@ import {
     type UseQueryResult,
 } from "@tanstack/react-query";
 
-import {
-    assignClassTeacher,
-    createClass,
-    getClassById,
-    listTeacherProfiles,
-    listClasses,
-    removeClassTeacher,
-    updateClass,
-} from "../api/classes.api";
+import { createClass, getClassById, listClasses, updateClass } from "../api/classes.api";
 import type {
     ClassesListParams,
     CreateClassRequest,
     SchoolClass,
     SchoolClassWithRelations,
-    TeacherProfileSummary,
     UpdateClassRequest,
 } from "../types/class.types";
 
@@ -30,7 +21,6 @@ export const classesKeys = {
     list: (params: ClassesListParams) => [...classesKeys.lists(), params] as const,
     details: () => [...classesKeys.all, "detail"] as const,
     detail: (id: string) => [...classesKeys.details(), id] as const,
-    teachers: () => [...classesKeys.all, "teachers"] as const,
 };
 
 export function useClassesList(
@@ -49,13 +39,6 @@ export function useClass(id: string | null): UseQueryResult<SchoolClassWithRelat
         queryKey: classesKeys.detail(id ?? ""),
         queryFn: () => getClassById(id as string),
         enabled: Boolean(id),
-    });
-}
-
-export function useAssignableTeachers(): UseQueryResult<TeacherProfileSummary[]> {
-    return useQuery({
-        queryKey: classesKeys.teachers(),
-        queryFn: listTeacherProfiles,
     });
 }
 
@@ -86,30 +69,4 @@ export function useUpdateClass(): UseMutationResult<
     });
 }
 
-export function useAssignClassTeacher(): UseMutationResult<
-    SchoolClass,
-    Error,
-    { id: string; teacherId: string }
-> {
-    const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: ({ id, teacherId }) => assignClassTeacher(id, { teacherId }),
-        onSuccess: (schoolClass) => {
-            void queryClient.invalidateQueries({ queryKey: classesKeys.lists() });
-            void queryClient.invalidateQueries({ queryKey: classesKeys.detail(schoolClass.id) });
-        },
-    });
-}
-
-export function useRemoveClassTeacher(): UseMutationResult<SchoolClass, Error, { id: string }> {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: ({ id }) => removeClassTeacher(id),
-        onSuccess: (schoolClass) => {
-            void queryClient.invalidateQueries({ queryKey: classesKeys.lists() });
-            void queryClient.invalidateQueries({ queryKey: classesKeys.detail(schoolClass.id) });
-        },
-    });
-}

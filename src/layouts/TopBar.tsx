@@ -1,6 +1,10 @@
 import type { JSX } from "react";
 
+import { NavLink } from "react-router-dom";
+
 import { LogOut, Bell } from "lucide-react";
+
+import { ROUTES } from "@constants/routes.constants";
 
 import { useAuthStore } from "@features/auth";
 
@@ -36,7 +40,11 @@ export function TopBar(): JSX.Element {
                 <div className="bg-sidebar-border mx-2 h-6 w-px" />
 
                 {/* User avatar/info */}
-                <div className="flex items-center gap-3">
+                <NavLink
+                    to={ROUTES.PROFILE}
+                    aria-label="View profile"
+                    className="hover:bg-sidebar-accent flex items-center gap-3 rounded-lg px-2 py-1 transition-colors"
+                >
                     <div className="relative">
                         <div className="bg-sidebar-primary text-sidebar-primary-foreground flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold shadow-sm">
                             {user?.firstName?.[0]}
@@ -52,7 +60,7 @@ export function TopBar(): JSX.Element {
                             {user?.role?.toLowerCase()}
                         </p>
                     </div>
-                </div>
+                </NavLink>
 
                 <Button
                     variant="ghost"

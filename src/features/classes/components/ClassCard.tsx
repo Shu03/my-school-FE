@@ -4,69 +4,37 @@ import type { JSX } from "react";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-    CalendarRange,
-    Check,
-    GraduationCap,
-    Pencil,
-    UserPlus,
-    UserRound,
-    UserRoundX,
-    X,
-} from "lucide-react";
+import { CalendarRange, Check, GraduationCap, Pencil, X } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+
+import { CLASS_VALIDATION } from "@constants/classes.constants";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
-import { teacherInitials } from "../lib/format";
 import { editClassSchema, type EditClassFormValues } from "../schemas/class.schema";
-import type { SchoolClass, TeacherOption } from "../types/class.types";
+import type { SchoolClass } from "../types/class.types";
 
 interface ClassCardProps {
     schoolClass: SchoolClass;
     yearName: string;
-    teacherName: string | null;
-    teacherOptions: TeacherOption[];
-    isTeachersLoading: boolean;
-    teacherLoadError: boolean;
     isUpdating: boolean;
-    isAssigning: boolean;
-    isRemoving: boolean;
     onUpdate: (id: string, data: { name: string; gradeLevel: number }) => Promise<boolean>;
-    onAssignTeacher: (id: string, teacherId: string) => Promise<boolean>;
-    onRemoveTeacher: (id: string) => Promise<boolean>;
 }
 
 export function ClassCard({
     schoolClass,
     yearName,
-    teacherName,
-    teacherOptions,
-    isTeachersLoading,
-    teacherLoadError,
     isUpdating,
-    isAssigning,
-    isRemoving,
     onUpdate,
-    onAssignTeacher,
-    onRemoveTeacher,
 }: ClassCardProps): JSX.Element {
     const reduceMotion = useReducedMotion();
     const [isEditing, setIsEditing] = useState(false);
-    const [pendingTeacherId, setPendingTeacherId] = useState("");
 
     const swap = reduceMotion
         ? {}
@@ -76,17 +44,6 @@ export function ClassCard({
               exit: { opacity: 0, y: -6 },
               transition: { duration: 0.18, ease: [0.16, 1, 0.3, 1] as const },
           };
-
-    async function handleAssign(): Promise<void> {
-        if (!pendingTeacherId) {
-            return;
-        }
-
-        const success = await onAssignTeacher(schoolClass.id, pendingTeacherId);
-        if (success) {
-            setPendingTeacherId("");
-        }
-    }
 
     const total = schoolClass.studentCount;
     const boys = schoolClass.boysCount;
@@ -212,106 +169,6 @@ export function ClassCard({
                                     </>
                                 )}
                             </section>
-
-                            <div className="bg-border/60 h-px" />
-
-                            {teacherName ? (
-                                <div className="border-border/60 bg-muted/30 flex items-center gap-3 rounded-lg border px-4 py-3">
-                                    <span className="bg-primary/10 text-primary texture-sheen flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold">
-                                        {teacherInitials(teacherName)}
-                                    </span>
-                                    <div className="min-w-0">
-                                        <p className="text-muted-foreground text-[0.7rem] font-semibold tracking-wide uppercase">
-                                            Class teacher
-                                        </p>
-                                        <p className="truncate text-sm font-medium">
-                                            {teacherName}
-                                        </p>
-                                    </div>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="text-muted-foreground hover:text-destructive ml-auto"
-                                                aria-label={`Unassign teacher from ${schoolClass.name}`}
-                                                disabled={isRemoving}
-                                                onClick={() => void onRemoveTeacher(schoolClass.id)}
-                                            >
-                                                {isRemoving ? (
-                                                    <Spinner className="size-4" />
-                                                ) : (
-                                                    <UserRoundX className="size-4" />
-                                                )}
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>Unassign teacher</TooltipContent>
-                                    </Tooltip>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col gap-2">
-                                    <p className="text-muted-foreground flex items-center gap-1.5 text-[0.7rem] font-semibold tracking-wide uppercase">
-                                        <UserRound className="size-3.5" />
-                                        Assign class teacher
-                                    </p>
-                                    <div className="flex items-center gap-2">
-                                        <Select
-                                            value={pendingTeacherId}
-                                            onValueChange={setPendingTeacherId}
-                                            disabled={teacherLoadError || isAssigning}
-                                        >
-                                            <SelectTrigger
-                                                className="flex-1"
-                                                aria-label="Select class teacher"
-                                            >
-                                                <SelectValue placeholder="Select a teacher" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {isTeachersLoading ? (
-                                                    <div className="text-muted-foreground px-2 py-1.5 text-sm">
-                                                        Loading teachers...
-                                                    </div>
-                                                ) : (
-                                                    teacherOptions.map((teacher) => (
-                                                        <SelectItem
-                                                            key={teacher.id}
-                                                            value={teacher.id}
-                                                        >
-                                                            {teacher.label}
-                                                        </SelectItem>
-                                                    ))
-                                                )}
-                                            </SelectContent>
-                                        </Select>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Button
-                                                    size="icon"
-                                                    aria-label={`Assign teacher to ${schoolClass.name}`}
-                                                    disabled={
-                                                        !pendingTeacherId ||
-                                                        isAssigning ||
-                                                        teacherLoadError
-                                                    }
-                                                    onClick={() => void handleAssign()}
-                                                >
-                                                    {isAssigning ? (
-                                                        <Spinner className="size-4" />
-                                                    ) : (
-                                                        <UserPlus className="size-4" />
-                                                    )}
-                                                </Button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>Assign teacher</TooltipContent>
-                                        </Tooltip>
-                                    </div>
-                                    {teacherLoadError && (
-                                        <p className="text-muted-foreground text-xs">
-                                            Teacher list is unavailable right now.
-                                        </p>
-                                    )}
-                                </div>
-                            )}
                         </CardContent>
                     </motion.div>
                 )}
@@ -373,8 +230,8 @@ function ClassEditForm({
                         <Input
                             id={`grade-${schoolClass.id}`}
                             type="number"
-                            min={1}
-                            max={99}
+                            min={CLASS_VALIDATION.GRADE_MIN}
+                            max={CLASS_VALIDATION.GRADE_MAX}
                             className="w-20"
                             {...register("gradeLevel", { valueAsNumber: true })}
                         />

@@ -1,5 +1,7 @@
 import type { JSX } from "react";
 
+import { CLASS_VALIDATION } from "@constants/classes.constants";
+
 import { Input } from "@/components/ui/input";
 import {
     Select,
@@ -47,8 +49,8 @@ export function ClassesToolbar({
             <Input
                 type="number"
                 inputMode="numeric"
-                min={1}
-                max={99}
+                min={CLASS_VALIDATION.GRADE_MIN}
+                max={CLASS_VALIDATION.GRADE_MAX}
                 placeholder="Filter grade"
                 className="w-34"
                 value={gradeLevelFilter}

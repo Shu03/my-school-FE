@@ -15,6 +15,7 @@ import {
     ClipboardList,
     NotebookPen,
     Megaphone,
+    Wallet,
 } from "lucide-react";
 
 import { APP_BRAND } from "@constants/app.constants";
@@ -70,6 +71,17 @@ function canAccessSubjects(user: User | null): boolean {
     );
 }
 
+function canAccessFees(user: User | null): boolean {
+    if (!user) {
+        return false;
+    }
+
+    return (
+        user.role === Role.ADMIN ||
+        (user.role === Role.TEACHER && hasPermission(user.permissions, PERMISSIONS.FEES_MANAGE))
+    );
+}
+
 const navItems: NavItem[] = [
     { label: "Dashboard", path: ROUTES.DASHBOARD, icon: LayoutDashboard },
     { label: "Users", path: ROUTES.USERS, icon: Users, roles: [Role.ADMIN] },
@@ -107,6 +119,13 @@ const navItems: NavItem[] = [
     { label: "Homework", path: ROUTES.HOMEWORK, icon: NotebookPen },
     { label: "Announcements", path: ROUTES.ANNOUNCEMENTS, icon: Megaphone },
     { label: "Exams", path: ROUTES.EXAMS, icon: ClipboardList },
+    {
+        label: "Fees",
+        path: ROUTES.FEES,
+        icon: Wallet,
+        canView: canAccessFees,
+    },
+    { label: "My Fees", path: ROUTES.MY_FEES, icon: Wallet, roles: [Role.STUDENT] },
 ];
 
 export function Sidebar(): JSX.Element {

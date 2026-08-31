@@ -8,20 +8,15 @@ export {
     classesKeys,
     useClassesList,
     useClass,
-    useAssignableTeachers,
     useCreateClass,
     useUpdateClass,
-    useAssignClassTeacher,
-    useRemoveClassTeacher,
 } from "./hooks/useClasses";
 
 export type {
-    AssignClassTeacherRequest,
     ClassesListParams,
     CreateClassRequest,
     SchoolClass,
     SchoolClassWithRelations,
     TeacherOption,
-    TeacherProfileSummary,
     UpdateClassRequest,
 } from "./types/class.types";

@@ -30,8 +30,6 @@ export const API_ENDPOINTS = {
     CLASSES: {
         BASE: "/classes",
         byId: (id: string) => `/classes/${id}`,
-        assignTeacher: (id: string) => `/classes/${id}/assign-teacher`,
-        removeTeacher: (id: string) => `/classes/${id}/remove-teacher`,
     },
     SUBJECTS: {
         BASE: "/subjects",
@@ -88,5 +86,14 @@ export const API_ENDPOINTS = {
     ANNOUNCEMENTS: {
         BASE: "/announcements",
         byId: (id: string) => `/announcements/${id}`,
+    },
+    FEES: {
+        STRUCTURES: "/fees/structures",
+        structureById: (id: string) => `/fees/structures/${id}`,
+        BACKFILL: "/fees/backfill",
+        RECORDS: "/fees/records",
+        recordById: (id: string) => `/fees/records/${id}`,
+        recordPayments: (id: string) => `/fees/records/${id}/payments`,
+        studentHistory: (studentId: string) => `/fees/student/${studentId}`,
     },
 } as const;

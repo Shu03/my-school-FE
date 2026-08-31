@@ -11,6 +11,9 @@ export const ChangePasswordPage = lazy(() =>
         default: m.ChangePasswordPage,
     })),
 );
+export const ProfilePage = lazy(() =>
+    import("@features/auth/pages/ProfilePage").then((m) => ({ default: m.ProfilePage })),
+);
 export const DashboardPage = lazy(() =>
     import("@features/dashboard/pages/DashboardPage").then((m) => ({ default: m.DashboardPage })),
 );
@@ -92,6 +95,21 @@ export const ExamsPage = lazy(() =>
 export const ExamDetailPage = lazy(() =>
     import("@features/exams/pages/ExamDetailPage").then((m) => ({
         default: m.ExamDetailPage,
+    })),
+);
+export const FeesPage = lazy(() =>
+    import("@features/fees/pages/FeesPage").then((m) => ({
+        default: m.FeesPage,
+    })),
+);
+export const FeeRecordDetailPage = lazy(() =>
+    import("@features/fees/pages/FeeRecordDetailPage").then((m) => ({
+        default: m.FeeRecordDetailPage,
+    })),
+);
+export const MyFeesPage = lazy(() =>
+    import("@features/fees/pages/MyFeesPage").then((m) => ({
+        default: m.MyFeesPage,
     })),
 );
 

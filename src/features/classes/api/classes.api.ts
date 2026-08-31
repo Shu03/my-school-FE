@@ -3,12 +3,10 @@ import { API_ENDPOINTS } from "@constants/apiEndpoints.constants";
 import apiFetch from "@lib/api/client";
 
 import type {
-    AssignClassTeacherRequest,
     ClassesListParams,
     CreateClassRequest,
     SchoolClass,
     SchoolClassWithRelations,
-    TeacherProfileSummary,
     UpdateClassRequest,
 } from "../types/class.types";
 
@@ -48,27 +46,5 @@ export async function updateClass(id: string, data: UpdateClassRequest): Promise
     return apiFetch<SchoolClass>(API_ENDPOINTS.CLASSES.byId(id), {
         method: "PATCH",
         body: JSON.stringify(data),
-    });
-}
-
-export async function assignClassTeacher(
-    id: string,
-    data: AssignClassTeacherRequest,
-): Promise<SchoolClass> {
-    return apiFetch<SchoolClass>(API_ENDPOINTS.CLASSES.assignTeacher(id), {
-        method: "PATCH",
-        body: JSON.stringify(data),
-    });
-}
-
-export async function removeClassTeacher(id: string): Promise<SchoolClass> {
-    return apiFetch<SchoolClass>(API_ENDPOINTS.CLASSES.removeTeacher(id), {
-        method: "PATCH",
-    });
-}
-
-export async function listTeacherProfiles(): Promise<TeacherProfileSummary[]> {
-    return apiFetch<TeacherProfileSummary[]>(API_ENDPOINTS.TEACHERS.BASE, {
-        method: "GET",
     });
 }

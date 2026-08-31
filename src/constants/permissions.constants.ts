@@ -12,6 +12,7 @@ export const PERMISSIONS = {
     HOMEWORK_MANAGE: "HOMEWORK_MANAGE",
     ANNOUNCEMENTS_MANAGE: "ANNOUNCEMENTS_MANAGE",
     REPORTS_VIEW: "REPORTS_VIEW",
+    FEES_MANAGE: "FEES_MANAGE",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
@@ -33,4 +34,5 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
     HOMEWORK_MANAGE: "Manage homework",
     ANNOUNCEMENTS_MANAGE: "Manage announcements",
     REPORTS_VIEW: "View reports",
+    FEES_MANAGE: "Manage fees",
 };

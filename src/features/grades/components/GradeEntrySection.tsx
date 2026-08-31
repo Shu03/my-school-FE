@@ -71,7 +71,9 @@ export function GradeEntrySection({
 
     async function handleSubmit(): Promise<void> {
         const records = students
-            .filter((student) => marks[student.id]?.trim() !== "" && marks[student.id] !== undefined)
+            .filter(
+                (student) => marks[student.id]?.trim() !== "" && marks[student.id] !== undefined,
+            )
             .map((student) => ({
                 studentId: student.id,
                 marksObtained: Number(marks[student.id]),

@@ -47,9 +47,7 @@ export function ExamGradesSummarySection({
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <div className="bg-muted/40 rounded-lg px-4 py-3">
                     <p className="text-muted-foreground text-xs">Graded</p>
-                    <p className="text-lg font-semibold tabular-nums">
-                        {summary.students.length}
-                    </p>
+                    <p className="text-lg font-semibold tabular-nums">{summary.students.length}</p>
                 </div>
                 <div className="bg-muted/40 rounded-lg px-4 py-3">
                     <p className="text-muted-foreground text-xs">Average</p>

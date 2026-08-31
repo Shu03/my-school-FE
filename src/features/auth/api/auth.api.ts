@@ -10,6 +10,7 @@ import type {
     LoginResponse,
     LoginSuccessResponse,
     MeResponse,
+    Profile,
     ResetPasswordResponse,
     User,
 } from "../types/auth.types";
@@ -72,4 +73,10 @@ export async function getMe(): Promise<User> {
         teacherProfileId: me.teacherProfile?.id,
         studentProfileId: me.studentProfile?.id,
     };
+}
+
+export async function getProfile(): Promise<Profile> {
+    return apiFetch<Profile>(API_ENDPOINTS.AUTH.ME, {
+        method: "GET",
+    });
 }
