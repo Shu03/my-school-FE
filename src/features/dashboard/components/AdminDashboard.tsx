@@ -10,7 +10,10 @@ import {
     Users,
 } from "lucide-react";
 
+import { HolidaysWidget } from "@features/holidays";
+
 import { Stagger, StaggerItem } from "@components/common/Motion";
+
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -149,6 +152,10 @@ export function AdminDashboard(): JSX.Element {
                     </StaggerItem>
                 ))}
             </Stagger>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+                <HolidaysWidget />
+            </div>
         </div>
     );
 }

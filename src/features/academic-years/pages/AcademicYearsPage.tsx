@@ -11,6 +11,15 @@ import { ROUTES } from "@constants/routes.constants";
 import { Role } from "@/types/api";
 
 import { useAuthStore } from "@features/auth";
+import {
+    HolidayFormDialog,
+    HolidaysTable,
+    getHolidayErrorMessage,
+    useCreateHoliday,
+    useDeleteHoliday,
+    useHolidaysList,
+} from "@features/holidays";
+import type { CreateHolidayFormValues, Holiday } from "@features/holidays";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -35,11 +44,20 @@ export function AcademicYearsPage(): JSX.Element {
 
     const [formOpen, setFormOpen] = useState(false);
     const [editingTerm, setEditingTerm] = useState<Term | null>(null);
+    const [holidayFormOpen, setHolidayFormOpen] = useState(false);
 
     const { data: currentYear, isLoading, isError, refetch } = useCurrentAcademicYear();
     const createTermMutation = useCreateTerm();
     const updateTermMutation = useUpdateTerm();
     const deleteTermMutation = useDeleteTerm();
+
+    const {
+        data: holidays = [],
+        isLoading: holidaysLoading,
+        isError: holidaysError,
+    } = useHolidaysList({ academicYearId: currentYear?.id }, Boolean(currentYear?.id));
+    const createHolidayMutation = useCreateHoliday();
+    const deleteHolidayMutation = useDeleteHoliday();
 
     const sortedTerms = useMemo(
         () =>
@@ -101,6 +119,40 @@ export function AcademicYearsPage(): JSX.Element {
             setEditingTerm(null);
         } catch (error) {
             toast.error(getAcademicYearErrorMessage(error));
+        }
+    }
+
+    async function handleDeleteHoliday(holiday: Holiday): Promise<void> {
+        const confirmed = window.confirm(
+            `Delete ${holiday.name}? This action cannot be undone.`,
+        );
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            await deleteHolidayMutation.mutateAsync({ id: holiday.id });
+            toast.success("Holiday deleted successfully.");
+        } catch (error) {
+            toast.error(getHolidayErrorMessage(error));
+        }
+    }
+
+    async function handleHolidaySubmit(values: CreateHolidayFormValues): Promise<void> {
+        if (!currentYear) {
+            return;
+        }
+
+        try {
+            await createHolidayMutation.mutateAsync({
+                name: values.name,
+                date: values.date,
+                academicYearId: currentYear.id,
+            });
+            toast.success("Holiday added successfully.");
+            setHolidayFormOpen(false);
+        } catch (error) {
+            toast.error(getHolidayErrorMessage(error));
         }
     }
 
@@ -178,6 +230,45 @@ export function AcademicYearsPage(): JSX.Element {
                 </div>
             </div>
 
+            <div className="bg-card text-card-foreground ring-foreground/10 overflow-hidden rounded-xl shadow-sm ring-1">
+                <div className="border-border/60 from-primary/12 via-primary/5 border-b bg-linear-to-br to-transparent px-6 py-5">
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <h1 className="text-xl font-semibold tracking-tight">Holidays</h1>
+                            <p className="text-muted-foreground mt-1 text-sm">
+                                {currentYear
+                                    ? `Holidays for ${currentYear.name}.`
+                                    : "Manage holidays for the current academic year."}
+                            </p>
+                        </div>
+                        <Button onClick={() => setHolidayFormOpen(true)} disabled={!currentYear}>
+                            <Plus className="size-4" />
+                            Add holiday
+                        </Button>
+                    </div>
+                </div>
+                <div className="px-6 py-6">
+                    {holidaysError ? (
+                        <Alert variant="destructive">
+                            <AlertCircle />
+                            <AlertDescription>Could not load holidays.</AlertDescription>
+                        </Alert>
+                    ) : (
+                        <HolidaysTable
+                            holidays={holidays}
+                            isLoading={holidaysLoading}
+                            canDelete={isAdmin}
+                            deletingHolidayId={
+                                deleteHolidayMutation.isPending
+                                    ? (deleteHolidayMutation.variables?.id ?? null)
+                                    : null
+                            }
+                            onDelete={(holiday) => void handleDeleteHoliday(holiday)}
+                        />
+                    )}
+                </div>
+            </div>
+
             {currentYear && (
                 <TermFormDialog
                     open={formOpen}
@@ -186,6 +277,18 @@ export function AcademicYearsPage(): JSX.Element {
                     isSubmitting={createTermMutation.isPending || updateTermMutation.isPending}
                     onOpenChange={setFormOpen}
                     onSubmit={handleFormSubmit}
+                />
+            )}
+
+            {currentYear && (
+                <HolidayFormDialog
+                    open={holidayFormOpen}
+                    yearName={currentYear.name}
+                    yearStartDate={currentYear.startDate}
+                    yearEndDate={currentYear.endDate}
+                    isSubmitting={createHolidayMutation.isPending}
+                    onOpenChange={setHolidayFormOpen}
+                    onSubmit={handleHolidaySubmit}
                 />
             )}
         </div>
