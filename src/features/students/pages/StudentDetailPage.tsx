@@ -6,11 +6,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { AlertCircle, ArrowLeft, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
+import { PERMISSIONS } from "@constants/permissions.constants";
 import { ROUTES } from "@constants/routes.constants";
 
 import { Role } from "@/types/api";
 
-import { useAuthStore } from "@features/auth";
+import { hasPermission, useAuthStore } from "@features/auth";
+import { StudentGradeHistoryCard } from "@features/grades";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -45,6 +47,10 @@ export function StudentDetailPage(): JSX.Element {
     const isOwnProfile = user?.role === Role.STUDENT && user.studentProfileId === id;
     const canView = isAdmin || isOwnProfile || user?.role === Role.TEACHER;
     const canManage = isAdmin;
+    const canViewGrades =
+        isAdmin ||
+        isOwnProfile ||
+        (user?.role === Role.TEACHER && hasPermission(user.permissions, PERMISSIONS.GRADES_READ));
 
     const [profileOpen, setProfileOpen] = useState(false);
     const [enrollOpen, setEnrollOpen] = useState(false);
@@ -166,6 +172,17 @@ export function StudentDetailPage(): JSX.Element {
                 onEnroll={() => setEnrollOpen(true)}
                 onEdit={setEditingEnrollment}
             />
+
+            {canViewGrades && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-lg">Grades</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <StudentGradeHistoryCard studentId={id} />
+                    </CardContent>
+                </Card>
+            )}
 
             {canManage && (
                 <>

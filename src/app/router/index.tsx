@@ -32,6 +32,8 @@ import {
     AttendancePage,
     HomeworkPage,
     AnnouncementsPage,
+    ExamsPage,
+    ExamDetailPage,
 } from "./lazy";
 import { NotFoundPage } from "./NotFoundPage";
 
@@ -111,6 +113,24 @@ export const router = createBrowserRouter([
                 element: (
                     <Lazy>
                         <AnnouncementsPage />
+                    </Lazy>
+                ),
+            },
+
+            {
+                path: ROUTES.EXAMS,
+                element: (
+                    <Lazy>
+                        <ExamsPage />
+                    </Lazy>
+                ),
+            },
+
+            {
+                path: ROUTES.EXAM_DETAIL,
+                element: (
+                    <Lazy>
+                        <ExamDetailPage />
                     </Lazy>
                 ),
             },

@@ -12,6 +12,7 @@ import {
     GraduationCap,
     UserRound,
     ClipboardCheck,
+    ClipboardList,
     NotebookPen,
     Megaphone,
 } from "lucide-react";
@@ -105,6 +106,7 @@ const navItems: NavItem[] = [
     },
     { label: "Homework", path: ROUTES.HOMEWORK, icon: NotebookPen },
     { label: "Announcements", path: ROUTES.ANNOUNCEMENTS, icon: Megaphone },
+    { label: "Exams", path: ROUTES.EXAMS, icon: ClipboardList },
 ];
 
 export function Sidebar(): JSX.Element {
@@ -175,7 +177,7 @@ export function Sidebar(): JSX.Element {
             </nav>
 
             {/* Footer */}
-            <div className="border-sidebar-border/60 border-t px-5 py-4">
+            <div className="border-sidebar-border/60 px-5 py-4">
                 <p className="text-sidebar-foreground/45 truncate text-xs">{APP_BRAND.COPYRIGHT}</p>
             </div>
         </aside>

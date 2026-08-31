@@ -84,6 +84,16 @@ export const AnnouncementsPage = lazy(() =>
         default: m.AnnouncementsPage,
     })),
 );
+export const ExamsPage = lazy(() =>
+    import("@features/exams/pages/ExamsPage").then((m) => ({
+        default: m.ExamsPage,
+    })),
+);
+export const ExamDetailPage = lazy(() =>
+    import("@features/exams/pages/ExamDetailPage").then((m) => ({
+        default: m.ExamDetailPage,
+    })),
+);
 
 function PageLoader(): JSX.Element {
     return (

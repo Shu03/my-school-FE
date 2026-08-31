@@ -38,6 +38,7 @@ const ALL_CLASSES = "all";
 
 export function HomeworkPage(): JSX.Element {
     const user = useAuthStore((s) => s.user);
+    const isStudent = user?.role === Role.STUDENT;
     const canManage =
         user?.role === Role.ADMIN || hasPermission(user?.permissions, PERMISSIONS.HOMEWORK_MANAGE);
 
@@ -48,7 +49,7 @@ export function HomeworkPage(): JSX.Element {
     const { data: currentYear } = useCurrentAcademicYear();
     const { data: classes = [] } = useClassesList(
         { academicYearId: currentYear?.id },
-        Boolean(currentYear?.id),
+        !isStudent && Boolean(currentYear?.id),
     );
 
     const {
@@ -143,21 +144,23 @@ export function HomeworkPage(): JSX.Element {
                 </div>
 
                 <div className="flex flex-col gap-4 px-6 py-6">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <Select value={classFilter} onValueChange={setClassFilter}>
-                            <SelectTrigger className="w-52" aria-label="Filter by class">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value={ALL_CLASSES}>All classes</SelectItem>
-                                {classes.map((item) => (
-                                    <SelectItem key={item.id} value={item.id}>
-                                        {item.name} (Grade {item.gradeLevel})
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                    {!isStudent && (
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Select value={classFilter} onValueChange={setClassFilter}>
+                                <SelectTrigger className="w-52" aria-label="Filter by class">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value={ALL_CLASSES}>All classes</SelectItem>
+                                    {classes.map((item) => (
+                                        <SelectItem key={item.id} value={item.id}>
+                                            {item.name} (Grade {item.gradeLevel})
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
 
                     {isError ? (
                         <Alert variant="destructive">
