@@ -94,6 +94,7 @@ export function useUpdatePreset(): UseMutationResult<
         mutationFn: ({ presetId, data }) => updatePreset(presetId, data),
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: teachersKeys.presets() });
+            void queryClient.invalidateQueries({ queryKey: teachersKeys.lists() });
         },
     });
 }
@@ -105,6 +106,7 @@ export function useDeletePreset(): UseMutationResult<void, Error, { presetId: st
         mutationFn: ({ presetId }) => deletePreset(presetId),
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: teachersKeys.presets() });
+            void queryClient.invalidateQueries({ queryKey: teachersKeys.lists() });
         },
     });
 }
@@ -135,6 +137,7 @@ export function useAssignPreset(): UseMutationResult<
     return useMutation({
         mutationFn: ({ id, presetId }) => assignPreset(id, { presetId }),
         onSuccess: (teacher) => {
+            void queryClient.invalidateQueries({ queryKey: teachersKeys.lists() });
             void queryClient.invalidateQueries({ queryKey: teachersKeys.detail(teacher.id) });
         },
     });
@@ -146,6 +149,7 @@ export function useRemovePreset(): UseMutationResult<TeacherProfile, Error, { id
     return useMutation({
         mutationFn: ({ id }) => removePreset(id),
         onSuccess: (teacher) => {
+            void queryClient.invalidateQueries({ queryKey: teachersKeys.lists() });
             void queryClient.invalidateQueries({ queryKey: teachersKeys.detail(teacher.id) });
         },
     });
@@ -161,6 +165,7 @@ export function useReplaceOverrides(): UseMutationResult<
     return useMutation({
         mutationFn: ({ id, data }) => replaceOverrides(id, data),
         onSuccess: (teacher) => {
+            void queryClient.invalidateQueries({ queryKey: teachersKeys.lists() });
             void queryClient.invalidateQueries({ queryKey: teachersKeys.detail(teacher.id) });
         },
     });

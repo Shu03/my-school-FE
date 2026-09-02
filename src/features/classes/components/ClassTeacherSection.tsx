@@ -38,7 +38,7 @@ export function ClassTeacherSection({
                 data: { classId, role: "CLASS_TEACHER" },
             });
             await queryClient.invalidateQueries({ queryKey: classesKeys.detail(classId) });
-            toast.success("Class teacher assigned successfully.");
+            toast.success("Section teacher assigned successfully.");
             setAssignOpen(false);
         } catch (error) {
             toast.error(getAssignmentErrorMessage(error));
@@ -48,7 +48,7 @@ export function ClassTeacherSection({
     return (
         <Card className="gap-0">
             <CardHeader className="flex flex-row items-center justify-between gap-3">
-                <CardTitle className="text-base">Class teacher</CardTitle>
+                <CardTitle className="text-base">Section teacher</CardTitle>
                 {canManage && !classTeacher && (
                     <Button size="sm" variant="outline" onClick={() => setAssignOpen(true)}>
                         <UserPlus className="size-4" />
@@ -89,7 +89,7 @@ export function ClassTeacherSection({
                 ) : (
                     <div className="text-muted-foreground flex flex-col items-center gap-2 py-6 text-center text-sm">
                         <UserRound className="size-8 opacity-40" />
-                        <p>No class teacher assigned yet.</p>
+                        <p>No Section teacher assigned yet.</p>
                     </div>
                 )}
             </CardContent>
@@ -97,8 +97,8 @@ export function ClassTeacherSection({
             {canManage && (
                 <AssignTeacherDialog
                     open={assignOpen}
-                    title="Assign class teacher"
-                    description="Select a teacher to be the class teacher for this class."
+                    title="Assign Section teacher"
+                    description="Select the teacher responsible for this Section."
                     isSubmitting={createAssignment.isPending}
                     onOpenChange={setAssignOpen}
                     onSubmit={handleAssign}

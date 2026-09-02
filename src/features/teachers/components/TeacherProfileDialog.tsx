@@ -68,9 +68,20 @@ export function TeacherProfileDialog({
                 <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
                     <div className="space-y-2">
                         <Label htmlFor="employeeCode">Employee code</Label>
-                        <Input id="employeeCode" {...register("employeeCode")} />
+                        <Input
+                            id="employeeCode"
+                            aria-invalid={Boolean(errors.employeeCode)}
+                            aria-describedby={
+                                errors.employeeCode ? "employeeCode-error" : undefined
+                            }
+                            {...register("employeeCode")}
+                        />
                         {errors.employeeCode && (
-                            <p className="text-destructive text-xs">
+                            <p
+                                id="employeeCode-error"
+                                role="alert"
+                                className="text-destructive text-xs"
+                            >
                                 {errors.employeeCode.message}
                             </p>
                         )}

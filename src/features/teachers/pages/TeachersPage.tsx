@@ -3,10 +3,12 @@ import type { JSX } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import { AlertCircle, Plus, Users } from "lucide-react";
+import { AlertCircle, Plus, ShieldCheck, UserPlus, Users } from "lucide-react";
 import { toast } from "sonner";
 
-import { teacherDetail } from "@constants/routes.constants";
+import { ROUTES } from "@constants/routes.constants";
+
+import { ConfirmDialog } from "@components/common/ConfirmDialog";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -14,7 +16,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { PresetFormDialog } from "../components/PresetFormDialog";
 import { PresetsTable } from "../components/PresetsTable";
-import { TeachersTable } from "../components/TeachersTable";
+import { TeacherDirectory } from "../components/TeacherDirectory";
+import { TeacherInspector } from "../components/TeacherInspector";
 import {
     useCreatePreset,
     useDeletePreset,
@@ -24,13 +27,15 @@ import {
 } from "../hooks/useTeachers";
 import { getPresetDeleteErrorMessage, getTeacherErrorMessage } from "../lib/errors";
 import type { PresetFormValues } from "../schemas/teacher.schema";
-import type { PermissionPreset } from "../types/teacher.types";
+import type { PermissionPreset, TeacherProfile } from "../types/teacher.types";
 
 export function TeachersPage(): JSX.Element {
     const navigate = useNavigate();
 
     const [presetFormOpen, setPresetFormOpen] = useState(false);
     const [editingPreset, setEditingPreset] = useState<PermissionPreset | null>(null);
+    const [deletingPreset, setDeletingPreset] = useState<PermissionPreset | null>(null);
+    const [selectedTeacherId, setSelectedTeacherId] = useState<string | null>(null);
 
     const {
         data: teachers = [],
@@ -48,6 +53,11 @@ export function TeachersPage(): JSX.Element {
     const createPresetMutation = useCreatePreset();
     const updatePresetMutation = useUpdatePreset();
     const deletePresetMutation = useDeletePreset();
+    const selectedTeacher = teachers.find((teacher) => teacher.id === selectedTeacherId) ?? null;
+
+    function handleSelectTeacher(teacher: TeacherProfile): void {
+        setSelectedTeacherId(teacher.id);
+    }
 
     function handleCreatePreset(): void {
         setEditingPreset(null);
@@ -59,15 +69,12 @@ export function TeachersPage(): JSX.Element {
         setPresetFormOpen(true);
     }
 
-    async function handleDeletePreset(preset: PermissionPreset): Promise<void> {
-        const confirmed = window.confirm(`Delete ${preset.name}? This action cannot be undone.`);
-        if (!confirmed) {
-            return;
-        }
-
+    async function handleDeletePreset(): Promise<void> {
+        if (!deletingPreset) return;
         try {
-            await deletePresetMutation.mutateAsync({ presetId: preset.id });
+            await deletePresetMutation.mutateAsync({ presetId: deletingPreset.id });
             toast.success("Preset deleted successfully.");
+            setDeletingPreset(null);
         } catch (error) {
             toast.error(getPresetDeleteErrorMessage(error));
         }
@@ -95,22 +102,38 @@ export function TeachersPage(): JSX.Element {
 
     return (
         <div className="flex flex-col gap-6">
-            <div className="bg-card text-card-foreground ring-foreground/10 overflow-hidden rounded-xl shadow-sm ring-1">
+            <div className="bg-card text-card-foreground ring-foreground/10 relative isolate overflow-hidden rounded-xl shadow-sm ring-1">
                 <div className="border-border/60 from-primary/12 via-primary/5 border-b bg-linear-to-br to-transparent px-6 py-5">
-                    <h1 className="flex items-center gap-2 text-xl font-semibold tracking-tight">
-                        <Users className="size-5" />
-                        Teachers
-                    </h1>
-                    <p className="text-muted-foreground mt-1 text-sm">
-                        Manage teacher profiles, permission presets, and class assignments.
-                    </p>
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div className="flex items-start gap-3">
+                            <div className="texture-sheen bg-primary/12 text-primary ring-primary/25 flex size-11 shrink-0 items-center justify-center rounded-xl ring-1">
+                                <Users className="size-5" />
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-semibold tracking-tight">Teachers</h1>
+                                <p className="text-muted-foreground mt-1 text-sm">
+                                    Manage faculty profiles, access, and teaching assignments.
+                                </p>
+                            </div>
+                        </div>
+                        <Button onClick={() => navigate(`${ROUTES.USER_NEW}?role=TEACHER`)}>
+                            <UserPlus />
+                            Add teacher
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="px-6 py-6">
                     <Tabs defaultValue="teachers">
-                        <TabsList>
-                            <TabsTrigger value="teachers">Teachers</TabsTrigger>
-                            <TabsTrigger value="presets">Permission presets</TabsTrigger>
+                        <TabsList className="h-10 w-full sm:w-auto">
+                            <TabsTrigger value="teachers">
+                                <Users />
+                                Teachers
+                            </TabsTrigger>
+                            <TabsTrigger value="presets">
+                                <ShieldCheck />
+                                Permission presets
+                            </TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="teachers" className="mt-4">
@@ -130,11 +153,15 @@ export function TeachersPage(): JSX.Element {
                                     </AlertDescription>
                                 </Alert>
                             ) : (
-                                <TeachersTable
-                                    teachers={teachers}
-                                    isLoading={teachersLoading}
-                                    onView={(teacher) => navigate(teacherDetail(teacher.id))}
-                                />
+                                <div className="min-w-0">
+                                    <TeacherDirectory
+                                        teachers={teachers}
+                                        presets={presets}
+                                        isLoading={teachersLoading}
+                                        selectedTeacherId={selectedTeacherId}
+                                        onSelect={handleSelectTeacher}
+                                    />
+                                </div>
                             )}
                         </TabsContent>
 
@@ -172,21 +199,45 @@ export function TeachersPage(): JSX.Element {
                                                 : null
                                         }
                                         onEdit={handleEditPreset}
-                                        onDelete={(preset) => void handleDeletePreset(preset)}
+                                        onDelete={setDeletingPreset}
                                     />
                                 )}
                             </div>
                         </TabsContent>
                     </Tabs>
                 </div>
+
+                <TeacherInspector
+                    teacher={selectedTeacher}
+                    presets={presets}
+                    onOpenChange={(open) => {
+                        if (!open) setSelectedTeacherId(null);
+                    }}
+                />
             </div>
 
             <PresetFormDialog
+                key={`${editingPreset?.id ?? "new"}-${presetFormOpen ? "open" : "closed"}`}
                 open={presetFormOpen}
                 preset={editingPreset}
                 isSubmitting={createPresetMutation.isPending || updatePresetMutation.isPending}
                 onOpenChange={setPresetFormOpen}
                 onSubmit={handlePresetSubmit}
+            />
+            <ConfirmDialog
+                open={Boolean(deletingPreset)}
+                title="Delete permission preset?"
+                description={
+                    deletingPreset
+                        ? `${deletingPreset.name} will no longer be available for assignment. The server will prevent deletion if teachers still depend on it.`
+                        : ""
+                }
+                confirmLabel="Delete preset"
+                isPending={deletePresetMutation.isPending}
+                onOpenChange={(open) => {
+                    if (!open) setDeletingPreset(null);
+                }}
+                onConfirm={() => void handleDeletePreset()}
             />
         </div>
     );

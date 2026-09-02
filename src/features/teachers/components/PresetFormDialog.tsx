@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import type { JSX } from "react";
 
 import type { Permission } from "@constants/permissions.constants";
@@ -37,19 +37,10 @@ export function PresetFormDialog({
     onSubmit,
 }: PresetFormDialogProps): JSX.Element {
     const isEdit = Boolean(preset);
-    const [name, setName] = useState("");
-    const [permissions, setPermissions] = useState<Permission[]>([]);
+    const [name, setName] = useState(preset?.name ?? "");
+    const [permissions, setPermissions] = useState<Permission[]>(preset?.permissions ?? []);
     const [error, setError] = useState<string | null>(null);
-    const [wasOpen, setWasOpen] = useState(false);
-
-    if (open && !wasOpen) {
-        setWasOpen(true);
-        setName(preset?.name ?? "");
-        setPermissions(preset?.permissions ?? []);
-        setError(null);
-    } else if (!open && wasOpen) {
-        setWasOpen(false);
-    }
+    const errorId = useId();
 
     function togglePermission(permission: Permission): void {
         setPermissions((current) =>
@@ -77,7 +68,7 @@ export function PresetFormDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>{isEdit ? "Edit preset" : "Create preset"}</DialogTitle>
                     <DialogDescription>
@@ -96,19 +87,31 @@ export function PresetFormDialog({
                             id="preset-name"
                             placeholder="Class Teacher"
                             value={name}
-                            onChange={(event) => setName(event.target.value)}
+                            aria-invalid={Boolean(error && !name.trim())}
+                            aria-describedby={error ? errorId : undefined}
+                            onChange={(event) => {
+                                setName(event.target.value);
+                                setError(null);
+                            }}
                         />
                     </div>
 
                     <div className="space-y-2">
                         <Label>Permissions</Label>
+                        <p className="text-muted-foreground text-xs">
+                            {permissions.length} selected
+                        </p>
                         <PermissionCheckboxGroup
                             selected={permissions}
                             onToggle={togglePermission}
                         />
                     </div>
 
-                    {error && <p className="text-destructive text-xs">{error}</p>}
+                    {error && (
+                        <p id={errorId} role="alert" className="text-destructive text-xs">
+                            {error}
+                        </p>
+                    )}
 
                     <DialogFooter>
                         <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

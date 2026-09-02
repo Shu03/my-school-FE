@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 
-import { Pencil, Shield, Trash2 } from "lucide-react";
+import { KeyRound, Pencil, Shield, Trash2 } from "lucide-react";
 
 import { PERMISSION_LABELS } from "@constants/permissions.constants";
 
@@ -79,13 +79,21 @@ export function PresetsTable({
                                         {preset.name}
                                     </div>
                                 </TableCell>
-                                <TableCell>
-                                    <div className="flex flex-wrap gap-1">
-                                        {preset.permissions.map((permission) => (
-                                            <Badge key={permission} variant="secondary">
-                                                {PERMISSION_LABELS[permission]}
-                                            </Badge>
-                                        ))}
+                                <TableCell className="whitespace-normal">
+                                    <div className="flex items-start gap-2">
+                                        <Badge variant="secondary" className="shrink-0">
+                                            <KeyRound />
+                                            {preset.permissions.length}
+                                        </Badge>
+                                        <p className="text-muted-foreground line-clamp-2 text-xs leading-relaxed">
+                                            {preset.permissions
+                                                .slice(0, 4)
+                                                .map((permission) => PERMISSION_LABELS[permission])
+                                                .join(", ")}
+                                            {preset.permissions.length > 4
+                                                ? ` and ${preset.permissions.length - 4} more`
+                                                : ""}
+                                        </p>
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-right">
@@ -94,7 +102,7 @@ export function PresetsTable({
                                             <TooltipTrigger asChild>
                                                 <Button
                                                     variant="ghost"
-                                                    size="icon"
+                                                    size="icon-lg"
                                                     aria-label={`Edit ${preset.name}`}
                                                     onClick={() => onEdit(preset)}
                                                 >
@@ -107,7 +115,8 @@ export function PresetsTable({
                                             <TooltipTrigger asChild>
                                                 <Button
                                                     variant="ghost"
-                                                    size="icon"
+                                                    size="icon-lg"
+                                                    className="text-destructive"
                                                     aria-label={`Delete ${preset.name}`}
                                                     onClick={() => onDelete(preset)}
                                                     disabled={deletingPresetId === preset.id}

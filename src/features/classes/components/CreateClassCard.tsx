@@ -80,7 +80,7 @@ export function CreateClassCard({
                     <span className="bg-primary/10 text-primary group-hover:bg-primary/15 flex size-12 items-center justify-center rounded-2xl transition-colors duration-200">
                         <Plus className="size-6" />
                     </span>
-                    <span className="text-sm font-medium">Add class</span>
+                    <span className="text-sm font-medium">Add Class</span>
                     {academicYearName && (
                         <span className="flex items-center gap-1 text-xs opacity-80">
                             <CalendarRange className="size-3.5" />
@@ -141,7 +141,7 @@ function CreateClassForm({
             <CardHeader className="px-5 pt-5">
                 <div className="flex items-center justify-between gap-2">
                     <p className="text-muted-foreground text-[0.7rem] font-semibold tracking-[0.14em] uppercase">
-                        New class
+                        New Class
                     </p>
                     <span className="text-muted-foreground flex items-center gap-1 text-xs">
                         <CalendarRange className="size-3.5" />
@@ -153,7 +153,7 @@ function CreateClassForm({
                 <div className="flex items-start gap-2">
                     <div className="flex flex-col gap-1">
                         <Label htmlFor="new-class-grade" className="text-xs">
-                            Grade
+                            Class
                         </Label>
                         <Input
                             id="new-class-grade"
@@ -166,11 +166,11 @@ function CreateClassForm({
                     </div>
                     <div className="flex flex-1 flex-col gap-1">
                         <Label htmlFor="new-class-name" className="text-xs">
-                            Class name
+                            Initial Section
                         </Label>
                         <Input
                             id="new-class-name"
-                            placeholder="6A"
+                            placeholder="A"
                             autoFocus
                             {...register("name")}
                         />
@@ -187,7 +187,7 @@ function CreateClassForm({
                         variant="ghost"
                         size="sm"
                         disabled={isSubmitting}
-                        aria-label="Discard new class"
+                        aria-label="Discard new Class"
                         onClick={onCancel}
                     >
                         <X className="size-4" />

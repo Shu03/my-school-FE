@@ -2,12 +2,14 @@ import { useState } from "react";
 import type { JSX } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { BookOpen, UserPlus } from "lucide-react";
+import { BookOpen, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
 import { subjectsKeys, useSubject, useSubjectsList } from "@features/subjects";
 import type { Subject } from "@features/subjects";
-import { useCreateAssignment } from "@features/teachers";
+import { useCreateAssignment, useDeleteAssignment } from "@features/teachers";
+
+import { ConfirmDialog } from "@components/common/ConfirmDialog";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -35,9 +37,9 @@ export function ClassSubjectsSection({
         <Card className="gap-0">
             <CardHeader>
                 <CardTitle className="text-base">
-                    Subjects &amp; teachers
+                    Section subject teachers
                     <span className="text-muted-foreground ml-2 text-sm font-normal">
-                        Grade {gradeLevel}
+                        Class {gradeLevel}
                     </span>
                 </CardTitle>
             </CardHeader>
@@ -50,7 +52,7 @@ export function ClassSubjectsSection({
                 ) : subjects.length === 0 ? (
                     <div className="text-muted-foreground flex flex-col items-center gap-2 py-8 text-center text-sm">
                         <BookOpen className="size-8 opacity-40" />
-                        <p>No subjects defined for this grade yet.</p>
+                        <p>No subjects defined for this Class yet.</p>
                     </div>
                 ) : (
                     <ul className="divide-border/60 divide-y">
@@ -78,7 +80,9 @@ interface ClassSubjectRowProps {
 function ClassSubjectRow({ classId, subject, canManage }: ClassSubjectRowProps): JSX.Element {
     const queryClient = useQueryClient();
     const [assignOpen, setAssignOpen] = useState(false);
+    const [removeOpen, setRemoveOpen] = useState(false);
     const createAssignment = useCreateAssignment();
+    const deleteAssignment = useDeleteAssignment();
 
     const { data: subjectDetail, isLoading } = useSubject(subject.id);
 
@@ -95,6 +99,21 @@ function ClassSubjectRow({ classId, subject, canManage }: ClassSubjectRowProps):
             await queryClient.invalidateQueries({ queryKey: subjectsKeys.detail(subject.id) });
             toast.success("Subject teacher assigned successfully.");
             setAssignOpen(false);
+        } catch (error) {
+            toast.error(getAssignmentErrorMessage(error));
+        }
+    }
+
+    async function handleRemove(): Promise<void> {
+        if (!assignment) return;
+        try {
+            await deleteAssignment.mutateAsync({
+                id: assignment.teacher.id,
+                assignmentId: assignment.id,
+            });
+            await queryClient.invalidateQueries({ queryKey: subjectsKeys.detail(subject.id) });
+            toast.success("Subject teacher removed successfully.");
+            setRemoveOpen(false);
         } catch (error) {
             toast.error(getAssignmentErrorMessage(error));
         }
@@ -118,13 +137,28 @@ function ClassSubjectRow({ classId, subject, canManage }: ClassSubjectRowProps):
                 {isLoading ? (
                     <Spinner className="size-4" />
                 ) : assignment ? (
-                    <div className="min-w-0">
-                        <p className="text-muted-foreground text-[0.7rem] tracking-wide uppercase">
-                            Teacher
-                        </p>
-                        <p className="truncate text-sm font-medium">
-                            {assignment.teacher.user.firstName} {assignment.teacher.user.lastName}
-                        </p>
+                    <div className="flex items-center gap-2">
+                        <div className="min-w-0">
+                            <p className="text-muted-foreground text-[0.7rem] tracking-wide uppercase">
+                                Teacher
+                            </p>
+                            <p className="truncate text-sm font-medium">
+                                {assignment.teacher.user.firstName}{" "}
+                                {assignment.teacher.user.lastName}
+                            </p>
+                        </div>
+                        {canManage ? (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon-lg"
+                                className="text-destructive"
+                                aria-label={`Remove teacher from ${subject.name}`}
+                                onClick={() => setRemoveOpen(true)}
+                            >
+                                <Trash2 />
+                            </Button>
+                        ) : null}
                     </div>
                 ) : (
                     <>
@@ -143,12 +177,25 @@ function ClassSubjectRow({ classId, subject, canManage }: ClassSubjectRowProps):
                 <AssignTeacherDialog
                     open={assignOpen}
                     title={`Assign teacher — ${subject.name}`}
-                    description="Select a teacher to teach this subject for this class."
+                    description="Select a teacher to teach this subject in the selected Section."
                     isSubmitting={createAssignment.isPending}
                     onOpenChange={setAssignOpen}
                     onSubmit={handleAssign}
                 />
             )}
+            <ConfirmDialog
+                open={removeOpen}
+                title="Remove subject teacher?"
+                description={
+                    assignment
+                        ? `${assignment.teacher.user.firstName} ${assignment.teacher.user.lastName} will be removed from ${subject.name} in this Section.`
+                        : ""
+                }
+                confirmLabel="Remove teacher"
+                isPending={deleteAssignment.isPending}
+                onOpenChange={setRemoveOpen}
+                onConfirm={() => void handleRemove()}
+            />
         </li>
     );
 }

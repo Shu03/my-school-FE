@@ -8,6 +8,7 @@ import {
 
 import { resetPassword as resetUserPassword } from "@features/auth";
 import type { ResetPasswordResponse } from "@features/auth";
+import { teachersKeys } from "@features/teachers";
 
 import {
     activateUser,
@@ -67,6 +68,7 @@ export function useCreateAdmin(): UseMutationResult<
         mutationFn: createAdmin,
         onSuccess: () => {
             void queryClient.invalidateQueries({ queryKey: usersKeys.lists() });
+            void queryClient.invalidateQueries({ queryKey: teachersKeys.lists() });
         },
     });
 }
@@ -110,6 +112,9 @@ export function useUpdateUser(): UseMutationResult<
         onSuccess: (user) => {
             void queryClient.invalidateQueries({ queryKey: usersKeys.lists() });
             void queryClient.invalidateQueries({ queryKey: usersKeys.detail(user.id) });
+            if (user.role === "TEACHER") {
+                void queryClient.invalidateQueries({ queryKey: teachersKeys.lists() });
+            }
         },
     });
 }
@@ -121,6 +126,9 @@ export function useActivateUser(): UseMutationResult<User, Error, string> {
         onSuccess: (user) => {
             void queryClient.invalidateQueries({ queryKey: usersKeys.lists() });
             void queryClient.invalidateQueries({ queryKey: usersKeys.detail(user.id) });
+            if (user.role === "TEACHER") {
+                void queryClient.invalidateQueries({ queryKey: teachersKeys.lists() });
+            }
         },
     });
 }
@@ -132,6 +140,9 @@ export function useDeactivateUser(): UseMutationResult<User, Error, string> {
         onSuccess: (user) => {
             void queryClient.invalidateQueries({ queryKey: usersKeys.lists() });
             void queryClient.invalidateQueries({ queryKey: usersKeys.detail(user.id) });
+            if (user.role === "TEACHER") {
+                void queryClient.invalidateQueries({ queryKey: teachersKeys.lists() });
+            }
         },
     });
 }

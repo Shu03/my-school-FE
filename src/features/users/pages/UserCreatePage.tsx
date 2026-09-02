@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { JSX } from "react";
 
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Backpack, GraduationCap, Shield, UserRoundPlus } from "lucide-react";
@@ -34,6 +34,10 @@ import type { User } from "../types/user.types";
 
 export function UserCreatePage(): JSX.Element {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const requestedRole = searchParams.get("role");
+    const defaultRole =
+        requestedRole === "TEACHER" || requestedRole === "STUDENT" ? requestedRole : "ADMIN";
 
     function handleCreated(user: User, tempPassword: string): void {
         navigate(ROUTES.USERS, { state: { createdUser: user, tempPassword } });
@@ -45,7 +49,7 @@ export function UserCreatePage(): JSX.Element {
             description="Choose a role and fill in the details. A temporary password is generated automatically."
             icon={<UserRoundPlus className="size-5" />}
         >
-            <Tabs defaultValue="ADMIN">
+            <Tabs defaultValue={defaultRole}>
                 <TabsList className="h-10 w-full">
                     <TabsTrigger value="ADMIN">
                         <Shield />

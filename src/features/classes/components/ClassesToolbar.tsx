@@ -51,7 +51,7 @@ export function ClassesToolbar({
                 inputMode="numeric"
                 min={CLASS_VALIDATION.GRADE_MIN}
                 max={CLASS_VALIDATION.GRADE_MAX}
-                placeholder="Filter grade"
+                placeholder="Filter Class"
                 className="w-34"
                 value={gradeLevelFilter}
                 onChange={(event) => onGradeLevelFilterChange(event.target.value)}

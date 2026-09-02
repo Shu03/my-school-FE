@@ -55,7 +55,7 @@ export function ClassStudentsSection({
                 ) : students.length === 0 ? (
                     <div className="text-muted-foreground flex flex-col items-center gap-2 py-10 text-center text-sm">
                         <Users className="size-8 opacity-40" />
-                        <p>No students enrolled in this class yet.</p>
+                        <p>No students enrolled in this Section yet.</p>
                     </div>
                 ) : (
                     <Table>

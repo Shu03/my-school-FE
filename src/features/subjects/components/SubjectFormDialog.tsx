@@ -27,6 +27,7 @@ interface SubjectFormDialogProps {
     isSubmitting: boolean;
     onOpenChange: (open: boolean) => void;
     onSubmit: (values: CreateSubjectFormValues) => Promise<void>;
+    fixedGradeLevel?: number;
 }
 
 export function SubjectFormDialog({
@@ -35,6 +36,7 @@ export function SubjectFormDialog({
     isSubmitting,
     onOpenChange,
     onSubmit,
+    fixedGradeLevel,
 }: SubjectFormDialogProps): JSX.Element {
     const isEdit = Boolean(subject);
 
@@ -56,10 +58,10 @@ export function SubjectFormDialog({
         reset({
             name: subject?.name ?? "",
             code: subject?.code ?? "",
-            gradeLevel: subject?.gradeLevel ?? 1,
+            gradeLevel: subject?.gradeLevel ?? fixedGradeLevel ?? 1,
             description: subject?.description ?? "",
         });
-    }, [open, subject, reset]);
+    }, [fixedGradeLevel, open, subject, reset]);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -69,7 +71,9 @@ export function SubjectFormDialog({
                     <DialogDescription>
                         {isEdit
                             ? "Update the subject name, code, or description."
-                            : "Add a subject for a specific grade level."}
+                            : fixedGradeLevel
+                              ? `Add a subject shared by every Section in Class ${fixedGradeLevel}.`
+                              : "Add a subject for a specific class."}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -91,13 +95,13 @@ export function SubjectFormDialog({
                             )}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="gradeLevel">Grade level</Label>
+                            <Label htmlFor="gradeLevel">Class</Label>
                             <Input
                                 id="gradeLevel"
                                 type="number"
                                 min={1}
                                 max={99}
-                                disabled={isEdit}
+                                disabled={isEdit || fixedGradeLevel !== undefined}
                                 {...register("gradeLevel", { valueAsNumber: true })}
                             />
                             {errors.gradeLevel && (
