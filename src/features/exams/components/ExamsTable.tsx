@@ -105,7 +105,7 @@ export function ExamsTable({
                                         </Badge>
                                     </TableCell>
                                     <TableCell>
-                                        {exam.class.name} (Grade {exam.class.gradeLevel})
+                                        {exam.section.name} (Class {exam.section.classLevel})
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex flex-wrap gap-1">

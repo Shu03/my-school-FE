@@ -26,7 +26,7 @@ interface CreateClassCardProps {
     onCancel: () => void;
     onSubmit: (values: {
         name: string;
-        gradeLevel: number;
+        classLevel: number;
         academicYearId: string;
     }) => Promise<boolean>;
 }
@@ -100,7 +100,7 @@ interface CreateClassFormProps {
     onCancel: () => void;
     onSubmit: (values: {
         name: string;
-        gradeLevel: number;
+        classLevel: number;
         academicYearId: string;
     }) => Promise<boolean>;
 }
@@ -121,7 +121,7 @@ function CreateClassForm({
         resolver: zodResolver(editClassSchema),
         defaultValues: {
             name: "",
-            gradeLevel: 1,
+            classLevel: 1,
         },
     });
 
@@ -161,7 +161,7 @@ function CreateClassForm({
                             min={CLASS_VALIDATION.GRADE_MIN}
                             max={CLASS_VALIDATION.GRADE_MAX}
                             className="w-20"
-                            {...register("gradeLevel", { valueAsNumber: true })}
+                            {...register("classLevel", { valueAsNumber: true })}
                         />
                     </div>
                     <div className="flex flex-1 flex-col gap-1">
@@ -176,9 +176,9 @@ function CreateClassForm({
                         />
                     </div>
                 </div>
-                {(errors.name ?? errors.gradeLevel) && (
+                {(errors.name ?? errors.classLevel) && (
                     <p className="text-destructive text-xs">
-                        {errors.name?.message ?? errors.gradeLevel?.message}
+                        {errors.name?.message ?? errors.classLevel?.message}
                     </p>
                 )}
                 <div className="flex items-center justify-end gap-2">

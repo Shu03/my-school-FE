@@ -158,7 +158,7 @@ function UserDetailsBody({
             await enrollStudentMutation.mutateAsync({
                 id: studentProfileId,
                 data: {
-                    classId: values.classId,
+                    sectionId: values.sectionId,
                     academicYearId: values.academicYearId || undefined,
                     rollNumber: values.rollNumber?.trim() || undefined,
                 },

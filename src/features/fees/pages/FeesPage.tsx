@@ -71,7 +71,7 @@ export function FeesPage(): JSX.Element {
         isError: recordsError,
         refetch: refetchRecords,
     } = useFeeRecordsList({
-        classId: isAdmin && classFilter !== ALL ? classFilter : undefined,
+        sectionId: isAdmin && classFilter !== ALL ? classFilter : undefined,
         academicYearId: currentYear?.id,
         status: statusFilter === ALL ? undefined : (statusFilter as FeeStatus),
     });
@@ -116,7 +116,7 @@ export function FeesPage(): JSX.Element {
                 toast.success("Fee structure updated successfully.");
             } else {
                 await createMutation.mutateAsync({
-                    gradeLevel: values.gradeLevel,
+                    classLevel: values.classLevel,
                     academicYearId: currentYear?.id,
                     totalAmount: values.totalAmount,
                     dueDate: values.dueDate,
@@ -177,7 +177,7 @@ export function FeesPage(): JSX.Element {
                                             <SelectItem value={ALL}>All classes</SelectItem>
                                             {classes.map((item) => (
                                                 <SelectItem key={item.id} value={item.id}>
-                                                    {item.name} (Grade {item.gradeLevel})
+                                                    {item.name} (Class {item.classLevel})
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>

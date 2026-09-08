@@ -1,4 +1,7 @@
+import { useEffect, useMemo, useState } from "react";
 import type { JSX } from "react";
+
+import { useSearchParams } from "react-router-dom";
 
 import { ClipboardCheck } from "lucide-react";
 
@@ -9,12 +12,29 @@ import { useAuthStore } from "@features/auth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { AttendanceMarker } from "../components/AttendanceMarker";
-import { AttendanceSummaryView } from "../components/AttendanceSummaryView";
-import { ClassAttendanceView } from "../components/ClassAttendanceView";
+import { AttendanceOverviewView } from "../components/AttendanceOverviewView";
 
 export function AttendancePage(): JSX.Element {
     const user = useAuthStore((s) => s.user);
-    const isAdmin = user?.role === Role.ADMIN;
+    const isStudent = user?.role === Role.STUDENT;
+    const canMark = user?.role === Role.ADMIN || user?.role === Role.TEACHER;
+    const [searchParams] = useSearchParams();
+
+    const initialTab = useMemo(() => {
+        const requestedTab = searchParams.get("tab");
+        if (requestedTab === "mark" && canMark) {
+            return "mark";
+        }
+
+        return "overview";
+    }, [canMark, searchParams]);
+
+    const initialSectionId = searchParams.get("sectionId") ?? undefined;
+    const [activeTab, setActiveTab] = useState<"mark" | "overview">(initialTab);
+
+    useEffect(() => {
+        setActiveTab(initialTab);
+    }, [initialTab]);
 
     return (
         <div className="flex flex-col gap-6">
@@ -30,28 +50,26 @@ export function AttendancePage(): JSX.Element {
                 </div>
 
                 <div className="px-6 py-6">
-                    <Tabs defaultValue="mark">
-                        <TabsList>
-                            <TabsTrigger value="mark">Mark</TabsTrigger>
-                            {isAdmin && <TabsTrigger value="view">View</TabsTrigger>}
-                            {isAdmin && <TabsTrigger value="summary">Summary</TabsTrigger>}
+                    <Tabs
+                        value={activeTab}
+                        onValueChange={(value) => setActiveTab(value as "mark" | "overview")}
+                    >
+                        <TabsList className="h-10 w-full">
+                            {canMark && <TabsTrigger value="mark">Mark</TabsTrigger>}
+                            <TabsTrigger value="overview">
+                                {isStudent ? "My Attendance" : "Overview"}
+                            </TabsTrigger>
                         </TabsList>
 
-                        <TabsContent value="mark" className="pt-4">
-                            <AttendanceMarker />
+                        {canMark && (
+                            <TabsContent value="mark" className="pt-4">
+                                <AttendanceMarker initialSectionId={initialSectionId} />
+                            </TabsContent>
+                        )}
+
+                        <TabsContent value="overview" className="pt-4">
+                            <AttendanceOverviewView />
                         </TabsContent>
-
-                        {isAdmin && (
-                            <TabsContent value="view" className="pt-4">
-                                <ClassAttendanceView />
-                            </TabsContent>
-                        )}
-
-                        {isAdmin && (
-                            <TabsContent value="summary" className="pt-4">
-                                <AttendanceSummaryView />
-                            </TabsContent>
-                        )}
                     </Tabs>
                 </div>
             </div>

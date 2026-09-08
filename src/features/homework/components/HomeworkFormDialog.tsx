@@ -66,17 +66,17 @@ export function HomeworkFormDialog({
         formState: { errors },
     } = useForm<HomeworkFormValues>({
         resolver: zodResolver(homeworkSchema),
-        defaultValues: { title: "", description: "", classId: "", subjectId: "", dueDate: "" },
+        defaultValues: { title: "", description: "", sectionId: "", subjectId: "", dueDate: "" },
     });
 
-    const classId = useWatch({ control, name: "classId" });
+    const sectionId = useWatch({ control, name: "sectionId" });
 
     const selectedClass = useMemo(
-        () => classes.find((item) => item.id === classId) ?? null,
-        [classes, classId],
+        () => classes.find((item) => item.id === sectionId) ?? null,
+        [classes, sectionId],
     );
 
-    const { data: subjects = [] } = useSubjectsList({ gradeLevel: selectedClass?.gradeLevel });
+    const { data: subjects = [] } = useSubjectsList({ classLevel: selectedClass?.classLevel });
 
     useEffect(() => {
         if (!open) {
@@ -86,7 +86,7 @@ export function HomeworkFormDialog({
         reset({
             title: homework?.title ?? "",
             description: homework?.description ?? "",
-            classId: homework?.classId ?? "",
+            sectionId: homework?.sectionId ?? "",
             subjectId: homework?.subjectId ?? "",
             dueDate: toDateInputValue(homework?.dueDate ?? ""),
         });
@@ -122,7 +122,7 @@ export function HomeworkFormDialog({
                             <Label>Class</Label>
                             <Controller
                                 control={control}
-                                name="classId"
+                                name="sectionId"
                                 render={({ field }) => (
                                     <Select
                                         value={field.value}
@@ -135,15 +135,17 @@ export function HomeworkFormDialog({
                                         <SelectContent>
                                             {classes.map((item) => (
                                                 <SelectItem key={item.id} value={item.id}>
-                                                    {item.name} (Grade {item.gradeLevel})
+                                                    {item.name} (Class {item.classLevel})
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
                                 )}
                             />
-                            {errors.classId && (
-                                <p className="text-destructive text-xs">{errors.classId.message}</p>
+                            {errors.sectionId && (
+                                <p className="text-destructive text-xs">
+                                    {errors.sectionId.message}
+                                </p>
                             )}
                         </div>
 

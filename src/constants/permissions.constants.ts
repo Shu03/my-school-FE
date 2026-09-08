@@ -2,7 +2,7 @@
 export const PERMISSIONS = {
     LEAVE_APPLY: "LEAVE_APPLY",
     ACADEMIC_YEAR_MANAGE: "ACADEMIC_YEAR_MANAGE",
-    CLASS_MANAGE: "CLASS_MANAGE",
+    SECTION_MANAGE: "SECTION_MANAGE",
     SUBJECT_MANAGE: "SUBJECT_MANAGE",
     ATTENDANCE_READ: "ATTENDANCE_READ",
     ATTENDANCE_WRITE: "ATTENDANCE_WRITE",
@@ -24,7 +24,7 @@ export const PERMISSION_LIST: Permission[] = Object.values(PERMISSIONS);
 export const PERMISSION_LABELS: Record<Permission, string> = {
     LEAVE_APPLY: "Apply for leave",
     ACADEMIC_YEAR_MANAGE: "Manage academic years",
-    CLASS_MANAGE: "Manage classes",
+    SECTION_MANAGE: "Manage sections",
     SUBJECT_MANAGE: "Manage subjects",
     ATTENDANCE_READ: "View attendance",
     ATTENDANCE_WRITE: "Mark attendance",

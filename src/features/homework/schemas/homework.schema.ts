@@ -19,7 +19,7 @@ export const homeworkSchema = z.object({
             HOMEWORK_VALIDATION.DESCRIPTION_MAX,
             `Description must be at most ${HOMEWORK_VALIDATION.DESCRIPTION_MAX} characters`,
         ),
-    classId: z.string().trim().min(1, "Class is required"),
+    sectionId: z.string().trim().min(1, "Section is required"),
     subjectId: z.string().trim().min(1, "Subject is required"),
     dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Due date must be a valid date"),
 });

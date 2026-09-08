@@ -43,7 +43,7 @@ export const updateStudentSchema = z
     });
 
 export const enrollStudentSchema = z.object({
-    classId: z.string().trim().min(1, "Class is required"),
+    sectionId: z.string().trim().min(1, "Section is required"),
     academicYearId: z.string().trim().optional(),
     rollNumber,
 });

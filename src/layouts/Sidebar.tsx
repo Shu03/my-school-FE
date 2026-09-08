@@ -55,7 +55,7 @@ function canAccessClasses(user: User | null): boolean {
 
     return (
         user.role === Role.ADMIN ||
-        (user.role === Role.TEACHER && hasPermission(user.permissions, PERMISSIONS.CLASS_MANAGE))
+        (user.role === Role.TEACHER && hasPermission(user.permissions, PERMISSIONS.SECTION_MANAGE))
     );
 }
 
@@ -90,7 +90,7 @@ const navItems: NavItem[] = [
         label: "Attendance",
         path: ROUTES.ATTENDANCE,
         icon: ClipboardCheck,
-        roles: [Role.ADMIN, Role.TEACHER],
+        roles: [Role.ADMIN, Role.TEACHER, Role.STUDENT],
     },
     { label: "Homework", path: ROUTES.HOMEWORK, icon: NotebookPen },
     { label: "Announcements", path: ROUTES.ANNOUNCEMENTS, icon: Megaphone },

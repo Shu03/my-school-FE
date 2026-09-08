@@ -19,17 +19,17 @@ interface AcademicYearOption {
 interface ClassesToolbarProps {
     years: AcademicYearOption[];
     selectedAcademicYearId: string;
-    gradeLevelFilter: string;
+    classLevelFilter: string;
     onAcademicYearChange: (academicYearId: string) => void;
-    onGradeLevelFilterChange: (value: string) => void;
+    onClassLevelFilterChange: (value: string) => void;
 }
 
 export function ClassesToolbar({
     years,
     selectedAcademicYearId,
-    gradeLevelFilter,
+    classLevelFilter,
     onAcademicYearChange,
-    onGradeLevelFilterChange,
+    onClassLevelFilterChange,
 }: ClassesToolbarProps): JSX.Element {
     return (
         <div className="flex flex-wrap items-center gap-2">
@@ -53,8 +53,8 @@ export function ClassesToolbar({
                 max={CLASS_VALIDATION.GRADE_MAX}
                 placeholder="Filter Class"
                 className="w-34"
-                value={gradeLevelFilter}
-                onChange={(event) => onGradeLevelFilterChange(event.target.value)}
+                value={classLevelFilter}
+                onChange={(event) => onClassLevelFilterChange(event.target.value)}
             />
         </div>
     );

@@ -1,9 +1,9 @@
 import type { ExamStatus, ExamType } from "@constants/exams.constants";
 
-export interface ExamClass {
+export interface ExamSection {
     id: string;
     name: string;
-    gradeLevel: number;
+    classLevel: number;
     academicYearId: string;
     classTeacherId: string | null;
     createdAt: string;
@@ -15,7 +15,7 @@ export interface ExamSubjectDetail {
     id: string;
     name: string;
     code: string;
-    gradeLevel: number;
+    classLevel: number;
     description: string | null;
     createdAt: string;
     updatedAt: string;
@@ -47,7 +47,7 @@ export interface Exam {
     id: string;
     name: string;
     type: ExamType;
-    classId: string;
+    sectionId: string;
     academicYearId: string;
     termId: string | null;
     isFinalized: boolean;
@@ -55,7 +55,7 @@ export interface Exam {
     createdById: string | null;
     createdAt: string;
     updatedAt: string;
-    class: ExamClass;
+    section: ExamSection;
     academicYear: ExamAcademicYear;
     examSubjects: ExamSubject[];
 }
@@ -75,7 +75,7 @@ export interface ExamWithSummary extends Exam {
 }
 
 export interface ExamsListParams {
-    classId?: string;
+    sectionId?: string;
     subjectId?: string;
     academicYearId?: string;
     type?: ExamType;
@@ -100,7 +100,7 @@ export interface ExamSubjectInput {
 export interface CreateExamRequest {
     name: string;
     type: ExamType;
-    classId: string;
+    sectionId: string;
     academicYearId?: string;
     termId?: string;
     subjects: ExamSubjectInput[];

@@ -111,7 +111,7 @@ export function ClassDetailPage(): JSX.Element {
                     }
                 >
                     <ArrowLeft className="size-4" />
-                    Back to Class {schoolClass.gradeLevel}
+                    Back to Class {schoolClass.classLevel}
                 </Button>
 
                 <div className="border-border/60 flex flex-wrap items-center gap-4 border-b pb-5">
@@ -120,7 +120,7 @@ export function ClassDetailPage(): JSX.Element {
                     </div>
                     <div className="min-w-0">
                         <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                            Class {schoolClass.gradeLevel}
+                            Class {schoolClass.classLevel}
                         </p>
                         {isEditing ? (
                             <form
@@ -209,20 +209,20 @@ export function ClassDetailPage(): JSX.Element {
                 <TabsContent value="staffing" className="mt-5">
                     <div className="grid gap-6 lg:grid-cols-2">
                         <ClassTeacherSection
-                            classId={schoolClass.id}
+                            sectionId={schoolClass.id}
                             classTeacher={schoolClass.classTeacher}
                             canManage={canManage}
                         />
                         <ClassSubjectsSection
-                            classId={schoolClass.id}
-                            gradeLevel={schoolClass.gradeLevel}
+                            sectionId={schoolClass.id}
+                            classLevel={schoolClass.classLevel}
                             canManage={canManage}
                         />
                     </div>
                 </TabsContent>
                 <TabsContent value="students" className="mt-5">
                     <ClassStudentsSection
-                        classId={schoolClass.id}
+                        sectionId={schoolClass.id}
                         academicYearId={schoolClass.academicYearId}
                     />
                 </TabsContent>

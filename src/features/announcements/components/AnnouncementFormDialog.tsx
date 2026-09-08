@@ -41,16 +41,20 @@ export function AnnouncementFormDialog({
     onSubmit,
 }: AnnouncementFormDialogProps): JSX.Element {
     const isEdit = Boolean(announcement);
+    const today = new Date().toISOString().slice(0, 10);
 
     const {
         register,
         handleSubmit,
         reset,
+        watch,
         formState: { errors },
     } = useForm<CreateAnnouncementFormValues>({
         resolver: zodResolver(createAnnouncementSchema),
-        defaultValues: { title: "", content: "" },
+        defaultValues: { title: "", content: "", startDate: "", endDate: "" },
     });
+
+    const startDate = watch("startDate");
 
     useEffect(() => {
         if (!open) {
@@ -60,8 +64,18 @@ export function AnnouncementFormDialog({
         reset({
             title: announcement?.title ?? "",
             content: announcement?.content ?? "",
+            startDate: announcement?.startDate?.slice(0, 10) ?? "",
+            endDate: announcement?.endDate?.slice(0, 10) ?? "",
         });
     }, [open, announcement, reset]);
+
+    async function submit(values: CreateAnnouncementFormValues): Promise<void> {
+        await onSubmit({
+            ...values,
+            startDate: new Date(values.startDate).toISOString(),
+            endDate: new Date(values.endDate).toISOString(),
+        });
+    }
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -77,7 +91,7 @@ export function AnnouncementFormDialog({
                     </DialogDescription>
                 </DialogHeader>
 
-                <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
+                <form className="space-y-4" onSubmit={handleSubmit(submit)} noValidate>
                     <div className="space-y-2">
                         <Label htmlFor="title">Title</Label>
                         <Input
@@ -88,6 +102,35 @@ export function AnnouncementFormDialog({
                         {errors.title && (
                             <p className="text-destructive text-xs">{errors.title.message}</p>
                         )}
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="startDate">Start date</Label>
+                            <Input
+                                id="startDate"
+                                type="date"
+                                min={isEdit ? undefined : today}
+                                {...register("startDate")}
+                            />
+                            {errors.startDate && (
+                                <p className="text-destructive text-xs">
+                                    {errors.startDate.message}
+                                </p>
+                            )}
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="endDate">End date</Label>
+                            <Input
+                                id="endDate"
+                                type="date"
+                                min={startDate || (isEdit ? undefined : today)}
+                                {...register("endDate")}
+                            />
+                            {errors.endDate && (
+                                <p className="text-destructive text-xs">{errors.endDate.message}</p>
+                            )}
+                        </div>
                     </div>
 
                     <div className="space-y-2">

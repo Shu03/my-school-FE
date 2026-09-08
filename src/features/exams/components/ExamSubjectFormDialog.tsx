@@ -33,7 +33,7 @@ import type { ExamSubject } from "../types/exam.types";
 
 interface ExamSubjectFormDialogProps {
     open: boolean;
-    gradeLevel: number;
+    classLevel: number;
     excludeSubjectIds: string[];
     editing: ExamSubject | null;
     isSubmitting: boolean;
@@ -43,7 +43,7 @@ interface ExamSubjectFormDialogProps {
 
 export function ExamSubjectFormDialog({
     open,
-    gradeLevel,
+    classLevel,
     excludeSubjectIds,
     editing,
     isSubmitting,
@@ -52,7 +52,7 @@ export function ExamSubjectFormDialog({
 }: ExamSubjectFormDialogProps): JSX.Element {
     const isEdit = Boolean(editing);
 
-    const { data: subjects = [] } = useSubjectsList({ gradeLevel });
+    const { data: subjects = [] } = useSubjectsList({ classLevel });
 
     const availableSubjects = useMemo(
         () => subjects.filter((subject) => !excludeSubjectIds.includes(subject.id)),

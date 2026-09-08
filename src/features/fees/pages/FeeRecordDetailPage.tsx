@@ -92,8 +92,8 @@ export function FeeRecordDetailPage(): JSX.Element {
                     <div>
                         <h1 className="text-xl font-semibold tracking-tight">{studentName}</h1>
                         <p className="text-muted-foreground mt-1 text-sm">
-                            {record.student.admissionNumber} · Grade{" "}
-                            {record.feeStructure.gradeLevel}
+                            {record.student.admissionNumber} · Class{" "}
+                            {record.feeStructure.classLevel}
                         </p>
                     </div>
                     {canRecordPayment && (

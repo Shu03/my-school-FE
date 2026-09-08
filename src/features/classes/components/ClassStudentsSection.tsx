@@ -2,14 +2,13 @@ import type { JSX } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import { ChevronRight, GraduationCap, Users } from "lucide-react";
+import { GraduationCap, Users } from "lucide-react";
 
 import { studentDetail } from "@constants/routes.constants";
 
 import { useStudentsList } from "@features/students";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -20,18 +19,19 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 
 interface ClassStudentsSectionProps {
-    classId: string;
+    sectionId: string;
     academicYearId: string;
 }
 
 export function ClassStudentsSection({
-    classId,
+    sectionId,
     academicYearId,
 }: ClassStudentsSectionProps): JSX.Element {
     const navigate = useNavigate();
-    const { data, isLoading } = useStudentsList({ classId, academicYearId, limit: 100 });
+    const { data, isLoading } = useStudentsList({ sectionId, academicYearId, limit: 100 });
 
     const students = data?.data ?? [];
     const total = data?.total ?? students.length;
@@ -63,14 +63,26 @@ export function ClassStudentsSection({
                             <TableRow>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Admission No.</TableHead>
-                                <TableHead className="w-16 text-right">
-                                    <span className="sr-only">View</span>
-                                </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {students.map((student) => (
-                                <TableRow key={student.id}>
+                                <TableRow
+                                    key={student.id}
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-label={`View details for ${student.user.firstName} ${student.user.lastName}`}
+                                    onClick={() => navigate(studentDetail(student.id))}
+                                    onKeyDown={(event) => {
+                                        if (event.key === "Enter" || event.key === " ") {
+                                            event.preventDefault();
+                                            navigate(studentDetail(student.id));
+                                        }
+                                    }}
+                                    className={cn(
+                                        "hover:bg-muted/40 focus-visible:bg-muted/40 focus-visible:ring-ring/40 cursor-pointer transition-colors outline-none focus-visible:ring-2 focus-visible:ring-inset",
+                                    )}
+                                >
                                     <TableCell>
                                         <div className="flex items-center gap-2 font-medium">
                                             <GraduationCap className="text-muted-foreground size-4" />
@@ -81,16 +93,6 @@ export function ClassStudentsSection({
                                         <Badge variant="secondary" className="font-mono">
                                             {student.admissionNumber}
                                         </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            aria-label={`View ${student.user.firstName} ${student.user.lastName}`}
-                                            onClick={() => navigate(studentDetail(student.id))}
-                                        >
-                                            <ChevronRight className="size-4" />
-                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             ))}

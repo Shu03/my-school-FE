@@ -1,7 +1,7 @@
-export interface HomeworkClass {
+export interface HomeworkSection {
     id: string;
     name: string;
-    gradeLevel: number;
+    classLevel: number;
 }
 
 export interface HomeworkSubject {
@@ -26,20 +26,20 @@ export interface Homework {
     id: string;
     title: string;
     description: string;
-    classId: string;
+    sectionId: string;
     subjectId: string;
     academicYearId: string;
     dueDate: string;
     createdById: string | null;
     createdAt: string;
     updatedAt: string;
-    class: HomeworkClass;
+    section: HomeworkSection;
     subject: HomeworkSubject;
     createdBy: HomeworkCreator | null;
 }
 
 export interface HomeworkListParams {
-    classId?: string;
+    sectionId?: string;
     subjectId?: string;
     academicYearId?: string;
 }
@@ -47,7 +47,7 @@ export interface HomeworkListParams {
 export interface CreateHomeworkRequest {
     title: string;
     description: string;
-    classId: string;
+    sectionId: string;
     subjectId: string;
     academicYearId?: string;
     dueDate: string;

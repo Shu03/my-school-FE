@@ -51,11 +51,13 @@ export interface FetchOptions extends RequestInit {
 export class ApiError extends Error {
     status: number;
     response: Response;
+    serverMessage?: string;
 
-    constructor(message: string, status: number, response: Response) {
+    constructor(message: string, status: number, response: Response, serverMessage?: string) {
         super(message);
         this.status = status;
         this.response = response;
+        this.serverMessage = serverMessage;
     }
 }
 
@@ -156,7 +158,24 @@ async function apiFetch<T = unknown>(endpoint: string, options: FetchOptions = {
     }
 
     if (!response.ok) {
-        throw new ApiError(`API Error: ${response.status}`, response.status, response);
+        let serverMessage: string | undefined;
+        try {
+            const errorBody = (await response.clone().json()) as { message?: unknown };
+            if (typeof errorBody.message === "string") {
+                serverMessage = errorBody.message;
+            } else if (Array.isArray(errorBody.message)) {
+                serverMessage = errorBody.message.filter((m) => typeof m === "string").join(" ");
+            }
+        } catch {
+            // Response body was empty or not JSON — fall back to generic messaging.
+        }
+
+        throw new ApiError(
+            serverMessage ?? `API Error: ${response.status}`,
+            response.status,
+            response,
+            serverMessage,
+        );
     }
 
     const data = await response.json();

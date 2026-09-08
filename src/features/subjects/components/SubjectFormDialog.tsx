@@ -27,7 +27,7 @@ interface SubjectFormDialogProps {
     isSubmitting: boolean;
     onOpenChange: (open: boolean) => void;
     onSubmit: (values: CreateSubjectFormValues) => Promise<void>;
-    fixedGradeLevel?: number;
+    fixedClassLevel?: number;
 }
 
 export function SubjectFormDialog({
@@ -36,7 +36,7 @@ export function SubjectFormDialog({
     isSubmitting,
     onOpenChange,
     onSubmit,
-    fixedGradeLevel,
+    fixedClassLevel,
 }: SubjectFormDialogProps): JSX.Element {
     const isEdit = Boolean(subject);
 
@@ -47,7 +47,7 @@ export function SubjectFormDialog({
         formState: { errors },
     } = useForm<CreateSubjectFormValues>({
         resolver: zodResolver(createSubjectSchema),
-        defaultValues: { name: "", code: "", gradeLevel: 1, description: "" },
+        defaultValues: { name: "", code: "", classLevel: 1, description: "" },
     });
 
     useEffect(() => {
@@ -58,10 +58,10 @@ export function SubjectFormDialog({
         reset({
             name: subject?.name ?? "",
             code: subject?.code ?? "",
-            gradeLevel: subject?.gradeLevel ?? fixedGradeLevel ?? 1,
+            classLevel: subject?.classLevel ?? fixedClassLevel ?? 1,
             description: subject?.description ?? "",
         });
-    }, [fixedGradeLevel, open, subject, reset]);
+    }, [fixedClassLevel, open, subject, reset]);
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -71,8 +71,8 @@ export function SubjectFormDialog({
                     <DialogDescription>
                         {isEdit
                             ? "Update the subject name, code, or description."
-                            : fixedGradeLevel
-                              ? `Add a subject shared by every Section in Class ${fixedGradeLevel}.`
+                            : fixedClassLevel
+                              ? `Add a subject shared by every Section in Class ${fixedClassLevel}.`
                               : "Add a subject for a specific class."}
                     </DialogDescription>
                 </DialogHeader>
@@ -95,18 +95,18 @@ export function SubjectFormDialog({
                             )}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="gradeLevel">Class</Label>
+                            <Label htmlFor="classLevel">Class</Label>
                             <Input
-                                id="gradeLevel"
+                                id="classLevel"
                                 type="number"
                                 min={1}
                                 max={99}
-                                disabled={isEdit || fixedGradeLevel !== undefined}
-                                {...register("gradeLevel", { valueAsNumber: true })}
+                                disabled={isEdit || fixedClassLevel !== undefined}
+                                {...register("classLevel", { valueAsNumber: true })}
                             />
-                            {errors.gradeLevel && (
+                            {errors.classLevel && (
                                 <p className="text-destructive text-xs">
-                                    {errors.gradeLevel.message}
+                                    {errors.classLevel.message}
                                 </p>
                             )}
                         </div>

@@ -30,16 +30,16 @@ const descriptionSchema = z
     )
     .optional();
 
-const gradeLevelSchema = z
-    .number({ error: "Grade level is required" })
-    .int("Grade level must be a whole number")
-    .min(SUBJECT_VALIDATION.GRADE_MIN, "Grade level must be at least 1")
-    .max(SUBJECT_VALIDATION.GRADE_MAX, "Grade level must be at most 99");
+const classLevelSchema = z
+    .number({ error: "Class level is required" })
+    .int("Class level must be a whole number")
+    .min(SUBJECT_VALIDATION.GRADE_MIN, "Class level must be at least 1")
+    .max(SUBJECT_VALIDATION.GRADE_MAX, "Class level must be at most 99");
 
 export const createSubjectSchema = z.object({
     name: nameSchema,
     code: codeSchema,
-    gradeLevel: gradeLevelSchema,
+    classLevel: classLevelSchema,
     description: descriptionSchema,
 });
 

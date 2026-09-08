@@ -14,7 +14,7 @@ export interface FeeAcademicYear {
 
 export interface FeeStructure {
     id: string;
-    gradeLevel: number;
+    classLevel: number;
     academicYearId: string;
     totalAmount: number;
     dueDate: string;
@@ -44,7 +44,7 @@ export interface FeeStudent {
 
 export interface FeeRecordStructure {
     id: string;
-    gradeLevel: number;
+    classLevel: number;
     academicYearId: string;
     totalAmount: number;
     dueDate: string;
@@ -97,13 +97,13 @@ export interface FeeStructuresListParams {
 }
 
 export interface FeeRecordsListParams {
-    classId?: string;
+    sectionId?: string;
     academicYearId?: string;
     status?: FeeStatus;
 }
 
 export interface CreateFeeStructureRequest {
-    gradeLevel: number;
+    classLevel: number;
     academicYearId?: string;
     totalAmount: number;
     dueDate: string;

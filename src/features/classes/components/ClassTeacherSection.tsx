@@ -17,13 +17,13 @@ import type { SchoolClassWithRelations } from "../types/class.types";
 import { AssignTeacherDialog } from "./AssignTeacherDialog";
 
 interface ClassTeacherSectionProps {
-    classId: string;
+    sectionId: string;
     classTeacher: SchoolClassWithRelations["classTeacher"];
     canManage: boolean;
 }
 
 export function ClassTeacherSection({
-    classId,
+    sectionId,
     classTeacher,
     canManage,
 }: ClassTeacherSectionProps): JSX.Element {
@@ -35,9 +35,9 @@ export function ClassTeacherSection({
         try {
             await createAssignment.mutateAsync({
                 id: teacherId,
-                data: { classId, role: "CLASS_TEACHER" },
+                data: { sectionId, role: "CLASS_TEACHER" },
             });
-            await queryClient.invalidateQueries({ queryKey: classesKeys.detail(classId) });
+            await queryClient.invalidateQueries({ queryKey: classesKeys.detail(sectionId) });
             toast.success("Section teacher assigned successfully.");
             setAssignOpen(false);
         } catch (error) {

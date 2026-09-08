@@ -27,7 +27,7 @@ export interface AttendanceStudent {
 export interface AttendanceRecord {
     id: string;
     studentId: string;
-    classId: string;
+    sectionId: string;
     academicYearId: string;
     date: string;
     status: AttendanceStatus;
@@ -44,7 +44,7 @@ export interface MarkAttendanceRecord {
 }
 
 export interface MarkAttendanceRequest {
-    classId: string;
+    sectionId: string;
     date: string;
     records: MarkAttendanceRecord[];
 }
@@ -52,11 +52,11 @@ export interface MarkAttendanceRequest {
 export interface BulkMarkResult {
     marked: number;
     date: string;
-    classId: string;
+    sectionId: string;
 }
 
 export interface ClassAttendanceParams {
-    classId: string;
+    sectionId: string;
     date: string;
 }
 
@@ -67,7 +67,7 @@ export interface StudentAttendanceParams {
 }
 
 export interface AttendanceSummaryParams {
-    classId: string;
+    sectionId: string;
     month: string;
 }
 

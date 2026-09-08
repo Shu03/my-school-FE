@@ -111,7 +111,7 @@ export function HomeworkList({
                         <CardFooter className="border-border/60 text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-2 border-t pt-4 text-xs">
                             <span className="flex items-center gap-1.5">
                                 <GraduationCap className="size-3.5" />
-                                {item.class.name} (Grade {item.class.gradeLevel})
+                                {item.section.name} (Class {item.section.classLevel})
                             </span>
                             <span
                                 className={

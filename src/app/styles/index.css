@@ -183,6 +183,15 @@
     html {
         @apply font-sans;
     }
+    button:not(:disabled),
+    [role="button"]:not([aria-disabled="true"]),
+    [role="tab"]:not([aria-disabled="true"]),
+    [role="menuitem"]:not([aria-disabled="true"]),
+    label[for],
+    summary,
+    a[href] {
+        @apply cursor-pointer;
+    }
 }
 
 /* ── Texture utilities ───────────────────────────────────────────────────

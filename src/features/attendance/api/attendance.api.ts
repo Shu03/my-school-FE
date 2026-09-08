@@ -34,7 +34,7 @@ export async function markAttendance(data: MarkAttendanceRequest): Promise<BulkM
 export async function getClassAttendance(
     params: ClassAttendanceParams,
 ): Promise<AttendanceRecord[]> {
-    const queryString = buildQuery({ classId: params.classId, date: params.date });
+    const queryString = buildQuery({ sectionId: params.sectionId, date: params.date });
 
     return apiFetch<AttendanceRecord[]>(`${API_ENDPOINTS.ATTENDANCE.BASE}?${queryString}`, {
         method: "GET",
@@ -63,7 +63,7 @@ export async function getStudentAttendance(
 export async function getAttendanceSummary(
     params: AttendanceSummaryParams,
 ): Promise<AttendanceSummaryItem[]> {
-    const queryString = buildQuery({ classId: params.classId, month: params.month });
+    const queryString = buildQuery({ sectionId: params.sectionId, month: params.month });
 
     return apiFetch<AttendanceSummaryItem[]>(`${API_ENDPOINTS.ATTENDANCE.SUMMARY}?${queryString}`, {
         method: "GET",

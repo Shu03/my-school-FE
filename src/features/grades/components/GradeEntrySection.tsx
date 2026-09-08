@@ -41,7 +41,7 @@ export function GradeEntrySection({
     const [syncKey, setSyncKey] = useState("");
 
     const { data: studentsData, isLoading: isLoadingStudents } = useStudentsList({
-        classId,
+        sectionId: classId,
         academicYearId,
         limit: GRADE_STUDENT_LIMIT,
     });

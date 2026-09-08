@@ -62,7 +62,7 @@ export async function backfillFees(data: BackfillRequest): Promise<BackfillResul
 
 export async function listFeeRecords(params: FeeRecordsListParams): Promise<FeeRecord[]> {
     const query = buildQuery({
-        classId: params.classId,
+        sectionId: params.sectionId,
         academicYearId: params.academicYearId,
         status: params.status,
     });

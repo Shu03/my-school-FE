@@ -206,7 +206,7 @@ export const router = createBrowserRouter([
                 ],
             },
 
-            // Admin and teacher (teacher list is scoped by the backend)
+            // Admin and teacher (student list is scoped by the backend)
             {
                 element: <RoleGuard allowedRoles={[Role.ADMIN, Role.TEACHER]} />,
                 children: [
@@ -218,6 +218,11 @@ export const router = createBrowserRouter([
                             </Lazy>
                         ),
                     },
+                ],
+            },
+            {
+                element: <RoleGuard allowedRoles={[Role.ADMIN, Role.TEACHER, Role.STUDENT]} />,
+                children: [
                     {
                         path: ROUTES.ATTENDANCE,
                         element: (
@@ -268,7 +273,7 @@ export const router = createBrowserRouter([
                     <RoleOrPermissionGuard
                         allowedRoles={[Role.ADMIN]}
                         permissionRole={Role.TEACHER}
-                        requiredPermission={PERMISSIONS.CLASS_MANAGE}
+                        requiredPermission={PERMISSIONS.SECTION_MANAGE}
                     />
                 ),
                 children: [

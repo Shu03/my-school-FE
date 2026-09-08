@@ -147,7 +147,7 @@ export function ExamDetailPage(): JSX.Element {
                                 <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-2 text-sm">
                                     <Badge variant="secondary">{EXAM_TYPE_LABELS[exam.type]}</Badge>
                                     <span>
-                                        {exam.class.name} (Grade {exam.class.gradeLevel})
+                                        {exam.section.name} (Class {exam.section.classLevel})
                                     </span>
                                     <span>·</span>
                                     <span>
@@ -197,7 +197,7 @@ export function ExamDetailPage(): JSX.Element {
 
             <ExamSubjectFormDialog
                 open={dialogOpen}
-                gradeLevel={exam.class.gradeLevel}
+                classLevel={exam.section.classLevel}
                 excludeSubjectIds={excludeSubjectIds}
                 editing={editing}
                 isSubmitting={addSubjectMutation.isPending || updateSubjectMutation.isPending}

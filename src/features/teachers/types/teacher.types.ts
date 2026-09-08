@@ -36,20 +36,20 @@ export interface TeacherProfile {
 export interface TeacherAssignment {
     id: string;
     teacherId: string;
-    classId: string;
+    sectionId: string;
     subjectId: string | null;
     role: TeacherClassRole;
     createdAt: string;
-    class: {
+    section: {
         id: string;
         name: string;
-        gradeLevel: number;
+        classLevel: number;
     };
     subject: {
         id: string;
         name: string;
         code: string;
-        gradeLevel: number;
+        classLevel: number;
     } | null;
 }
 
@@ -77,7 +77,7 @@ export interface ReplaceOverridesRequest {
 }
 
 export interface CreateAssignmentRequest {
-    classId: string;
+    sectionId: string;
     role: TeacherClassRole;
     subjectId?: string;
 }

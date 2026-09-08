@@ -5,10 +5,15 @@ import { toast } from "sonner";
 
 import type { Permission } from "@constants/permissions.constants";
 
-import { InspectorPanel } from "@components/common/InspectorPanel";
-
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import {
@@ -83,82 +88,78 @@ export function TeacherInspector({
     }
 
     return (
-        <>
-            <InspectorPanel
-                open
-                title={fullName}
-                description={`Manage profile, permissions, and assignments for ${fullName}.`}
-                onOpenChange={onOpenChange}
-            >
-                <div className="flex min-h-full flex-col">
-                    <header className="border-border/60 from-primary/12 via-primary/5 border-b bg-linear-to-br to-transparent px-5 py-5 pr-14">
-                        <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
-                            Teacher setup
-                        </p>
-                        <h2 className="mt-1 text-lg font-semibold">Access and assignments</h2>
-                    </header>
+        <Dialog open onOpenChange={onOpenChange}>
+            <DialogContent className="flex max-h-[85vh] flex-col overflow-hidden sm:max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle>{fullName}</DialogTitle>
+                    <DialogDescription>
+                        Manage permissions and assignments for {fullName}.
+                    </DialogDescription>
+                </DialogHeader>
 
-                    <Tabs
-                        defaultValue="permissions"
-                        className="flex min-h-0 flex-1 flex-col px-5 py-4"
+                <Tabs defaultValue="permissions" className="flex min-h-0 flex-1 flex-col">
+                    <TabsList className="h-10 w-full">
+                        <TabsTrigger value="permissions">
+                            <ShieldCheck />
+                            Permissions
+                        </TabsTrigger>
+                        <TabsTrigger value="assignments">
+                            <ClipboardList />
+                            Assignments
+                        </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent
+                        value="permissions"
+                        className="mt-4 min-h-0 flex-1 overflow-y-auto"
                     >
-                        <TabsList className="h-10 w-full">
-                            <TabsTrigger value="permissions">
-                                <ShieldCheck />
-                                Permissions
-                            </TabsTrigger>
-                            <TabsTrigger value="assignments">
-                                <ClipboardList />
-                                Assignments
-                            </TabsTrigger>
-                        </TabsList>
+                        <TeacherPermissionsCard
+                            key={teacher.id}
+                            teacher={teacher}
+                            presets={presets}
+                            canManage
+                            isAssigningPreset={assignPresetMutation.isPending}
+                            isRemovingPreset={removePresetMutation.isPending}
+                            isSavingOverrides={replaceOverridesMutation.isPending}
+                            onAssignPreset={handleAssignPreset}
+                            onRemovePreset={handleRemovePreset}
+                            onSaveOverrides={handleSaveOverrides}
+                            embedded
+                        />
+                    </TabsContent>
 
-                        <TabsContent value="permissions" className="mt-4">
-                            <TeacherPermissionsCard
-                                key={teacher.id}
-                                teacher={teacher}
-                                presets={presets}
-                                canManage
-                                isAssigningPreset={assignPresetMutation.isPending}
-                                isRemovingPreset={removePresetMutation.isPending}
-                                isSavingOverrides={replaceOverridesMutation.isPending}
-                                onAssignPreset={handleAssignPreset}
-                                onRemovePreset={handleRemovePreset}
-                                onSaveOverrides={handleSaveOverrides}
+                    <TabsContent
+                        value="assignments"
+                        className="mt-4 min-h-0 flex-1 overflow-y-auto"
+                    >
+                        {assignmentsError ? (
+                            <Alert variant="destructive">
+                                <AlertDescription className="flex items-center justify-between gap-3">
+                                    <span>Could not load assignments.</span>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => void refetchAssignments()}
+                                    >
+                                        Retry
+                                    </Button>
+                                </AlertDescription>
+                            </Alert>
+                        ) : (
+                            <TeacherAssignmentsSection
+                                assignments={assignments}
+                                isLoading={assignmentsLoading}
+                                canManage={false}
+                                deletingAssignmentId={null}
+                                onAdd={() => undefined}
+                                onDelete={() => undefined}
                                 embedded
                             />
-                        </TabsContent>
-
-                        <TabsContent value="assignments" className="mt-4">
-                            {assignmentsError ? (
-                                <Alert variant="destructive">
-                                    <AlertDescription className="flex items-center justify-between gap-3">
-                                        <span>Could not load assignments.</span>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => void refetchAssignments()}
-                                        >
-                                            Retry
-                                        </Button>
-                                    </AlertDescription>
-                                </Alert>
-                            ) : (
-                                <TeacherAssignmentsSection
-                                    assignments={assignments}
-                                    isLoading={assignmentsLoading}
-                                    canManage={false}
-                                    deletingAssignmentId={null}
-                                    onAdd={() => undefined}
-                                    onDelete={() => undefined}
-                                    embedded
-                                />
-                            )}
-                        </TabsContent>
-                    </Tabs>
-                </div>
-            </InspectorPanel>
-        </>
+                        )}
+                    </TabsContent>
+                </Tabs>
+            </DialogContent>
+        </Dialog>
     );
 }

@@ -26,7 +26,7 @@ import { useAttendanceSummary } from "../hooks/useAttendance";
 import { schoolCurrentMonth } from "../lib/format";
 
 export function AttendanceSummaryView(): JSX.Element {
-    const [classId, setClassId] = useState("");
+    const [sectionId, setSectionId] = useState("");
     const [month, setMonth] = useState(schoolCurrentMonth());
 
     const { data: currentYear } = useCurrentAcademicYear();
@@ -35,22 +35,22 @@ export function AttendanceSummaryView(): JSX.Element {
         Boolean(currentYear?.id),
     );
 
-    const enabled = Boolean(classId && month);
-    const { data: summary = [], isLoading } = useAttendanceSummary({ classId, month }, enabled);
+    const enabled = Boolean(sectionId && month);
+    const { data: summary = [], isLoading } = useAttendanceSummary({ sectionId, month }, enabled);
 
     return (
         <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-end gap-3">
                 <div className="space-y-2">
                     <Label>Class</Label>
-                    <Select value={classId} onValueChange={setClassId}>
+                    <Select value={sectionId} onValueChange={setSectionId}>
                         <SelectTrigger className="w-56" aria-label="Select class">
                             <SelectValue placeholder="Select a class" />
                         </SelectTrigger>
                         <SelectContent>
                             {classes.map((item) => (
                                 <SelectItem key={item.id} value={item.id}>
-                                    {item.name} (Grade {item.gradeLevel})
+                                    {item.name} (Class {item.classLevel})
                                 </SelectItem>
                             ))}
                         </SelectContent>

@@ -58,7 +58,7 @@ export function HomeworkPage(): JSX.Element {
         isError,
         refetch,
     } = useHomeworkList({
-        classId: classFilter === ALL_CLASSES ? undefined : classFilter,
+        sectionId: classFilter === ALL_CLASSES ? undefined : classFilter,
     });
 
     const createMutation = useCreateHomework();
@@ -105,7 +105,7 @@ export function HomeworkPage(): JSX.Element {
                 await createMutation.mutateAsync({
                     title: values.title,
                     description: values.description,
-                    classId: values.classId,
+                    sectionId: values.sectionId,
                     subjectId: values.subjectId,
                     academicYearId: currentYear?.id,
                     dueDate: values.dueDate,
@@ -154,7 +154,7 @@ export function HomeworkPage(): JSX.Element {
                                     <SelectItem value={ALL_CLASSES}>All classes</SelectItem>
                                     {classes.map((item) => (
                                         <SelectItem key={item.id} value={item.id}>
-                                            {item.name} (Grade {item.gradeLevel})
+                                            {item.name} (Class {item.classLevel})
                                         </SelectItem>
                                     ))}
                                 </SelectContent>

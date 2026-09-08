@@ -78,7 +78,7 @@ export function FeeRecordsTable({ records, isLoading, onView }: FeeRecordsTableP
                                         {record.student.admissionNumber}
                                     </p>
                                 </TableCell>
-                                <TableCell>Grade {record.feeStructure.gradeLevel}</TableCell>
+                                <TableCell>Class {record.feeStructure.classLevel}</TableCell>
                                 <TableCell className="text-right tabular-nums">
                                     {formatCurrency(record.totalAmount)}
                                 </TableCell>

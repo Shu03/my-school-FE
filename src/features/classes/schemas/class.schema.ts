@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { CLASS_VALIDATION } from "@constants/classes.constants";
 
-const gradeLevelSchema = z
+const classLevelSchema = z
     .number({ error: "Class is required" })
     .int("Class must be a whole number")
     .min(CLASS_VALIDATION.GRADE_MIN, `Class must be at least ${CLASS_VALIDATION.GRADE_MIN}`)
@@ -17,7 +17,7 @@ export const createClassSchema = z.object({
             CLASS_VALIDATION.NAME_MAX,
             `Section name must be at most ${CLASS_VALIDATION.NAME_MAX} characters`,
         ),
-    gradeLevel: gradeLevelSchema,
+    classLevel: classLevelSchema,
     academicYearId: z.string().trim().min(1, "Academic year is required"),
 });
 
@@ -32,10 +32,10 @@ export const updateClassSchema = z
                 `Section name must be at most ${CLASS_VALIDATION.NAME_MAX} characters`,
             )
             .optional(),
-        gradeLevel: gradeLevelSchema.optional(),
+        classLevel: classLevelSchema.optional(),
     })
     .superRefine((values, context) => {
-        if (!values.name && values.gradeLevel === undefined) {
+        if (!values.name && values.classLevel === undefined) {
             context.addIssue({
                 code: z.ZodIssueCode.custom,
                 path: ["name"],
@@ -53,7 +53,7 @@ export const editClassSchema = z.object({
             CLASS_VALIDATION.NAME_MAX,
             `Section name must be at most ${CLASS_VALIDATION.NAME_MAX} characters`,
         ),
-    gradeLevel: gradeLevelSchema,
+    classLevel: classLevelSchema,
 });
 
 export const editSectionSchema = z.object({

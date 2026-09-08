@@ -2,7 +2,7 @@ export interface Subject {
     id: string;
     name: string;
     code: string;
-    gradeLevel: number;
+    classLevel: number;
     description?: string;
     createdAt: string;
     updatedAt: string;
@@ -13,14 +13,14 @@ export type TeacherAssignmentRole = "CLASS_TEACHER" | "SUBJECT_TEACHER";
 export interface SubjectAssignment {
     id: string;
     teacherId: string;
-    classId: string;
+    sectionId: string;
     subjectId: string | null;
     role: TeacherAssignmentRole;
     createdAt: string;
-    class: {
+    section: {
         id: string;
         name: string;
-        gradeLevel: number;
+        classLevel: number;
     };
     teacher: {
         id: string;
@@ -38,14 +38,14 @@ export interface SubjectWithAssignments extends Subject {
 }
 
 export interface SubjectsListParams {
-    gradeLevel?: number;
+    classLevel?: number;
     search?: string;
 }
 
 export interface CreateSubjectRequest {
     name: string;
     code: string;
-    gradeLevel: number;
+    classLevel: number;
     description?: string;
 }
 

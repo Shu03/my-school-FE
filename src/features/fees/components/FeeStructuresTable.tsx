@@ -72,7 +72,7 @@ export function FeeStructuresTable({
                         structures.map((structure) => (
                             <TableRow key={structure.id}>
                                 <TableCell className="font-medium">
-                                    Grade {structure.gradeLevel}
+                                    Class {structure.classLevel}
                                 </TableCell>
                                 <TableCell className="text-right tabular-nums">
                                     {formatCurrency(structure.totalAmount)}
@@ -85,7 +85,7 @@ export function FeeStructuresTable({
                                         <Button
                                             variant="ghost"
                                             size="icon"
-                                            aria-label={`Edit grade ${structure.gradeLevel} structure`}
+                                            aria-label={`Edit class ${structure.classLevel} structure`}
                                             onClick={() => onEdit(structure)}
                                         >
                                             <Pencil className="size-4" />

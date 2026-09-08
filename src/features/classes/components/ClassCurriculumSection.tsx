@@ -24,13 +24,13 @@ import { getSubjectDeleteErrorMessage, getSubjectErrorMessage } from "../../subj
 import type { CreateSubjectFormValues } from "../../subjects/schemas/subject.schema";
 
 interface ClassCurriculumSectionProps {
-    gradeLevel: number;
+    classLevel: number;
     canManage: boolean;
     canDelete: boolean;
 }
 
 export function ClassCurriculumSection({
-    gradeLevel,
+    classLevel,
     canManage,
     canDelete,
 }: ClassCurriculumSectionProps): JSX.Element {
@@ -38,7 +38,7 @@ export function ClassCurriculumSection({
     const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
     const [deletingSubject, setDeletingSubject] = useState<Subject | null>(null);
 
-    const { data: subjects = [], isLoading, isError, refetch } = useSubjectsList({ gradeLevel });
+    const { data: subjects = [], isLoading, isError, refetch } = useSubjectsList({ classLevel });
     const createSubjectMutation = useCreateSubject();
     const updateSubjectMutation = useUpdateSubject();
     const deleteSubjectMutation = useDeleteSubject();
@@ -66,7 +66,7 @@ export function ClassCurriculumSection({
                 });
                 toast.success("Subject updated successfully.");
             } else {
-                await createSubjectMutation.mutateAsync({ ...values, gradeLevel });
+                await createSubjectMutation.mutateAsync({ ...values, classLevel });
                 toast.success("Subject added to this class.");
             }
             setFormOpen(false);
@@ -91,7 +91,7 @@ export function ClassCurriculumSection({
         return (
             <Alert variant="destructive">
                 <AlertDescription className="flex items-center justify-between gap-4">
-                    <span>Could not load subjects for Class {gradeLevel}.</span>
+                    <span>Could not load subjects for Class {classLevel}.</span>
                     <Button
                         type="button"
                         variant="outline"
@@ -110,7 +110,7 @@ export function ClassCurriculumSection({
             <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
                     <h2 id="class-subjects-heading" className="text-lg font-semibold">
-                        Class {gradeLevel} subjects
+                        Class {classLevel} subjects
                     </h2>
                     <p className="text-muted-foreground text-sm">
                         Shared by every Section in this Class.
@@ -203,14 +203,14 @@ export function ClassCurriculumSection({
                 isSubmitting={createSubjectMutation.isPending || updateSubjectMutation.isPending}
                 onOpenChange={setFormOpen}
                 onSubmit={handleSubmit}
-                fixedGradeLevel={gradeLevel}
+                fixedClassLevel={classLevel}
             />
             <ConfirmDialog
                 open={Boolean(deletingSubject)}
                 title="Delete subject?"
                 description={
                     deletingSubject
-                        ? `${deletingSubject.name} will be removed from Class ${gradeLevel}. Subjects with active assignments cannot be deleted.`
+                        ? `${deletingSubject.name} will be removed from Class ${classLevel}. Subjects with active assignments cannot be deleted.`
                         : ""
                 }
                 confirmLabel="Delete subject"

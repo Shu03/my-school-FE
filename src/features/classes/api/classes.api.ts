@@ -21,8 +21,8 @@ export async function listClasses(params?: ClassesListParams): Promise<SchoolCla
 
     const queryString = searchParams.toString();
     const endpoint = queryString
-        ? `${API_ENDPOINTS.CLASSES.BASE}?${queryString}`
-        : API_ENDPOINTS.CLASSES.BASE;
+        ? `${API_ENDPOINTS.SECTIONS.BASE}?${queryString}`
+        : API_ENDPOINTS.SECTIONS.BASE;
 
     return apiFetch<SchoolClass[]>(endpoint, {
         method: "GET",
@@ -30,20 +30,20 @@ export async function listClasses(params?: ClassesListParams): Promise<SchoolCla
 }
 
 export async function getClassById(id: string): Promise<SchoolClassWithRelations> {
-    return apiFetch<SchoolClassWithRelations>(API_ENDPOINTS.CLASSES.byId(id), {
+    return apiFetch<SchoolClassWithRelations>(API_ENDPOINTS.SECTIONS.byId(id), {
         method: "GET",
     });
 }
 
 export async function createClass(data: CreateClassRequest): Promise<SchoolClass> {
-    return apiFetch<SchoolClass>(API_ENDPOINTS.CLASSES.BASE, {
+    return apiFetch<SchoolClass>(API_ENDPOINTS.SECTIONS.BASE, {
         method: "POST",
         body: JSON.stringify(data),
     });
 }
 
 export async function updateClass(id: string, data: UpdateClassRequest): Promise<SchoolClass> {
-    return apiFetch<SchoolClass>(API_ENDPOINTS.CLASSES.byId(id), {
+    return apiFetch<SchoolClass>(API_ENDPOINTS.SECTIONS.byId(id), {
         method: "PATCH",
         body: JSON.stringify(data),
     });

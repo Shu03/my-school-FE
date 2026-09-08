@@ -16,7 +16,7 @@ export {
 export type {
     CreateHomeworkRequest,
     Homework,
-    HomeworkClass,
+    HomeworkSection,
     HomeworkCreator,
     HomeworkListParams,
     HomeworkSubject,

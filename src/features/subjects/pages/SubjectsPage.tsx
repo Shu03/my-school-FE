@@ -31,7 +31,7 @@ export function SubjectsPage(): JSX.Element {
     const isAdmin = user?.role === Role.ADMIN;
     const canManage = isAdmin || hasPermission(user?.permissions, PERMISSIONS.SUBJECT_MANAGE);
 
-    const [gradeLevelFilter, setGradeLevelFilter] = useState("");
+    const [classLevelFilter, setClassLevelFilter] = useState("");
     const [search, setSearch] = useState("");
     const [formOpen, setFormOpen] = useState(false);
     const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
@@ -42,7 +42,7 @@ export function SubjectsPage(): JSX.Element {
         isError,
         refetch,
     } = useSubjectsList({
-        gradeLevel: gradeLevelFilter ? Number(gradeLevelFilter) : undefined,
+        classLevel: classLevelFilter ? Number(classLevelFilter) : undefined,
         search: search || undefined,
     });
 
@@ -128,10 +128,10 @@ export function SubjectsPage(): JSX.Element {
                             inputMode="numeric"
                             min={1}
                             max={99}
-                            placeholder="Filter grade"
+                            placeholder="Filter class"
                             className="w-34"
-                            value={gradeLevelFilter}
-                            onChange={(event) => setGradeLevelFilter(event.target.value)}
+                            value={classLevelFilter}
+                            onChange={(event) => setClassLevelFilter(event.target.value)}
                         />
                         <Input
                             type="search"

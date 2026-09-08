@@ -27,7 +27,7 @@ export function ClassesPage(): JSX.Element {
     const [selectedAcademicYearId, setSelectedAcademicYearId] = useState<string | null>(
         returnState?.academicYearId ?? null,
     );
-    const [gradeLevelFilter, setGradeLevelFilter] = useState("");
+    const [classLevelFilter, setClassLevelFilter] = useState("");
     const [isCreating, setIsCreating] = useState(false);
     const [selectedClassNumber, setSelectedClassNumber] = useState<number | null>(
         returnState?.openClassNumber ?? null,
@@ -43,7 +43,7 @@ export function ClassesPage(): JSX.Element {
 
     const classesParams = {
         academicYearId: effectiveAcademicYearId || undefined,
-        gradeLevel: gradeLevelFilter ? Number(gradeLevelFilter) : undefined,
+        classLevel: classLevelFilter ? Number(classLevelFilter) : undefined,
     };
 
     const {
@@ -59,7 +59,7 @@ export function ClassesPage(): JSX.Element {
     const subjectCountByClass = useMemo<Record<number, number>>(
         () =>
             subjects.reduce<Record<number, number>>((counts, subject) => {
-                counts[subject.gradeLevel] = (counts[subject.gradeLevel] ?? 0) + 1;
+                counts[subject.classLevel] = (counts[subject.classLevel] ?? 0) + 1;
                 return counts;
             }, {}),
         [subjects],
@@ -77,8 +77,8 @@ export function ClassesPage(): JSX.Element {
     const sortedClasses = useMemo(
         () =>
             [...(classesData ?? [])].sort((left, right) => {
-                if (left.gradeLevel !== right.gradeLevel) {
-                    return left.gradeLevel - right.gradeLevel;
+                if (left.classLevel !== right.classLevel) {
+                    return left.classLevel - right.classLevel;
                 }
 
                 return left.name.localeCompare(right.name);
@@ -88,13 +88,13 @@ export function ClassesPage(): JSX.Element {
 
     async function handleCreateSubmit(values: {
         name: string;
-        gradeLevel: number;
+        classLevel: number;
         academicYearId: string;
     }): Promise<boolean> {
         try {
             await createClassMutation.mutateAsync({
                 name: values.name,
-                gradeLevel: values.gradeLevel,
+                classLevel: values.classLevel,
                 academicYearId: values.academicYearId,
             });
             toast.success("Class created with its first Section.");
@@ -111,9 +111,9 @@ export function ClassesPage(): JSX.Element {
             <ClassesToolbar
                 years={years}
                 selectedAcademicYearId={effectiveAcademicYearId}
-                gradeLevelFilter={gradeLevelFilter}
+                classLevelFilter={classLevelFilter}
                 onAcademicYearChange={(value) => setSelectedAcademicYearId(value)}
-                onGradeLevelFilterChange={setGradeLevelFilter}
+                onClassLevelFilterChange={setClassLevelFilter}
             />
 
             {classesError ? (

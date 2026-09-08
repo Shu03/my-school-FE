@@ -28,10 +28,14 @@ import { useMarkAttendance } from "../hooks/useAttendance";
 import { getAttendanceErrorMessage } from "../lib/errors";
 import { schoolToday } from "../lib/format";
 
-export function AttendanceMarker(): JSX.Element {
+interface AttendanceMarkerProps {
+    initialSectionId?: string;
+}
+
+export function AttendanceMarker({ initialSectionId }: AttendanceMarkerProps): JSX.Element {
     const today = schoolToday();
 
-    const [classId, setClassId] = useState("");
+    const [sectionId, setSectionId] = useState(initialSectionId ?? "");
     const [statuses, setStatuses] = useState<Record<string, AttendanceStatus>>({});
     const [syncKey, setSyncKey] = useState("");
 
@@ -42,16 +46,16 @@ export function AttendanceMarker(): JSX.Element {
     );
 
     const { data: studentsData, isLoading } = useStudentsList({
-        classId: classId || undefined,
+        sectionId: sectionId || undefined,
         academicYearId: currentYear?.id,
         limit: ATTENDANCE_STUDENT_LIMIT,
     });
-    const students = classId ? (studentsData?.data ?? []) : [];
+    const students = sectionId ? (studentsData?.data ?? []) : [];
 
     const markMutation = useMarkAttendance();
 
     // Initialize every student to PRESENT whenever the loaded roster changes (render-time sync).
-    const rosterKey = `${classId}:${students.map((student) => student.id).join(",")}`;
+    const rosterKey = `${sectionId}:${students.map((student) => student.id).join(",")}`;
     if (rosterKey !== syncKey) {
         setSyncKey(rosterKey);
         setStatuses(
@@ -70,13 +74,13 @@ export function AttendanceMarker(): JSX.Element {
     }
 
     async function handleSubmit(): Promise<void> {
-        if (!classId || students.length === 0) {
+        if (!sectionId || students.length === 0) {
             return;
         }
 
         try {
             const result = await markMutation.mutateAsync({
-                classId,
+                sectionId,
                 date: today,
                 records: students.map((student) => ({
                     studentId: student.id,
@@ -94,14 +98,14 @@ export function AttendanceMarker(): JSX.Element {
             <div className="flex flex-wrap items-end gap-3">
                 <div className="space-y-2">
                     <Label>Class</Label>
-                    <Select value={classId} onValueChange={setClassId}>
+                    <Select value={sectionId} onValueChange={setSectionId}>
                         <SelectTrigger className="w-56" aria-label="Select class">
                             <SelectValue placeholder="Select a class" />
                         </SelectTrigger>
                         <SelectContent>
                             {classes.map((item) => (
                                 <SelectItem key={item.id} value={item.id}>
-                                    {item.name} (Grade {item.gradeLevel})
+                                    {item.name} (Class {item.classLevel})
                                 </SelectItem>
                             ))}
                         </SelectContent>
@@ -112,26 +116,26 @@ export function AttendanceMarker(): JSX.Element {
                 </div>
             </div>
 
-            {!classId && (
+            {!sectionId && (
                 <p className="text-muted-foreground py-6 text-center text-sm">
                     Select a class to mark attendance.
                 </p>
             )}
 
-            {classId && isLoading && (
+            {sectionId && isLoading && (
                 <div className="flex items-center justify-center gap-2 py-10">
                     <Spinner />
                     <span className="text-muted-foreground text-sm">Loading students...</span>
                 </div>
             )}
 
-            {classId && !isLoading && students.length === 0 && (
+            {sectionId && !isLoading && students.length === 0 && (
                 <p className="text-muted-foreground py-6 text-center text-sm">
                     No active students enrolled in this class.
                 </p>
             )}
 
-            {classId && !isLoading && students.length > 0 && (
+            {sectionId && !isLoading && students.length > 0 && (
                 <>
                     <div className="flex items-center justify-between">
                         <p className="text-muted-foreground text-sm">{students.length} students</p>

@@ -15,7 +15,7 @@ export const presetSchema = z.object({
 
 export const assignmentSchema = z
     .object({
-        classId: z.string().trim().min(1, "Class is required"),
+        sectionId: z.string().trim().min(1, "Section is required"),
         role: z.enum(["CLASS_TEACHER", "SUBJECT_TEACHER"]),
         subjectId: z.string().trim().optional(),
     })

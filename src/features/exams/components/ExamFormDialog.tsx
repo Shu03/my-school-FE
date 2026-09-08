@@ -71,21 +71,21 @@ export function ExamFormDialog({
         defaultValues: {
             name: "",
             type: EXAM_TYPE_LIST[0],
-            classId: "",
+            sectionId: "",
             subjects: [EMPTY_SUBJECT],
         },
     });
 
     const { fields, append, remove } = useFieldArray({ control, name: "subjects" });
 
-    const classId = useWatch({ control, name: "classId" });
+    const sectionId = useWatch({ control, name: "sectionId" });
 
     const selectedClass = useMemo(
-        () => classes.find((item) => item.id === classId) ?? null,
-        [classes, classId],
+        () => classes.find((item) => item.id === sectionId) ?? null,
+        [classes, sectionId],
     );
 
-    const { data: subjects = [] } = useSubjectsList({ gradeLevel: selectedClass?.gradeLevel });
+    const { data: subjects = [] } = useSubjectsList({ classLevel: selectedClass?.classLevel });
 
     const watchedSubjects = useWatch({ control, name: "subjects" });
     const selectedSubjectIds = (watchedSubjects ?? [])
@@ -101,7 +101,7 @@ export function ExamFormDialog({
         reset({
             name: exam?.name ?? "",
             type: exam?.type ?? EXAM_TYPE_LIST[0],
-            classId: exam?.classId ?? "",
+            sectionId: exam?.sectionId ?? "",
             subjects: [EMPTY_SUBJECT],
         });
     }, [open, exam, reset]);
@@ -160,7 +160,7 @@ export function ExamFormDialog({
                             <Label>Class</Label>
                             <Controller
                                 control={control}
-                                name="classId"
+                                name="sectionId"
                                 render={({ field }) => (
                                     <Select
                                         value={field.value}
@@ -173,15 +173,17 @@ export function ExamFormDialog({
                                         <SelectContent>
                                             {classes.map((item) => (
                                                 <SelectItem key={item.id} value={item.id}>
-                                                    {item.name} (Grade {item.gradeLevel})
+                                                    {item.name} (Class {item.classLevel})
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
                                 )}
                             />
-                            {errors.classId && (
-                                <p className="text-destructive text-xs">{errors.classId.message}</p>
+                            {errors.sectionId && (
+                                <p className="text-destructive text-xs">
+                                    {errors.sectionId.message}
+                                </p>
                             )}
                         </div>
                     </div>

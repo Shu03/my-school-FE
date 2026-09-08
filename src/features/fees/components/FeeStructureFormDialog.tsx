@@ -55,7 +55,7 @@ export function FeeStructureFormDialog({
     } = useForm<FeeStructureFormValues>({
         resolver: zodResolver(feeStructureSchema),
         defaultValues: {
-            gradeLevel: FEE_VALIDATION.GRADE_LEVEL_MIN,
+            classLevel: FEE_VALIDATION.GRADE_LEVEL_MIN,
             totalAmount: FEE_VALIDATION.TOTAL_AMOUNT_MIN,
             dueDate: "",
         },
@@ -67,7 +67,7 @@ export function FeeStructureFormDialog({
         }
 
         reset({
-            gradeLevel: structure?.gradeLevel ?? FEE_VALIDATION.GRADE_LEVEL_MIN,
+            classLevel: structure?.classLevel ?? FEE_VALIDATION.GRADE_LEVEL_MIN,
             totalAmount: structure?.totalAmount ?? FEE_VALIDATION.TOTAL_AMOUNT_MIN,
             dueDate: toDateInputValue(structure?.dueDate ?? ""),
         });
@@ -87,8 +87,8 @@ export function FeeStructureFormDialog({
                     </DialogTitle>
                     <DialogDescription>
                         {isEdit
-                            ? "Update the amount and due date. Grade level cannot be changed."
-                            : "Define the fee amount for a grade in the current academic year."}
+                            ? "Update the amount and due date. Class level cannot be changed."
+                            : "Define the fee amount for a class in the current academic year."}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -99,13 +99,13 @@ export function FeeStructureFormDialog({
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="gradeLevel">Grade level</Label>
+                        <Label htmlFor="classLevel">Class level</Label>
                         <Controller
                             control={control}
-                            name="gradeLevel"
+                            name="classLevel"
                             render={({ field }) => (
                                 <Input
-                                    id="gradeLevel"
+                                    id="classLevel"
                                     type="number"
                                     value={field.value}
                                     onChange={(event) => field.onChange(event.target.valueAsNumber)}
@@ -113,8 +113,8 @@ export function FeeStructureFormDialog({
                                 />
                             )}
                         />
-                        {errors.gradeLevel && (
-                            <p className="text-destructive text-xs">{errors.gradeLevel.message}</p>
+                        {errors.classLevel && (
+                            <p className="text-destructive text-xs">{errors.classLevel.message}</p>
                         )}
                     </div>
 

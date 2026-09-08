@@ -56,12 +56,12 @@ export function EnrollStudentDialog({
         formState: { errors },
     } = useForm<EnrollStudentFormValues>({
         resolver: zodResolver(enrollStudentSchema),
-        defaultValues: { classId: "", academicYearId: "", rollNumber: "" },
+        defaultValues: { sectionId: "", academicYearId: "", rollNumber: "" },
     });
 
     async function handleFormSubmit(values: EnrollStudentFormValues): Promise<void> {
         await onSubmit({
-            classId: values.classId,
+            sectionId: values.sectionId,
             academicYearId: currentYear?.id,
             rollNumber: values.rollNumber?.trim() || undefined,
         });
@@ -92,7 +92,7 @@ export function EnrollStudentDialog({
                         <Label>Class</Label>
                         <Controller
                             control={control}
-                            name="classId"
+                            name="sectionId"
                             render={({ field }) => (
                                 <Select value={field.value} onValueChange={field.onChange}>
                                     <SelectTrigger aria-label="Select class">
@@ -101,15 +101,15 @@ export function EnrollStudentDialog({
                                     <SelectContent>
                                         {classes.map((item) => (
                                             <SelectItem key={item.id} value={item.id}>
-                                                {item.name} (Grade {item.gradeLevel})
+                                                {item.name} (Class {item.classLevel})
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
                             )}
                         />
-                        {errors.classId && (
-                            <p className="text-destructive text-xs">{errors.classId.message}</p>
+                        {errors.sectionId && (
+                            <p className="text-destructive text-xs">{errors.sectionId.message}</p>
                         )}
                     </div>
 

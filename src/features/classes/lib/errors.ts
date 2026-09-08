@@ -26,7 +26,7 @@ export function getAssignmentErrorMessage(error: unknown): string {
     switch (status) {
         case HTTP_STATUS.BAD_REQUEST:
         case HTTP_STATUS.CONFLICT:
-            return "This teacher could not be assigned. The role may already be taken or the grade level does not match.";
+            return "This teacher could not be assigned. The role may already be taken or the class level does not match.";
         case HTTP_STATUS.NOT_FOUND:
             return "The requested teacher, class, or subject was not found.";
         case HTTP_STATUS.FORBIDDEN:

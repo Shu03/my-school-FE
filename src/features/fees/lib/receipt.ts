@@ -29,7 +29,7 @@ function buildReceiptHtml(record: FeeRecordWithPayments, payment: FeePayment): s
         ["Payment date", formatDate(payment.paidOn)],
         ["Student", studentName],
         ["Admission No.", admissionNumber],
-        ["Grade", `Grade ${record.feeStructure.gradeLevel}`],
+        ["Class", `Class ${record.feeStructure.classLevel}`],
         ["Recorded by", recordedBy],
         ["Note", note],
     ];

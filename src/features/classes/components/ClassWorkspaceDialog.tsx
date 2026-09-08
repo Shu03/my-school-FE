@@ -49,7 +49,7 @@ export function ClassWorkspaceDialog({
                 <div className="max-h-[75vh] overflow-y-auto px-6 py-5">
                     {classNumber !== null ? (
                         <ClassCurriculumSection
-                            gradeLevel={classNumber}
+                            classLevel={classNumber}
                             canManage={canManageSubjects}
                             canDelete={isAdmin}
                         />

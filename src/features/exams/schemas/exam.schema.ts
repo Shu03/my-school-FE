@@ -24,7 +24,7 @@ export const examSchema = z.object({
             `Name must be at most ${EXAM_VALIDATION.NAME_MAX} characters`,
         ),
     type: z.enum(EXAM_TYPE_LIST as [ExamType, ...ExamType[]]),
-    classId: z.string().trim().min(1, "Class is required"),
+    sectionId: z.string().trim().min(1, "Section is required"),
     subjects: z
         .array(examSubjectRowSchema)
         .min(1, "Add at least one subject")

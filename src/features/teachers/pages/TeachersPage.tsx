@@ -56,6 +56,7 @@ export function TeachersPage(): JSX.Element {
     const selectedTeacher = teachers.find((teacher) => teacher.id === selectedTeacherId) ?? null;
 
     function handleSelectTeacher(teacher: TeacherProfile): void {
+        if (!teacher.user.isActive) return;
         setSelectedTeacherId(teacher.id);
     }
 

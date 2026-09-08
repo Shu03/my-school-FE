@@ -81,7 +81,7 @@ export function StudentsPage(): JSX.Element {
         page,
         limit,
         search: debouncedSearch || undefined,
-        classId: classFilter === ALL_CLASSES ? undefined : classFilter,
+        sectionId: classFilter === ALL_CLASSES ? undefined : classFilter,
     };
 
     const { data, isLoading, isError, refetch } = useStudentsList(params);
@@ -104,11 +104,11 @@ export function StudentsPage(): JSX.Element {
         );
     }
 
-    async function handlePromote(targetClassId: string): Promise<void> {
+    async function handlePromote(targetSectionId: string): Promise<void> {
         try {
             const result = await promoteMutation.mutateAsync({
                 studentIds: selectedIds,
-                targetClassId,
+                targetSectionId,
                 academicYearId: currentYear?.id,
             });
 
@@ -166,7 +166,7 @@ export function StudentsPage(): JSX.Element {
                                 <SelectItem value={ALL_CLASSES}>All classes</SelectItem>
                                 {classes.map((item) => (
                                     <SelectItem key={item.id} value={item.id}>
-                                        {item.name} (Grade {item.gradeLevel})
+                                        {item.name} (Class {item.classLevel})
                                     </SelectItem>
                                 ))}
                             </SelectContent>

@@ -26,11 +26,11 @@ export interface StudentProfile {
     user: StudentUserSummary;
 }
 
-/** Class summary nested inside an enrollment record. */
-export interface EnrollmentClass {
+/** Section summary nested inside an enrollment record. */
+export interface EnrollmentSection {
     id: string;
     name: string;
-    gradeLevel: number;
+    classLevel: number;
     academicYearId: string;
     classTeacherId: string | null;
     createdAt: string;
@@ -52,13 +52,13 @@ export interface EnrollmentAcademicYear {
 export interface StudentEnrollment {
     id: string;
     studentId: string;
-    classId: string;
+    sectionId: string;
     academicYearId: string;
     rollNumber: string;
     status: EnrollmentStatus;
     createdAt: string;
     updatedAt: string;
-    class: EnrollmentClass;
+    section: EnrollmentSection;
     academicYear: EnrollmentAcademicYear;
 }
 
@@ -69,7 +69,7 @@ export interface StudentProfileWithEnrollments extends StudentProfile {
 
 /** Filters and pagination for GET /students. */
 export interface StudentsListParams {
-    classId?: string;
+    sectionId?: string;
     academicYearId?: string;
     search?: string;
     page?: number;
@@ -90,7 +90,7 @@ export interface UpdateStudentRequest {
 }
 
 export interface EnrollStudentRequest {
-    classId: string;
+    sectionId: string;
     academicYearId?: string;
     rollNumber?: string;
 }
@@ -102,7 +102,7 @@ export interface UpdateEnrollmentRequest {
 
 export interface PromoteStudentsRequest {
     studentIds: string[];
-    targetClassId: string;
+    targetSectionId: string;
     academicYearId?: string;
 }
 

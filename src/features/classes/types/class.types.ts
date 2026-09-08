@@ -1,7 +1,7 @@
 export interface SchoolClass {
     id: string;
     name: string;
-    gradeLevel: number;
+    classLevel: number;
     academicYearId: string;
     /** Enrollment stats — optional until the backend exposes them. */
     studentCount?: number;
@@ -32,18 +32,18 @@ export interface SchoolClassWithRelations extends SchoolClass {
 
 export interface ClassesListParams {
     academicYearId?: string;
-    gradeLevel?: number;
+    classLevel?: number;
 }
 
 export interface CreateClassRequest {
     name: string;
-    gradeLevel: number;
+    classLevel: number;
     academicYearId?: string;
 }
 
 export interface UpdateClassRequest {
     name?: string;
-    gradeLevel?: number;
+    classLevel?: number;
 }
 
 export interface TeacherOption {

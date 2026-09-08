@@ -139,7 +139,7 @@ export function ExamSubjectPanel({
                     <GradeEntrySection
                         examId={exam.id}
                         subjectId={examSubject.subjectId}
-                        classId={exam.classId}
+                        classId={exam.sectionId}
                         academicYearId={exam.academicYearId}
                         totalMarks={examSubject.totalMarks}
                     />

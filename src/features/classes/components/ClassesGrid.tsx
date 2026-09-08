@@ -27,7 +27,7 @@ interface ClassesGridProps {
     onCancelCreate: () => void;
     onCreateSubmit: (values: {
         name: string;
-        gradeLevel: number;
+        classLevel: number;
         academicYearId: string;
     }) => Promise<boolean>;
     onOpenSubjects: (classNumber: number) => void;
@@ -74,14 +74,14 @@ export function ClassesGrid({
 
             {Array.from(
                 classes.reduce<Map<number, SchoolClass[]>>((groups, section) => {
-                    const sections = groups.get(section.gradeLevel) ?? [];
+                    const sections = groups.get(section.classLevel) ?? [];
                     sections.push(section);
-                    groups.set(section.gradeLevel, sections);
+                    groups.set(section.classLevel, sections);
                     return groups;
                 }, new Map()),
             )
                 .sort(([left], [right]) => left - right)
-                .map(([gradeLevel, sections]) => {
+                .map(([classLevel, sections]) => {
                     const enrollment = sections.reduce(
                         (total, section) => total + (section.studentCount ?? 0),
                         0,
@@ -90,7 +90,7 @@ export function ClassesGrid({
                         (section) => section.studentCount !== undefined,
                     );
                     return (
-                        <StaggerItem key={gradeLevel}>
+                        <StaggerItem key={classLevel}>
                             <article className="border-border/70 bg-card flex min-h-72 w-full flex-col overflow-hidden rounded-xl border shadow-sm transition-shadow duration-200 hover:shadow-md">
                                 <header className="border-border/60 from-primary/12 via-primary/5 flex w-full items-center justify-between border-b bg-linear-to-br to-transparent px-5 py-5">
                                     <div className="flex items-center gap-3">
@@ -102,7 +102,7 @@ export function ClassesGrid({
                                                 Class
                                             </p>
                                             <h2 className="text-3xl leading-none font-bold tabular-nums">
-                                                {gradeLevel}
+                                                {classLevel}
                                             </h2>
                                         </div>
                                     </div>
@@ -120,7 +120,7 @@ export function ClassesGrid({
                                         Sections
                                     </h3>
                                     <nav
-                                        aria-label={`Sections in Class ${gradeLevel}`}
+                                        aria-label={`Sections in Class ${classLevel}`}
                                         className="relative z-10 mt-3 flex flex-wrap gap-2"
                                     >
                                         {sections.map((section) => (
@@ -129,7 +129,7 @@ export function ClassesGrid({
                                                 to={classDetail(section.id)}
                                                 state={{
                                                     academicYearId: section.academicYearId,
-                                                    classNumber: gradeLevel,
+                                                    classNumber: classLevel,
                                                 }}
                                                 className="border-border/70 bg-background hover:border-primary/35 hover:bg-primary/5 focus-visible:border-ring focus-visible:ring-ring/40 group/section inline-flex min-h-9 items-center gap-1.5 rounded-lg border px-3 text-sm font-semibold transition-colors focus-visible:ring-3 focus-visible:outline-none"
                                             >
@@ -148,12 +148,12 @@ export function ClassesGrid({
                                         <button
                                             type="button"
                                             className="text-primary hover:bg-primary/8 focus-visible:ring-ring/40 ml-auto inline-flex min-h-9 items-center gap-1.5 rounded-lg px-2.5 font-semibold focus-visible:ring-3 focus-visible:outline-none"
-                                            onClick={() => onOpenSubjects(gradeLevel)}
+                                            onClick={() => onOpenSubjects(classLevel)}
                                         >
                                             <BookOpen className="size-3.5" />
                                             {subjectsLoading
                                                 ? "Subjects…"
-                                                : `${subjectCountByClass[gradeLevel] ?? 0} subjects`}
+                                                : `${subjectCountByClass[classLevel] ?? 0} subjects`}
                                             <ArrowRight className="size-3.5" />
                                         </button>
                                     </div>

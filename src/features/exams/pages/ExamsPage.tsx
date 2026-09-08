@@ -72,7 +72,7 @@ export function ExamsPage(): JSX.Element {
     );
 
     const { data, isLoading, isError, refetch } = useExamsList({
-        classId: classFilter === ALL ? undefined : classFilter,
+        sectionId: classFilter === ALL ? undefined : classFilter,
         type: typeFilter === ALL ? undefined : (typeFilter as ExamType),
         status: statusFilter,
         page,
@@ -157,7 +157,7 @@ export function ExamsPage(): JSX.Element {
                 await createMutation.mutateAsync({
                     name: values.name,
                     type: values.type,
-                    classId: values.classId,
+                    sectionId: values.sectionId,
                     academicYearId: currentYear?.id,
                     subjects: values.subjects,
                 });
@@ -211,7 +211,7 @@ export function ExamsPage(): JSX.Element {
                                     <SelectItem value={ALL}>All classes</SelectItem>
                                     {classes.map((item) => (
                                         <SelectItem key={item.id} value={item.id}>
-                                            {item.name} (Grade {item.gradeLevel})
+                                            {item.name} (Class {item.classLevel})
                                         </SelectItem>
                                     ))}
                                 </SelectContent>

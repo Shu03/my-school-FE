@@ -22,7 +22,7 @@ export type { EnrollStudentFormValues } from "./schemas/student.schema";
 export type {
     EnrollStudentRequest,
     EnrollmentAcademicYear,
-    EnrollmentClass,
+    EnrollmentSection,
     PromoteStudentsRequest,
     PromoteStudentsResponse,
     StudentEnrollment,

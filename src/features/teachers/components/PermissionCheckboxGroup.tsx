@@ -17,7 +17,7 @@ const PERMISSION_GROUPS: { label: string; permissions: Permission[] }[] = [
         label: "Academics",
         permissions: [
             PERMISSIONS.ACADEMIC_YEAR_MANAGE,
-            PERMISSIONS.CLASS_MANAGE,
+            PERMISSIONS.SECTION_MANAGE,
             PERMISSIONS.SUBJECT_MANAGE,
             PERMISSIONS.HOMEWORK_MANAGE,
             PERMISSIONS.NOTES_UPLOAD,

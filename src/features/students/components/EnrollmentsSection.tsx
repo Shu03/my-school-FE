@@ -64,7 +64,8 @@ export function EnrollmentsSection({
                         >
                             <div className="flex flex-wrap items-center gap-2 text-sm">
                                 <span className="font-medium">
-                                    {enrollment.class.name} (Grade {enrollment.class.gradeLevel})
+                                    {enrollment.section.name} (Class {enrollment.section.classLevel}
+                                    )
                                 </span>
                                 <span className="text-muted-foreground">
                                     {enrollment.academicYear.name}

@@ -45,7 +45,7 @@ export function SubjectsTable({
                     <TableRow>
                         <TableHead>Name</TableHead>
                         <TableHead>Code</TableHead>
-                        <TableHead>Grade</TableHead>
+                        <TableHead>Class</TableHead>
                         <TableHead>Description</TableHead>
                         {showActions && (
                             <TableHead className="w-28 text-right">
@@ -92,7 +92,7 @@ export function SubjectsTable({
                                         {subject.code}
                                     </Badge>
                                 </TableCell>
-                                <TableCell>{subject.gradeLevel}</TableCell>
+                                <TableCell>{subject.classLevel}</TableCell>
                                 <TableCell className="text-muted-foreground max-w-xs truncate">
                                     {subject.description ?? "—"}
                                 </TableCell>

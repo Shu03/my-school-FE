@@ -181,27 +181,32 @@ export function TeacherDirectory({
                     {filteredTeachers.map((teacher) => {
                         const fullName = `${teacher.user.firstName} ${teacher.user.lastName}`;
                         const selected = teacher.id === selectedTeacherId;
+                        const isInactive = !teacher.user.isActive;
 
                         return (
                             <button
                                 key={teacher.id}
                                 type="button"
                                 aria-pressed={selected}
+                                disabled={isInactive}
+                                title={
+                                    isInactive ? "Inactive teachers cannot be managed" : undefined
+                                }
                                 onClick={() => onSelect(teacher)}
                                 className={cn(
                                     "group focus-visible:border-ring focus-visible:ring-ring/40 relative min-h-52 overflow-hidden rounded-xl border p-4 text-left shadow-xs transition-all duration-200 outline-none focus-visible:ring-3 motion-reduce:transition-none",
-                                    selected
-                                        ? "border-primary/35 bg-primary/5 shadow-sm"
-                                        : "border-border/70 bg-card hover:border-primary/25 hover:-translate-y-0.5 hover:shadow-md motion-reduce:hover:translate-y-0",
+                                    isInactive
+                                        ? "border-border/70 bg-card cursor-not-allowed opacity-60"
+                                        : selected
+                                          ? "border-primary/35 bg-primary/5 shadow-sm"
+                                          : "border-border/70 bg-card hover:border-primary/25 hover:-translate-y-0.5 hover:shadow-md motion-reduce:hover:translate-y-0",
                                 )}
                             >
                                 <span
                                     aria-hidden="true"
                                     className={cn(
                                         "bg-primary absolute inset-y-3 left-0 w-1 rounded-r-full transition-transform duration-200 motion-reduce:transition-none",
-                                        selected
-                                            ? "scale-y-100"
-                                            : "scale-y-0 group-hover:scale-y-50",
+                                        selected ? "scale-y-100" : "scale-y-0",
                                     )}
                                 />
                                 <div className="flex items-start gap-3">

@@ -36,16 +36,16 @@ export function TeacherAssignmentsSection({
         const filtered = assignments.filter(
             (assignment) =>
                 !query ||
-                assignment.class.name.toLowerCase().includes(query) ||
+                assignment.section.name.toLowerCase().includes(query) ||
                 assignment.subject?.name.toLowerCase().includes(query) ||
                 assignment.subject?.code.toLowerCase().includes(query),
         );
 
         return Array.from(
             filtered.reduce<Map<string, TeacherAssignment[]>>((result, assignment) => {
-                const current = result.get(assignment.classId) ?? [];
+                const current = result.get(assignment.sectionId) ?? [];
                 current.push(assignment);
-                result.set(assignment.classId, current);
+                result.set(assignment.sectionId, current);
                 return result;
             }, new Map()),
         );
@@ -95,18 +95,19 @@ export function TeacherAssignmentsSection({
                 ) : null}
 
                 {!isLoading &&
-                    groups.map(([classId, classAssignments]) => {
+                    groups.map(([sectionId, classAssignments]) => {
                         const first = classAssignments[0];
                         if (!first) return null;
                         return (
                             <section
-                                key={classId}
+                                key={sectionId}
                                 className="border-border/70 overflow-hidden rounded-xl border"
                             >
                                 <div className="bg-muted/35 border-border/60 flex items-center gap-2 border-b px-3 py-2.5">
                                     <Layers3 className="text-primary size-4" />
                                     <h3 className="text-sm font-semibold">
-                                        Class {first.class.gradeLevel} · Section {first.class.name}
+                                        Class {first.section.classLevel} · Section{" "}
+                                        {first.section.name}
                                     </h3>
                                     <Badge variant="secondary" className="ml-auto">
                                         {classAssignments.length}
@@ -138,7 +139,7 @@ export function TeacherAssignmentsSection({
                                                             variant="ghost"
                                                             size="icon-lg"
                                                             className="text-destructive"
-                                                            aria-label={`Remove assignment for ${first.class.name}`}
+                                                            aria-label={`Remove assignment for ${first.section.name}`}
                                                             onClick={() => onDelete(assignment)}
                                                             disabled={
                                                                 deletingAssignmentId ===

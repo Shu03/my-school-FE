@@ -3,9 +3,9 @@ import { z } from "zod";
 import { FEE_VALIDATION } from "@constants/fees.constants";
 
 export const feeStructureSchema = z.object({
-    gradeLevel: z
-        .number({ message: "Grade level is required" })
-        .int("Grade level must be a whole number")
+    classLevel: z
+        .number({ message: "Class level is required" })
+        .int("Class level must be a whole number")
         .min(FEE_VALIDATION.GRADE_LEVEL_MIN, `Minimum is ${FEE_VALIDATION.GRADE_LEVEL_MIN}`)
         .max(FEE_VALIDATION.GRADE_LEVEL_MAX, `Maximum is ${FEE_VALIDATION.GRADE_LEVEL_MAX}`),
     totalAmount: z

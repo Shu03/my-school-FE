@@ -11,6 +11,8 @@ export interface Announcement {
     id: string;
     title: string;
     content: string;
+    startDate: string;
+    endDate: string;
     createdById: string | null;
     createdAt: string;
     updatedAt: string;
@@ -32,9 +34,13 @@ export interface AnnouncementsListResponse {
 export interface CreateAnnouncementRequest {
     title: string;
     content: string;
+    startDate: string;
+    endDate: string;
 }
 
 export interface UpdateAnnouncementRequest {
     title?: string;
     content?: string;
+    startDate?: string;
+    endDate?: string;
 }

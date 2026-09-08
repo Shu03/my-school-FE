@@ -56,22 +56,22 @@ export function AssignmentFormDialog({
         formState: { errors },
     } = useForm<AssignmentFormValues>({
         resolver: zodResolver(assignmentSchema),
-        defaultValues: { classId: "", role: "SUBJECT_TEACHER", subjectId: "" },
+        defaultValues: { sectionId: "", role: "SUBJECT_TEACHER", subjectId: "" },
     });
 
-    const classId = useWatch({ control, name: "classId" });
+    const sectionId = useWatch({ control, name: "sectionId" });
     const role = useWatch({ control, name: "role" });
 
     const selectedClass = useMemo(
-        () => classes.find((item) => item.id === classId) ?? null,
-        [classes, classId],
+        () => classes.find((item) => item.id === sectionId) ?? null,
+        [classes, sectionId],
     );
 
-    const { data: subjects = [] } = useSubjectsList({ gradeLevel: selectedClass?.gradeLevel });
+    const { data: subjects = [] } = useSubjectsList({ classLevel: selectedClass?.classLevel });
 
     async function handleFormSubmit(values: AssignmentFormValues): Promise<void> {
         await onSubmit({
-            classId: values.classId,
+            sectionId: values.sectionId,
             role: values.role,
             subjectId: values.role === "SUBJECT_TEACHER" ? values.subjectId : undefined,
         });
@@ -101,7 +101,7 @@ export function AssignmentFormDialog({
                         <Label>Class</Label>
                         <Controller
                             control={control}
-                            name="classId"
+                            name="sectionId"
                             render={({ field }) => (
                                 <Select value={field.value} onValueChange={field.onChange}>
                                     <SelectTrigger aria-label="Select class">
@@ -110,15 +110,15 @@ export function AssignmentFormDialog({
                                     <SelectContent>
                                         {classes.map((item) => (
                                             <SelectItem key={item.id} value={item.id}>
-                                                {item.name} (Grade {item.gradeLevel})
+                                                {item.name} (Class {item.classLevel})
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
                             )}
                         />
-                        {errors.classId && (
-                            <p className="text-destructive text-xs">{errors.classId.message}</p>
+                        {errors.sectionId && (
+                            <p className="text-destructive text-xs">{errors.sectionId.message}</p>
                         )}
                     </div>
 

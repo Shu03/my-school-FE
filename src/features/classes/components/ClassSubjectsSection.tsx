@@ -21,17 +21,17 @@ import { getAssignmentErrorMessage } from "../lib/errors";
 import { AssignTeacherDialog } from "./AssignTeacherDialog";
 
 interface ClassSubjectsSectionProps {
-    classId: string;
-    gradeLevel: number;
+    sectionId: string;
+    classLevel: number;
     canManage: boolean;
 }
 
 export function ClassSubjectsSection({
-    classId,
-    gradeLevel,
+    sectionId,
+    classLevel,
     canManage,
 }: ClassSubjectsSectionProps): JSX.Element {
-    const { data: subjects = [], isLoading } = useSubjectsList({ gradeLevel });
+    const { data: subjects = [], isLoading } = useSubjectsList({ classLevel });
 
     return (
         <Card className="gap-0">
@@ -39,7 +39,7 @@ export function ClassSubjectsSection({
                 <CardTitle className="text-base">
                     Section subject teachers
                     <span className="text-muted-foreground ml-2 text-sm font-normal">
-                        Class {gradeLevel}
+                        Class {classLevel}
                     </span>
                 </CardTitle>
             </CardHeader>
@@ -59,7 +59,7 @@ export function ClassSubjectsSection({
                         {subjects.map((subject) => (
                             <ClassSubjectRow
                                 key={subject.id}
-                                classId={classId}
+                                sectionId={sectionId}
                                 subject={subject}
                                 canManage={canManage}
                             />
@@ -72,12 +72,12 @@ export function ClassSubjectsSection({
 }
 
 interface ClassSubjectRowProps {
-    classId: string;
+    sectionId: string;
     subject: Subject;
     canManage: boolean;
 }
 
-function ClassSubjectRow({ classId, subject, canManage }: ClassSubjectRowProps): JSX.Element {
+function ClassSubjectRow({ sectionId, subject, canManage }: ClassSubjectRowProps): JSX.Element {
     const queryClient = useQueryClient();
     const [assignOpen, setAssignOpen] = useState(false);
     const [removeOpen, setRemoveOpen] = useState(false);
@@ -87,14 +87,14 @@ function ClassSubjectRow({ classId, subject, canManage }: ClassSubjectRowProps):
     const { data: subjectDetail, isLoading } = useSubject(subject.id);
 
     const assignment = subjectDetail?.teacherAssignments.find(
-        (item) => item.class.id === classId && item.role === "SUBJECT_TEACHER",
+        (item) => item.section.id === sectionId && item.role === "SUBJECT_TEACHER",
     );
 
     async function handleAssign(teacherId: string): Promise<void> {
         try {
             await createAssignment.mutateAsync({
                 id: teacherId,
-                data: { classId, role: "SUBJECT_TEACHER", subjectId: subject.id },
+                data: { sectionId, role: "SUBJECT_TEACHER", subjectId: subject.id },
             });
             await queryClient.invalidateQueries({ queryKey: subjectsKeys.detail(subject.id) });
             toast.success("Subject teacher assigned successfully.");

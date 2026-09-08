@@ -68,3 +68,20 @@ export function examDetail(id: string): string {
 export function feeDetail(id: string): string {
     return `/fees/records/${id}`;
 }
+
+/** Build the attendance page URL with optional mark-tab class preselection. */
+export function attendancePage(tab?: "mark" | "overview", sectionId?: string): string {
+    if (!tab && !sectionId) {
+        return ROUTES.ATTENDANCE;
+    }
+
+    const searchParams = new URLSearchParams();
+    if (tab) {
+        searchParams.set("tab", tab);
+    }
+    if (sectionId) {
+        searchParams.set("sectionId", sectionId);
+    }
+
+    return `${ROUTES.ATTENDANCE}?${searchParams.toString()}`;
+}

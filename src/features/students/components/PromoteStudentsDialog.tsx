@@ -30,7 +30,7 @@ interface PromoteStudentsDialogProps {
     selectedCount: number;
     isSubmitting: boolean;
     onOpenChange: (open: boolean) => void;
-    onSubmit: (targetClassId: string) => Promise<void>;
+    onSubmit: (targetSectionId: string) => Promise<void>;
 }
 
 export function PromoteStudentsDialog({
@@ -40,7 +40,7 @@ export function PromoteStudentsDialog({
     onOpenChange,
     onSubmit,
 }: PromoteStudentsDialogProps): JSX.Element {
-    const [targetClassId, setTargetClassId] = useState("");
+    const [targetSectionId, setTargetSectionId] = useState("");
     const [wasOpen, setWasOpen] = useState(open);
 
     const { data: currentYear } = useCurrentAcademicYear();
@@ -53,16 +53,16 @@ export function PromoteStudentsDialog({
     if (open !== wasOpen) {
         setWasOpen(open);
         if (!open) {
-            setTargetClassId("");
+            setTargetSectionId("");
         }
     }
 
     async function handleConfirm(): Promise<void> {
-        if (!targetClassId) {
+        if (!targetSectionId) {
             return;
         }
 
-        await onSubmit(targetClassId);
+        await onSubmit(targetSectionId);
     }
 
     return (
@@ -88,14 +88,14 @@ export function PromoteStudentsDialog({
 
                     <div className="space-y-2">
                         <Label>Target class</Label>
-                        <Select value={targetClassId} onValueChange={setTargetClassId}>
+                        <Select value={targetSectionId} onValueChange={setTargetSectionId}>
                             <SelectTrigger aria-label="Select target class">
                                 <SelectValue placeholder="Select a class" />
                             </SelectTrigger>
                             <SelectContent>
                                 {classes.map((item) => (
                                     <SelectItem key={item.id} value={item.id}>
-                                        {item.name} (Grade {item.gradeLevel})
+                                        {item.name} (Class {item.classLevel})
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -109,7 +109,7 @@ export function PromoteStudentsDialog({
                     </Button>
                     <Button
                         type="button"
-                        disabled={isSubmitting || !targetClassId}
+                        disabled={isSubmitting || !targetSectionId}
                         onClick={handleConfirm}
                     >
                         {isSubmitting && <Spinner />}

@@ -29,7 +29,7 @@ import { useClassAttendance } from "../hooks/useAttendance";
 import { schoolToday } from "../lib/format";
 
 export function ClassAttendanceView(): JSX.Element {
-    const [classId, setClassId] = useState("");
+    const [sectionId, setSectionId] = useState("");
     const [date, setDate] = useState(schoolToday());
 
     const { data: currentYear } = useCurrentAcademicYear();
@@ -38,22 +38,22 @@ export function ClassAttendanceView(): JSX.Element {
         Boolean(currentYear?.id),
     );
 
-    const enabled = Boolean(classId && date);
-    const { data: records = [], isLoading } = useClassAttendance({ classId, date }, enabled);
+    const enabled = Boolean(sectionId && date);
+    const { data: records = [], isLoading } = useClassAttendance({ sectionId, date }, enabled);
 
     return (
         <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-end gap-3">
                 <div className="space-y-2">
                     <Label>Class</Label>
-                    <Select value={classId} onValueChange={setClassId}>
+                    <Select value={sectionId} onValueChange={setSectionId}>
                         <SelectTrigger className="w-56" aria-label="Select class">
                             <SelectValue placeholder="Select a class" />
                         </SelectTrigger>
                         <SelectContent>
                             {classes.map((item) => (
                                 <SelectItem key={item.id} value={item.id}>
-                                    {item.name} (Grade {item.gradeLevel})
+                                    {item.name} (Class {item.classLevel})
                                 </SelectItem>
                             ))}
                         </SelectContent>

@@ -27,9 +27,9 @@ export const API_ENDPOINTS = {
         terms: (id: string) => `/academic-years/${id}/terms`,
         termById: (id: string, termId: string) => `/academic-years/${id}/terms/${termId}`,
     },
-    CLASSES: {
-        BASE: "/classes",
-        byId: (id: string) => `/classes/${id}`,
+    SECTIONS: {
+        BASE: "/sections",
+        byId: (id: string) => `/sections/${id}`,
     },
     SUBJECTS: {
         BASE: "/subjects",
