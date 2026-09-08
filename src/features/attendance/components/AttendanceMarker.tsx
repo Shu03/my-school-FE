@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { JSX } from "react";
 
+import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -23,6 +24,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 import { useMarkAttendance } from "../hooks/useAttendance";
 import { getAttendanceErrorMessage } from "../lib/errors";
@@ -160,36 +162,31 @@ export function AttendanceMarker({ initialSectionId }: AttendanceMarkerProps): J
                                             {student.admissionNumber}
                                         </span>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <Button
-                                            type="button"
-                                            size="sm"
-                                            variant={
-                                                status === ATTENDANCE_STATUS.PRESENT
-                                                    ? "default"
-                                                    : "outline"
+                                    <ToggleGroup
+                                        type="single"
+                                        value={status}
+                                        onValueChange={(value) => {
+                                            if (value) {
+                                                setStatus(student.id, value as AttendanceStatus);
                                             }
-                                            onClick={() =>
-                                                setStatus(student.id, ATTENDANCE_STATUS.PRESENT)
-                                            }
+                                        }}
+                                        aria-label={`Attendance for ${student.user.firstName} ${student.user.lastName}`}
+                                    >
+                                        <ToggleGroupItem
+                                            value={ATTENDANCE_STATUS.PRESENT}
+                                            className="data-[state=on]:text-success"
                                         >
+                                            <Check />
                                             Present
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            size="sm"
-                                            variant={
-                                                status === ATTENDANCE_STATUS.ABSENT
-                                                    ? "destructive"
-                                                    : "outline"
-                                            }
-                                            onClick={() =>
-                                                setStatus(student.id, ATTENDANCE_STATUS.ABSENT)
-                                            }
+                                        </ToggleGroupItem>
+                                        <ToggleGroupItem
+                                            value={ATTENDANCE_STATUS.ABSENT}
+                                            className="data-[state=on]:text-destructive"
                                         >
+                                            <X />
                                             Absent
-                                        </Button>
-                                    </div>
+                                        </ToggleGroupItem>
+                                    </ToggleGroup>
                                 </div>
                             );
                         })}

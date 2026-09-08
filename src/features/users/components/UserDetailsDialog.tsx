@@ -93,7 +93,7 @@ export function UserDetailsDialog({
                 </DialogHeader>
 
                 {isLoading && (
-                    <div className="flex items-center justify-center py-20">
+                    <div className="flex items-center justify-center py-16">
                         <Spinner />
                     </div>
                 )}
@@ -173,7 +173,7 @@ function UserDetailsBody({
     return (
         <>
             {/* Banner */}
-            <div className="from-primary/12 via-primary/5 border-border/60 relative border-b bg-gradient-to-br to-transparent px-6 pt-6 pb-5">
+            <div className="from-primary/12 via-primary/5 border-border/60 relative border-b bg-linear-to-br to-transparent px-6 pt-6 pb-5">
                 <div className="flex items-center gap-4">
                     <div className="bg-primary text-primary-foreground texture-sheen ring-primary/20 flex size-14 shrink-0 items-center justify-center rounded-2xl text-lg font-semibold shadow-sm ring-1">
                         {user.firstName.charAt(0)}

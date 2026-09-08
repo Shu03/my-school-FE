@@ -3,7 +3,7 @@ import type { JSX } from "react";
 
 import { useLocation } from "react-router-dom";
 
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAcademicYearsList, useCurrentAcademicYear } from "@features/academic-years";
@@ -108,6 +108,18 @@ export function ClassesPage(): JSX.Element {
 
     return (
         <div className="flex flex-col gap-6">
+            <div className="border-border/60 from-primary/12 via-primary/5 flex items-start gap-3 rounded-xl border bg-linear-to-br to-transparent px-6 py-5">
+                <div className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-lg">
+                    <BookOpen className="size-5" />
+                </div>
+                <div>
+                    <h1 className="text-xl font-semibold tracking-tight">Classes</h1>
+                    <p className="text-muted-foreground mt-1 text-sm">
+                        Manage classes, sections, and their subject assignments.
+                    </p>
+                </div>
+            </div>
+
             <ClassesToolbar
                 years={years}
                 selectedAcademicYearId={effectiveAcademicYearId}

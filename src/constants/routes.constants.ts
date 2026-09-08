@@ -28,6 +28,7 @@ export const ROUTES = {
     FEES: "/fees",
     FEE_DETAIL: "/fees/records/:id",
     MY_FEES: "/my-fees",
+    MY_REPORT_CARD: "/report-card",
     SETTINGS: "/settings",
     NOT_FOUND: "*",
 } as const;

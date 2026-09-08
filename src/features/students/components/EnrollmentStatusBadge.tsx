@@ -6,9 +6,9 @@ import { Badge } from "@/components/ui/badge";
 
 const STATUS_VARIANTS: Record<
     EnrollmentStatus,
-    "default" | "secondary" | "destructive" | "outline"
+    "success" | "secondary" | "destructive" | "outline"
 > = {
-    ACTIVE: "default",
+    ACTIVE: "success",
     PROMOTED: "secondary",
     FAILED: "destructive",
     TRANSFERRED: "outline",

@@ -14,6 +14,7 @@ import {
     NotebookPen,
     Megaphone,
     Wallet,
+    Award,
 } from "lucide-react";
 
 import { APP_BRAND } from "@constants/app.constants";
@@ -95,6 +96,12 @@ const navItems: NavItem[] = [
     { label: "Homework", path: ROUTES.HOMEWORK, icon: NotebookPen },
     { label: "Announcements", path: ROUTES.ANNOUNCEMENTS, icon: Megaphone },
     { label: "Exams", path: ROUTES.EXAMS, icon: ClipboardList },
+    {
+        label: "Report Card",
+        path: ROUTES.MY_REPORT_CARD,
+        icon: Award,
+        roles: [Role.STUDENT],
+    },
     {
         label: "Fees",
         path: ROUTES.FEES,

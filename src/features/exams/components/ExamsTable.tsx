@@ -132,7 +132,7 @@ export function ExamsTable({
                                         ) : exam.isFinalized ? (
                                             <Badge>Finalized</Badge>
                                         ) : (
-                                            <Badge variant="outline">Active</Badge>
+                                            <Badge variant="success">Active</Badge>
                                         )}
                                     </TableCell>
                                     <TableCell className="text-right">

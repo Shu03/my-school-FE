@@ -79,7 +79,7 @@ export function PromoteStudentsDialog({
 
                 <div className="space-y-4">
                     <div className="bg-muted/40 text-muted-foreground flex gap-2 rounded-lg border p-3 text-sm">
-                        <TriangleAlert className="size-4 shrink-0 text-amber-500" />
+                        <TriangleAlert className="size-4 shrink-0 text-warning" />
                         <span>
                             Students already enrolled in the target year will be skipped. This
                             action creates new enrollments and cannot be undone automatically.

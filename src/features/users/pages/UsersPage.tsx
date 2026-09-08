@@ -3,7 +3,7 @@ import type { JSX } from "react";
 
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { ROUTES, userEdit } from "@constants/routes.constants";
@@ -156,6 +156,18 @@ export function UsersPage(): JSX.Element {
 
     return (
         <div className="flex flex-col gap-6">
+            <div className="border-border/60 from-primary/12 via-primary/5 flex items-start gap-3 rounded-xl border bg-linear-to-br to-transparent px-6 py-5">
+                <div className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-lg">
+                    <Users className="size-5" />
+                </div>
+                <div>
+                    <h1 className="text-xl font-semibold tracking-tight">Users</h1>
+                    <p className="text-muted-foreground mt-1 text-sm">
+                        Manage user accounts, roles, and access.
+                    </p>
+                </div>
+            </div>
+
             <UsersToolbar
                 search={searchInput}
                 onSearchChange={setSearchInput}

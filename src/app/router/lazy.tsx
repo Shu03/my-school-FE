@@ -117,6 +117,11 @@ export const MyFeesPage = lazy(() =>
         default: m.MyFeesPage,
     })),
 );
+export const MyReportCardPage = lazy(() =>
+    import("@features/grades/pages/MyReportCardPage").then((m) => ({
+        default: m.MyReportCardPage,
+    })),
+);
 
 function PageLoader(): JSX.Element {
     return (

@@ -39,6 +39,7 @@ import {
     FeesPage,
     FeeRecordDetailPage,
     MyFeesPage,
+    MyReportCardPage,
 } from "./lazy";
 import { NotFoundPage } from "./NotFoundPage";
 
@@ -150,21 +151,46 @@ export const router = createBrowserRouter([
             },
 
             {
-                path: ROUTES.FEE_DETAIL,
                 element: (
-                    <Lazy>
-                        <FeeRecordDetailPage />
-                    </Lazy>
+                    <RoleOrPermissionGuard
+                        allowedRoles={[Role.ADMIN, Role.STUDENT]}
+                        permissionRole={Role.TEACHER}
+                        requiredPermission={PERMISSIONS.FEES_MANAGE}
+                    />
                 ),
+                children: [
+                    {
+                        path: ROUTES.FEE_DETAIL,
+                        element: (
+                            <Lazy>
+                                <FeeRecordDetailPage />
+                            </Lazy>
+                        ),
+                    },
+                ],
             },
 
+            // Student self-scoped routes
             {
-                path: ROUTES.MY_FEES,
-                element: (
-                    <Lazy>
-                        <MyFeesPage />
-                    </Lazy>
-                ),
+                element: <RoleGuard allowedRoles={[Role.STUDENT]} />,
+                children: [
+                    {
+                        path: ROUTES.MY_FEES,
+                        element: (
+                            <Lazy>
+                                <MyFeesPage />
+                            </Lazy>
+                        ),
+                    },
+                    {
+                        path: ROUTES.MY_REPORT_CARD,
+                        element: (
+                            <Lazy>
+                                <MyReportCardPage />
+                            </Lazy>
+                        ),
+                    },
+                ],
             },
 
             // Admin-only routes
