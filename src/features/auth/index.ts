@@ -10,6 +10,7 @@ export { useAuthStore } from "./store/auth.store";
 
 // API
 export { resetPassword } from "./api/auth.api";
+export { useProfile } from "./hooks/useProfile";
 
 // App-shell bootstrap hooks
 export { useAuthInitializer } from "./hooks/useAuthInitializer";

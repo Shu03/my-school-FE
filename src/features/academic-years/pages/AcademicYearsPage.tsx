@@ -46,13 +46,20 @@ export function AcademicYearsPage(): JSX.Element {
     const [editingTerm, setEditingTerm] = useState<Term | null>(null);
     const [holidayFormOpen, setHolidayFormOpen] = useState(false);
 
-    const { data: currentYear, isLoading, isError, refetch } = useCurrentAcademicYear();
+    const {
+        data: currentYear,
+        error: currentYearError,
+        isLoading,
+        isError,
+        refetch,
+    } = useCurrentAcademicYear();
     const createTermMutation = useCreateTerm();
     const updateTermMutation = useUpdateTerm();
     const deleteTermMutation = useDeleteTerm();
 
     const {
         data: holidays = [],
+        error: holidaysApiError,
         isLoading: holidaysLoading,
         isError: holidaysError,
     } = useHolidaysList({ academicYearId: currentYear?.id }, Boolean(currentYear?.id));
@@ -186,10 +193,7 @@ export function AcademicYearsPage(): JSX.Element {
                         <Alert variant="destructive">
                             <AlertCircle />
                             <AlertDescription className="flex items-center justify-between gap-4">
-                                <span>
-                                    Could not load current academic year. Set one from Manage
-                                    academic years.
-                                </span>
+                                <span>{getAcademicYearErrorMessage(currentYearError)}</span>
                                 <div className="flex items-center gap-2">
                                     <Button
                                         type="button"
@@ -249,7 +253,9 @@ export function AcademicYearsPage(): JSX.Element {
                     {holidaysError ? (
                         <Alert variant="destructive">
                             <AlertCircle />
-                            <AlertDescription>Could not load holidays.</AlertDescription>
+                            <AlertDescription>
+                                {getHolidayErrorMessage(holidaysApiError)}
+                            </AlertDescription>
                         </Alert>
                     ) : (
                         <HolidaysTable

@@ -8,6 +8,7 @@ import { Role } from "@/types/api";
 import { useCurrentAcademicYear } from "@features/academic-years";
 import { useAuthStore } from "@features/auth";
 import { useClassesList } from "@features/classes";
+import { useCurrentStudentEnrollment } from "@features/students";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -78,6 +79,8 @@ export function AttendanceOverviewView(): JSX.Element {
     const { startDate, endDate } = useMemo(() => getMonthBounds(month), [month]);
 
     const { data: currentYear } = useCurrentAcademicYear();
+    const { enrollment: currentEnrollment, isLoading: enrollmentLoading } =
+        useCurrentStudentEnrollment();
     const { data: classes = [] } = useClassesList(
         { academicYearId: currentYear?.id },
         Boolean(currentYear?.id) && !isStudent,
@@ -96,7 +99,9 @@ export function AttendanceOverviewView(): JSX.Element {
     );
 
     const studentId = user?.studentProfileId ?? null;
-    const studentEnabled = Boolean(isStudent && studentId);
+    const studentEnabled = Boolean(
+        isStudent && studentId && currentYear?.id && currentEnrollment?.sectionId,
+    );
     const { data: studentMonthlyRecords = [], isLoading: studentMonthlyLoading } =
         useStudentAttendance(
             studentId,
@@ -159,11 +164,21 @@ export function AttendanceOverviewView(): JSX.Element {
                 </p>
             )}
 
-            {isStudent && (
-                <p className="text-muted-foreground text-sm">
-                    Showing your attendance for selected date and month.
-                </p>
-            )}
+            {isStudent &&
+                (enrollmentLoading ? (
+                    <div className="flex items-center gap-2 py-2">
+                        <Spinner />
+                        <span className="text-muted-foreground text-sm">Loading your class...</span>
+                    </div>
+                ) : currentEnrollment ? (
+                    <p className="text-muted-foreground text-sm">
+                        {currentEnrollment.section.name} / Showing your attendance for {month}.
+                    </p>
+                ) : (
+                    <p className="text-muted-foreground text-sm">
+                        You are not enrolled in an active class for the current academic year.
+                    </p>
+                ))}
 
             {!isStudent && classViewEnabled && (
                 <Card className="gap-0">
@@ -291,6 +306,10 @@ export function AttendanceOverviewView(): JSX.Element {
                                         Loading...
                                     </span>
                                 </div>
+                            ) : !currentEnrollment ? (
+                                <p className="text-muted-foreground text-sm">
+                                    Attendance will appear once you are enrolled in a current class.
+                                </p>
                             ) : studentDailyRecords.length === 0 ? (
                                 <p className="text-muted-foreground text-sm">
                                     No attendance recorded for the selected date.

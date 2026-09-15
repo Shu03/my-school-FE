@@ -3,6 +3,10 @@ import { HTTP_STATUS } from "@constants/httpStatus.constants";
 import { ApiError } from "@lib/api/client";
 
 export function getTeacherErrorMessage(error: unknown): string {
+    if (error instanceof ApiError && error.serverMessage) {
+        return error.serverMessage;
+    }
+
     const status = error instanceof ApiError ? error.status : undefined;
 
     switch (status) {
@@ -21,6 +25,10 @@ export function getTeacherErrorMessage(error: unknown): string {
 }
 
 export function getPresetDeleteErrorMessage(error: unknown): string {
+    if (error instanceof ApiError && error.serverMessage) {
+        return error.serverMessage;
+    }
+
     const status = error instanceof ApiError ? error.status : undefined;
 
     if (status === HTTP_STATUS.BAD_REQUEST) {
@@ -31,6 +39,10 @@ export function getPresetDeleteErrorMessage(error: unknown): string {
 }
 
 export function getAssignmentErrorMessage(error: unknown): string {
+    if (error instanceof ApiError && error.serverMessage) {
+        return error.serverMessage;
+    }
+
     const status = error instanceof ApiError ? error.status : undefined;
 
     if (status === HTTP_STATUS.BAD_REQUEST) {

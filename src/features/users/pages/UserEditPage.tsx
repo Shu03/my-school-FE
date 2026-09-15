@@ -30,7 +30,7 @@ import type { UserWithProfiles } from "../types/user.types";
 
 export function UserEditPage(): JSX.Element {
     const { id } = useParams<{ id: string }>();
-    const { data: user, isLoading, isError } = useUser(id ?? null);
+    const { data: user, error, isLoading, isError } = useUser(id ?? null);
 
     return (
         <UserFormShell
@@ -45,7 +45,7 @@ export function UserEditPage(): JSX.Element {
             ) : isError || !user ? (
                 <Alert variant="destructive">
                     <AlertCircle />
-                    <AlertDescription>Could not load this user. Please try again.</AlertDescription>
+                    <AlertDescription>{getUserErrorMessage(error)}</AlertDescription>
                 </Alert>
             ) : (
                 <EditUserForm key={user.id} user={user} />

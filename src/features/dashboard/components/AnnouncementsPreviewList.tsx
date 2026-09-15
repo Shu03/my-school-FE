@@ -2,11 +2,7 @@ import type { JSX } from "react";
 
 import type { AnnouncementPreview } from "../lib/mockStats";
 
-export function AnnouncementsPreviewList({
-    items,
-}: {
-    items: AnnouncementPreview[];
-}): JSX.Element {
+export function AnnouncementsPreviewList({ items }: { items: AnnouncementPreview[] }): JSX.Element {
     return (
         <ul className="space-y-3">
             {items.map((item) => (
@@ -18,7 +14,9 @@ export function AnnouncementsPreviewList({
                         <p className="text-sm font-medium">{item.title}</p>
                         <span className="text-muted-foreground shrink-0 text-xs">{item.date}</span>
                     </div>
-                    <p className="text-muted-foreground mt-1 line-clamp-2 text-xs">{item.content}</p>
+                    <p className="text-muted-foreground mt-1 line-clamp-2 text-xs">
+                        {item.content}
+                    </p>
                     <p className="text-muted-foreground/80 mt-1.5 text-[0.7rem] font-medium">
                         {item.author}
                     </p>

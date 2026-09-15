@@ -29,6 +29,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { ClassStudentsSection } from "../components/ClassStudentsSection";
+import { ClassAttendanceSummarySection } from "../components/ClassAttendanceSummarySection";
 import { ClassSubjectsSection } from "../components/ClassSubjectsSection";
 import { ClassTeacherSection } from "../components/ClassTeacherSection";
 import { useClass, useUpdateClass } from "../hooks/useClasses";
@@ -43,7 +44,7 @@ export function ClassDetailPage(): JSX.Element {
     const canManage = user?.role === Role.ADMIN;
     const [isEditing, setIsEditing] = useState(false);
 
-    const { data: schoolClass, isLoading, isError } = useClass(id || null);
+    const { data: schoolClass, error, isLoading, isError } = useClass(id || null);
     const updateSectionMutation = useUpdateClass();
     const {
         register,
@@ -87,9 +88,7 @@ export function ClassDetailPage(): JSX.Element {
                 </Button>
                 <Alert variant="destructive">
                     <AlertCircle />
-                    <AlertDescription>
-                        Could not load this Section. Please try again.
-                    </AlertDescription>
+                    <AlertDescription>{getClassErrorMessage(error)}</AlertDescription>
                 </Alert>
             </div>
         );
@@ -221,10 +220,18 @@ export function ClassDetailPage(): JSX.Element {
                     </div>
                 </TabsContent>
                 <TabsContent value="students" className="mt-5">
-                    <ClassStudentsSection
-                        sectionId={schoolClass.id}
-                        academicYearId={schoolClass.academicYearId}
-                    />
+                    <div className="flex flex-col gap-6">
+                        <ClassAttendanceSummarySection
+                            sectionId={schoolClass.id}
+                            canMarkAttendance={
+                                user?.role === Role.ADMIN || user?.role === Role.TEACHER
+                            }
+                        />
+                        <ClassStudentsSection
+                            sectionId={schoolClass.id}
+                            academicYearId={schoolClass.academicYearId}
+                        />
+                    </div>
                 </TabsContent>
             </Tabs>
         </div>

@@ -71,7 +71,7 @@ export function ExamsPage(): JSX.Element {
         !isStudent && Boolean(currentYear?.id),
     );
 
-    const { data, isLoading, isError, refetch } = useExamsList({
+    const { data, error, isLoading, isError, refetch } = useExamsList({
         sectionId: classFilter === ALL ? undefined : classFilter,
         type: typeFilter === ALL ? undefined : (typeFilter as ExamType),
         status: statusFilter,
@@ -259,7 +259,7 @@ export function ExamsPage(): JSX.Element {
                         <Alert variant="destructive">
                             <AlertCircle />
                             <AlertDescription className="flex items-center justify-between gap-4">
-                                <span>Could not load exams. Please try again.</span>
+                                <span>{getExamErrorMessage(error)}</span>
                                 <Button
                                     type="button"
                                     variant="outline"

@@ -118,7 +118,7 @@ export function UsersPage(): JSX.Element {
         isActive: statusFilter === ALL_FILTER ? undefined : statusFilter === "active",
     };
 
-    const { data, isLoading, isError, refetch } = useUsersList(params);
+    const { data, error, isLoading, isError, refetch } = useUsersList(params);
     const users = data?.data ?? [];
     const total = data?.total ?? 0;
 
@@ -182,7 +182,7 @@ export function UsersPage(): JSX.Element {
                 <Alert variant="destructive">
                     <AlertCircle />
                     <AlertDescription className="flex items-center justify-between gap-4">
-                        <span>Could not load users. Please try again.</span>
+                        <span>{getUserErrorMessage(error)}</span>
                         <Button
                             type="button"
                             variant="outline"

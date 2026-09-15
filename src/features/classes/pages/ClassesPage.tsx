@@ -48,6 +48,7 @@ export function ClassesPage(): JSX.Element {
 
     const {
         data: classesData,
+        error: classesApiError,
         isLoading: classesLoading,
         isError: classesError,
         refetch,
@@ -132,7 +133,7 @@ export function ClassesPage(): JSX.Element {
                 <Alert variant="destructive">
                     <AlertCircle />
                     <AlertDescription className="flex items-center justify-between gap-4">
-                        <span>Could not load classes and sections.</span>
+                        <span>{getClassErrorMessage(classesApiError)}</span>
                         <Button
                             type="button"
                             variant="outline"

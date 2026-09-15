@@ -39,12 +39,14 @@ export function TeachersPage(): JSX.Element {
 
     const {
         data: teachers = [],
+        error: teachersApiError,
         isLoading: teachersLoading,
         isError: teachersError,
         refetch: refetchTeachers,
     } = useTeachersList();
     const {
         data: presets = [],
+        error: presetsApiError,
         isLoading: presetsLoading,
         isError: presetsError,
         refetch: refetchPresets,
@@ -142,7 +144,7 @@ export function TeachersPage(): JSX.Element {
                                 <Alert variant="destructive">
                                     <AlertCircle />
                                     <AlertDescription className="flex items-center justify-between gap-4">
-                                        <span>Could not load teachers.</span>
+                                        <span>{getTeacherErrorMessage(teachersApiError)}</span>
                                         <Button
                                             type="button"
                                             variant="outline"
@@ -179,7 +181,7 @@ export function TeachersPage(): JSX.Element {
                                     <Alert variant="destructive">
                                         <AlertCircle />
                                         <AlertDescription className="flex items-center justify-between gap-4">
-                                            <span>Could not load presets.</span>
+                                            <span>{getTeacherErrorMessage(presetsApiError)}</span>
                                             <Button
                                                 type="button"
                                                 variant="outline"

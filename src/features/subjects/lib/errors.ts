@@ -3,6 +3,10 @@ import { HTTP_STATUS } from "@constants/httpStatus.constants";
 import { ApiError } from "@lib/api/client";
 
 export function getSubjectErrorMessage(error: unknown): string {
+    if (error instanceof ApiError && error.serverMessage) {
+        return error.serverMessage;
+    }
+
     const status = error instanceof ApiError ? error.status : undefined;
 
     switch (status) {
@@ -21,6 +25,10 @@ export function getSubjectErrorMessage(error: unknown): string {
 }
 
 export function getSubjectDeleteErrorMessage(error: unknown): string {
+    if (error instanceof ApiError && error.serverMessage) {
+        return error.serverMessage;
+    }
+
     const status = error instanceof ApiError ? error.status : undefined;
 
     if (status === HTTP_STATUS.BAD_REQUEST) {

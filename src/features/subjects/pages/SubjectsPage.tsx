@@ -38,6 +38,7 @@ export function SubjectsPage(): JSX.Element {
 
     const {
         data: subjects = [],
+        error,
         isLoading,
         isError,
         refetch,
@@ -146,7 +147,7 @@ export function SubjectsPage(): JSX.Element {
                         <Alert variant="destructive">
                             <AlertCircle />
                             <AlertDescription className="flex items-center justify-between gap-4">
-                                <span>Could not load subjects.</span>
+                                <span>{getSubjectErrorMessage(error)}</span>
                                 <Button
                                     type="button"
                                     variant="outline"

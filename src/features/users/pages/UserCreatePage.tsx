@@ -37,7 +37,7 @@ export function UserCreatePage(): JSX.Element {
     const [searchParams] = useSearchParams();
     const requestedRole = searchParams.get("role");
     const defaultRole =
-        requestedRole === "TEACHER" || requestedRole === "STUDENT" ? requestedRole : "ADMIN";
+        requestedRole === "TEACHER" || requestedRole === "ADMIN" ? requestedRole : "STUDENT";
 
     function handleCreated(user: User, tempPassword: string): void {
         navigate(ROUTES.USERS, { state: { createdUser: user, tempPassword } });
@@ -51,6 +51,10 @@ export function UserCreatePage(): JSX.Element {
         >
             <Tabs defaultValue={defaultRole}>
                 <TabsList className="h-10 w-full">
+                    <TabsTrigger value="STUDENT">
+                        <Backpack />
+                        Student
+                    </TabsTrigger>
                     <TabsTrigger value="ADMIN">
                         <Shield />
                         Admin
@@ -58,10 +62,6 @@ export function UserCreatePage(): JSX.Element {
                     <TabsTrigger value="TEACHER">
                         <GraduationCap />
                         Teacher
-                    </TabsTrigger>
-                    <TabsTrigger value="STUDENT">
-                        <Backpack />
-                        Student
                     </TabsTrigger>
                 </TabsList>
 

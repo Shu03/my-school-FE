@@ -129,10 +129,34 @@ export interface TeacherScheduleItem {
 }
 
 export const TEACHER_SCHEDULE: TeacherScheduleItem[] = [
-    { sectionId: "sec-8a", className: "Class 8 · A", subject: "Mathematics", time: "08:30", room: "R-201" },
-    { sectionId: "sec-9b", className: "Class 9 · B", subject: "Mathematics", time: "09:30", room: "R-204" },
-    { sectionId: "sec-10a", className: "Class 10 · A", subject: "Physics", time: "11:00", room: "Lab-1" },
-    { sectionId: "sec-7c", className: "Class 7 · C", subject: "Mathematics", time: "12:30", room: "R-108" },
+    {
+        sectionId: "sec-8a",
+        className: "Class 8 · A",
+        subject: "Mathematics",
+        time: "08:30",
+        room: "R-201",
+    },
+    {
+        sectionId: "sec-9b",
+        className: "Class 9 · B",
+        subject: "Mathematics",
+        time: "09:30",
+        room: "R-204",
+    },
+    {
+        sectionId: "sec-10a",
+        className: "Class 10 · A",
+        subject: "Physics",
+        time: "11:00",
+        room: "Lab-1",
+    },
+    {
+        sectionId: "sec-7c",
+        className: "Class 7 · C",
+        subject: "Mathematics",
+        time: "12:30",
+        room: "R-108",
+    },
 ];
 
 export interface GradingQueueItem {
@@ -145,9 +169,30 @@ export interface GradingQueueItem {
 }
 
 export const TEACHER_GRADING_QUEUE: GradingQueueItem[] = [
-    { examId: "exam-mid", examName: "Mid-Term", className: "Class 10 · A", subject: "Physics", pending: 12, total: 34 },
-    { examId: "exam-unit2", examName: "Unit Test 2", className: "Class 9 · B", subject: "Mathematics", pending: 30, total: 30 },
-    { examId: "exam-unit2b", examName: "Unit Test 2", className: "Class 8 · A", subject: "Mathematics", pending: 6, total: 32 },
+    {
+        examId: "exam-mid",
+        examName: "Mid-Term",
+        className: "Class 10 · A",
+        subject: "Physics",
+        pending: 12,
+        total: 34,
+    },
+    {
+        examId: "exam-unit2",
+        examName: "Unit Test 2",
+        className: "Class 9 · B",
+        subject: "Mathematics",
+        pending: 30,
+        total: 30,
+    },
+    {
+        examId: "exam-unit2b",
+        examName: "Unit Test 2",
+        className: "Class 8 · A",
+        subject: "Mathematics",
+        pending: 6,
+        total: 32,
+    },
 ];
 
 export interface StudentClassItem {
@@ -175,10 +220,34 @@ export interface StudentHomeworkItem {
 }
 
 export const STUDENT_HOMEWORK: StudentHomeworkItem[] = [
-    { id: "hw-1", title: "Algebra worksheet 4", subject: "Mathematics", dueDate: "Tomorrow", status: "DUE" },
-    { id: "hw-2", title: "Essay: My hometown", subject: "English", dueDate: "In 2 days", status: "DUE" },
-    { id: "hw-3", title: "Newton's laws problems", subject: "Physics", dueDate: "Today", status: "OVERDUE" },
-    { id: "hw-4", title: "Map of trade routes", subject: "History", dueDate: "Submitted", status: "SUBMITTED" },
+    {
+        id: "hw-1",
+        title: "Algebra worksheet 4",
+        subject: "Mathematics",
+        dueDate: "Tomorrow",
+        status: "DUE",
+    },
+    {
+        id: "hw-2",
+        title: "Essay: My hometown",
+        subject: "English",
+        dueDate: "In 2 days",
+        status: "DUE",
+    },
+    {
+        id: "hw-3",
+        title: "Newton's laws problems",
+        subject: "Physics",
+        dueDate: "Today",
+        status: "OVERDUE",
+    },
+    {
+        id: "hw-4",
+        title: "Map of trade routes",
+        subject: "History",
+        dueDate: "Submitted",
+        status: "SUBMITTED",
+    },
 ];
 
 export type StudentExamStatus = "UPCOMING" | "RESULT";
@@ -195,8 +264,22 @@ export interface StudentExamItem {
 
 export const STUDENT_EXAMS: StudentExamItem[] = [
     { id: "ex-1", examName: "Mid-Term", subject: "Physics", date: "12 Sep", status: "UPCOMING" },
-    { id: "ex-2", examName: "Mid-Term", subject: "Mathematics", date: "14 Sep", status: "UPCOMING" },
-    { id: "ex-3", examName: "Unit Test 2", subject: "English", date: "28 Aug", status: "RESULT", marksObtained: 41, totalMarks: 50 },
+    {
+        id: "ex-2",
+        examName: "Mid-Term",
+        subject: "Mathematics",
+        date: "14 Sep",
+        status: "UPCOMING",
+    },
+    {
+        id: "ex-3",
+        examName: "Unit Test 2",
+        subject: "English",
+        date: "28 Aug",
+        status: "RESULT",
+        marksObtained: 41,
+        totalMarks: 50,
+    },
 ];
 
 export interface StudentFeeSummaryMock {

@@ -67,6 +67,7 @@ export function FeesPage(): JSX.Element {
 
     const {
         data: records = [],
+        error: recordsApiError,
         isLoading: recordsLoading,
         isError: recordsError,
         refetch: refetchRecords,
@@ -78,6 +79,7 @@ export function FeesPage(): JSX.Element {
 
     const {
         data: structures = [],
+        error: structuresApiError,
         isLoading: structuresLoading,
         isError: structuresError,
         refetch: refetchStructures,
@@ -203,7 +205,7 @@ export function FeesPage(): JSX.Element {
                                 <Alert variant="destructive">
                                     <AlertCircle />
                                     <AlertDescription className="flex items-center justify-between gap-4">
-                                        <span>Could not load fee records. Please try again.</span>
+                                        <span>{getFeeErrorMessage(recordsApiError)}</span>
                                         <Button
                                             type="button"
                                             variant="outline"
@@ -241,9 +243,7 @@ export function FeesPage(): JSX.Element {
                                 <Alert variant="destructive">
                                     <AlertCircle />
                                     <AlertDescription className="flex items-center justify-between gap-4">
-                                        <span>
-                                            Could not load fee structures. Please try again.
-                                        </span>
+                                        <span>{getFeeErrorMessage(structuresApiError)}</span>
                                         <Button
                                             type="button"
                                             variant="outline"

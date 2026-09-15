@@ -1,6 +1,5 @@
 import type { JSX } from "react";
 
-import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import {
     Table,
@@ -33,15 +32,12 @@ export function FeeRecordsTable({ records, isLoading, onView }: FeeRecordsTableP
                         <TableHead className="text-right">Total</TableHead>
                         <TableHead className="text-right">Paid</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead className="w-20 text-right">
-                            <span className="sr-only">Actions</span>
-                        </TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {isLoading && (
                         <TableRow>
-                            <TableCell colSpan={6}>
+                            <TableCell colSpan={5}>
                                 <div className="flex items-center justify-center gap-2 py-10">
                                     <Spinner />
                                     <span className="text-muted-foreground text-sm">
@@ -54,7 +50,7 @@ export function FeeRecordsTable({ records, isLoading, onView }: FeeRecordsTableP
 
                     {!isLoading && records.length === 0 && (
                         <TableRow>
-                            <TableCell colSpan={6}>
+                            <TableCell colSpan={5}>
                                 <div className="text-muted-foreground py-10 text-center text-sm">
                                     No fee records found.
                                 </div>
@@ -64,16 +60,25 @@ export function FeeRecordsTable({ records, isLoading, onView }: FeeRecordsTableP
 
                     {!isLoading &&
                         records.map((record) => (
-                            <TableRow key={record.id}>
+                            <TableRow
+                                key={record.id}
+                                className="focus-visible:bg-muted/50 focus-visible:ring-ring cursor-pointer focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
+                                tabIndex={0}
+                                role="button"
+                                aria-label={`View fee record for ${record.student.user.firstName} ${record.student.user.lastName}`}
+                                onClick={() => onView(record)}
+                                onKeyDown={(event) => {
+                                    if (event.key === "Enter" || event.key === " ") {
+                                        event.preventDefault();
+                                        onView(record);
+                                    }
+                                }}
+                            >
                                 <TableCell>
-                                    <Button
-                                        variant="link"
-                                        className="h-auto p-0 font-medium"
-                                        onClick={() => onView(record)}
-                                    >
+                                    <span className="font-medium">
                                         {record.student.user.firstName}{" "}
                                         {record.student.user.lastName}
-                                    </Button>
+                                    </span>
                                     <p className="text-muted-foreground font-mono text-xs">
                                         {record.student.admissionNumber}
                                     </p>
@@ -87,15 +92,6 @@ export function FeeRecordsTable({ records, isLoading, onView }: FeeRecordsTableP
                                 </TableCell>
                                 <TableCell>
                                     <FeeStatusBadge status={record.status} />
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => onView(record)}
-                                    >
-                                        View
-                                    </Button>
                                 </TableCell>
                             </TableRow>
                         ))}

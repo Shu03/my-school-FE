@@ -50,7 +50,7 @@ export function TeacherDetailPage(): JSX.Element {
     const [profileOpen, setProfileOpen] = useState(false);
     const [assignmentOpen, setAssignmentOpen] = useState(false);
 
-    const { data: teacher, isLoading, isError } = useTeacher(canView ? id : null);
+    const { data: teacher, error, isLoading, isError } = useTeacher(canView ? id : null);
     const { data: assignments = [], isLoading: assignmentsLoading } = useTeacherAssignments(
         canView ? id : null,
     );
@@ -155,7 +155,7 @@ export function TeacherDetailPage(): JSX.Element {
         return (
             <Alert variant="destructive">
                 <AlertCircle />
-                <AlertDescription>The requested teacher was not found.</AlertDescription>
+                <AlertDescription>{getTeacherErrorMessage(error)}</AlertDescription>
             </Alert>
         );
     }

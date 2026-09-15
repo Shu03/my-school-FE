@@ -38,7 +38,7 @@ export function FeeRecordDetailPage(): JSX.Element {
 
     const [paymentOpen, setPaymentOpen] = useState(false);
 
-    const { data: record, isLoading, isError } = useFeeRecord(id || null);
+    const { data: record, error, isLoading, isError } = useFeeRecord(id || null);
     const recordPaymentMutation = useRecordPayment(id);
 
     async function handleRecordPayment(values: PaymentFormValues): Promise<void> {
@@ -68,12 +68,14 @@ export function FeeRecordDetailPage(): JSX.Element {
         return (
             <Alert variant="destructive">
                 <AlertCircle />
-                <AlertDescription>Could not load this fee record.</AlertDescription>
+                <AlertDescription>{getFeeErrorMessage(error)}</AlertDescription>
             </Alert>
         );
     }
 
     const studentName = `${record.student.user.firstName} ${record.student.user.lastName}`;
+    const remainingAmount = Math.max(record.totalAmount - record.amountPaid, 0);
+    const canRecordRemainingPayment = canRecordPayment && remainingAmount > 0;
 
     return (
         <div className="flex flex-col gap-6">
@@ -96,7 +98,7 @@ export function FeeRecordDetailPage(): JSX.Element {
                             {record.feeStructure.classLevel}
                         </p>
                     </div>
-                    {canRecordPayment && (
+                    {canRecordRemainingPayment && (
                         <Button onClick={() => setPaymentOpen(true)}>
                             <Plus className="size-4" />
                             Record payment
@@ -124,10 +126,11 @@ export function FeeRecordDetailPage(): JSX.Element {
                 </CardContent>
             </Card>
 
-            {canRecordPayment && (
+            {canRecordRemainingPayment && (
                 <RecordPaymentDialog
                     open={paymentOpen}
                     isSubmitting={recordPaymentMutation.isPending}
+                    remainingAmount={remainingAmount}
                     onOpenChange={setPaymentOpen}
                     onSubmit={handleRecordPayment}
                 />

@@ -95,7 +95,12 @@ const navItems: NavItem[] = [
     },
     { label: "Homework", path: ROUTES.HOMEWORK, icon: NotebookPen },
     { label: "Announcements", path: ROUTES.ANNOUNCEMENTS, icon: Megaphone },
-    { label: "Exams", path: ROUTES.EXAMS, icon: ClipboardList },
+    {
+        label: "Exams",
+        path: ROUTES.EXAMS,
+        icon: ClipboardList,
+        roles: [Role.ADMIN, Role.TEACHER],
+    },
     {
         label: "Report Card",
         path: ROUTES.MY_REPORT_CARD,

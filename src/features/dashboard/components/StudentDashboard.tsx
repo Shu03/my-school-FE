@@ -2,14 +2,7 @@ import type { JSX } from "react";
 
 import { Link } from "react-router-dom";
 
-import {
-    Award,
-    CalendarCheck,
-    Megaphone,
-    NotebookPen,
-    Percent,
-    Wallet,
-} from "lucide-react";
+import { Award, CalendarCheck, Megaphone, NotebookPen, Percent, Wallet } from "lucide-react";
 
 import { ROUTES } from "@constants/routes.constants";
 

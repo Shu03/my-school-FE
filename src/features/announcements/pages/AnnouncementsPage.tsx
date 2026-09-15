@@ -38,7 +38,7 @@ export function AnnouncementsPage(): JSX.Element {
     const [formOpen, setFormOpen] = useState(false);
     const [editing, setEditing] = useState<Announcement | null>(null);
 
-    const { data, isLoading, isError, refetch } = useAnnouncementsList({ page, limit });
+    const { data, error, isLoading, isError, refetch } = useAnnouncementsList({ page, limit });
     const announcements = data?.data ?? [];
     const total = data?.total ?? 0;
 
@@ -122,7 +122,7 @@ export function AnnouncementsPage(): JSX.Element {
                         <Alert variant="destructive">
                             <AlertCircle />
                             <AlertDescription className="flex items-center justify-between gap-4">
-                                <span>Could not load announcements. Please try again.</span>
+                                <span>{getAnnouncementErrorMessage(error)}</span>
                                 <Button
                                     type="button"
                                     variant="outline"

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { AlertCircle, KeyRound, Mail, Phone, UserRound } from "lucide-react";
 
 import { ROUTES } from "@constants/routes.constants";
+import { ApiError } from "@lib/api/client";
 
 import { Role } from "@/types/api";
 
@@ -39,7 +40,7 @@ function DetailRow({ label, value }: { label: string; value: string }): JSX.Elem
 
 export function ProfilePage(): JSX.Element {
     const navigate = useNavigate();
-    const { data: profile, isLoading, isError } = useProfile();
+    const { data: profile, error, isLoading, isError } = useProfile();
 
     if (isLoading) {
         return (
@@ -54,7 +55,11 @@ export function ProfilePage(): JSX.Element {
         return (
             <Alert variant="destructive">
                 <AlertCircle />
-                <AlertDescription>Could not load your profile.</AlertDescription>
+                <AlertDescription>
+                    {error instanceof ApiError && error.serverMessage
+                        ? error.serverMessage
+                        : "Could not load your profile."}
+                </AlertDescription>
             </Alert>
         );
     }

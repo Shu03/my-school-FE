@@ -133,21 +133,25 @@ export const router = createBrowserRouter([
             },
 
             {
-                path: ROUTES.EXAMS,
-                element: (
-                    <Lazy>
-                        <ExamsPage />
-                    </Lazy>
-                ),
-            },
-
-            {
-                path: ROUTES.EXAM_DETAIL,
-                element: (
-                    <Lazy>
-                        <ExamDetailPage />
-                    </Lazy>
-                ),
+                element: <RoleGuard allowedRoles={[Role.ADMIN, Role.TEACHER]} />,
+                children: [
+                    {
+                        path: ROUTES.EXAMS,
+                        element: (
+                            <Lazy>
+                                <ExamsPage />
+                            </Lazy>
+                        ),
+                    },
+                    {
+                        path: ROUTES.EXAM_DETAIL,
+                        element: (
+                            <Lazy>
+                                <ExamDetailPage />
+                            </Lazy>
+                        ),
+                    },
+                ],
             },
 
             {

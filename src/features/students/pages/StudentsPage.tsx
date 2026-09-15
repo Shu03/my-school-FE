@@ -84,7 +84,7 @@ export function StudentsPage(): JSX.Element {
         sectionId: classFilter === ALL_CLASSES ? undefined : classFilter,
     };
 
-    const { data, isLoading, isError, refetch } = useStudentsList(params);
+    const { data, error, isLoading, isError, refetch } = useStudentsList(params);
     const students = data?.data ?? [];
     const total = data?.total ?? 0;
 
@@ -177,7 +177,7 @@ export function StudentsPage(): JSX.Element {
                         <Alert variant="destructive">
                             <AlertCircle />
                             <AlertDescription className="flex items-center justify-between gap-4">
-                                <span>Could not load students. Please try again.</span>
+                                <span>{getStudentErrorMessage(error)}</span>
                                 <Button
                                     type="button"
                                     variant="outline"

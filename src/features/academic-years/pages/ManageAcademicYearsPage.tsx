@@ -38,7 +38,7 @@ export function ManageAcademicYearsPage(): JSX.Element {
     const [setCurrentOpen, setSetCurrentOpen] = useState(false);
     const [targetYear, setTargetYear] = useState<AcademicYear | null>(null);
 
-    const { data, isLoading, isError, refetch } = useAcademicYearsList();
+    const { data, error, isLoading, isError, refetch } = useAcademicYearsList();
     const createMutation = useCreateAcademicYear();
     const updateMutation = useUpdateAcademicYear();
     const setCurrentMutation = useSetCurrentAcademicYear();
@@ -139,7 +139,7 @@ export function ManageAcademicYearsPage(): JSX.Element {
                         <Alert variant="destructive">
                             <AlertCircle />
                             <AlertDescription className="flex items-center justify-between gap-4">
-                                <span>Could not load academic years.</span>
+                                <span>{getAcademicYearErrorMessage(error)}</span>
                                 <Button
                                     type="button"
                                     variant="outline"

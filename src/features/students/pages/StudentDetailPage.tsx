@@ -5,7 +5,6 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import {
     AlertCircle,
-    ArrowRight,
     ArrowLeft,
     CalendarDays,
     GraduationCap,
@@ -18,12 +17,11 @@ import { toast } from "sonner";
 
 import { ATTENDANCE_STATUS } from "@constants/attendance.constants";
 import { PERMISSIONS } from "@constants/permissions.constants";
-import { attendancePage } from "@constants/routes.constants";
 import { ENROLLMENT_STATUS } from "@constants/students.constants";
 
 import { Role } from "@/types/api";
 
-import { useAttendanceSummary, useStudentAttendance } from "@features/attendance";
+import { useStudentAttendance } from "@features/attendance";
 import { hasPermission, useAuthStore } from "@features/auth";
 import { StudentGradeHistoryCard } from "@features/grades";
 
@@ -106,7 +104,7 @@ export function StudentDetailPage(): JSX.Element {
     const [enrollOpen, setEnrollOpen] = useState(false);
     const [editingEnrollment, setEditingEnrollment] = useState<StudentEnrollment | null>(null);
 
-    const { data: student, isLoading, isError } = useStudent(canView ? id : null);
+    const { data: student, error, isLoading, isError } = useStudent(canView ? id : null);
 
     const updateStudentMutation = useUpdateStudent();
     const enrollStudentMutation = useEnrollStudent();
@@ -157,18 +155,6 @@ export function StudentDetailPage(): JSX.Element {
     const month = new Date().toISOString().slice(0, 7);
     const { startDate, endDate } = getMonthBounds(month);
 
-    const {
-        data: classSummary = [],
-        isLoading: classSummaryLoading,
-        isError: classSummaryError,
-    } = useAttendanceSummary(
-        {
-            sectionId: activeEnrollment?.sectionId ?? "",
-            month,
-        },
-        Boolean(activeEnrollment),
-    );
-
     const { data: ownAttendance = [], isLoading: ownAttendanceLoading } = useStudentAttendance(
         student?.id ?? null,
         {
@@ -180,39 +166,8 @@ export function StudentDetailPage(): JSX.Element {
     );
 
     const ownStats = useMemo(() => {
-        const fromSummary = classSummary.find((item) => item.studentId === student?.id);
-        if (fromSummary) {
-            return {
-                totalDays: fromSummary.totalDays,
-                present: fromSummary.present,
-                absent: fromSummary.absent,
-                percentage: fromSummary.percentage,
-            };
-        }
-
         return summarizeOwnAttendance(ownAttendance.map((record) => record.status));
-    }, [classSummary, ownAttendance, student?.id]);
-
-    const classStats = useMemo(() => {
-        const totalStudents = classSummary.length;
-        const totalDays = classSummary.reduce((sum, item) => sum + item.totalDays, 0);
-        const totalPresent = classSummary.reduce((sum, item) => sum + item.present, 0);
-        const totalAbsent = classSummary.reduce((sum, item) => sum + item.absent, 0);
-        const averagePercentage =
-            totalStudents > 0
-                ? Math.round(
-                      classSummary.reduce((sum, item) => sum + item.percentage, 0) / totalStudents,
-                  )
-                : 0;
-
-        return {
-            totalStudents,
-            totalDays,
-            totalPresent,
-            totalAbsent,
-            averagePercentage,
-        };
-    }, [classSummary]);
+    }, [ownAttendance]);
 
     if (!canView) {
         return (
@@ -236,7 +191,7 @@ export function StudentDetailPage(): JSX.Element {
         return (
             <Alert variant="destructive">
                 <AlertCircle />
-                <AlertDescription>The requested student was not found.</AlertDescription>
+                <AlertDescription>{getStudentErrorMessage(error)}</AlertDescription>
             </Alert>
         );
     }
@@ -329,7 +284,7 @@ export function StudentDetailPage(): JSX.Element {
             />
 
             {activeEnrollment && (
-                <div className="grid gap-4 lg:grid-cols-2">
+                <div className="grid gap-4">
                     <Card className="gap-0">
                         <CardHeader className="border-border/60 from-primary/10 via-primary/5 border-b bg-linear-to-br to-transparent">
                             <CardTitle className="flex items-center gap-2 text-base">
@@ -374,71 +329,6 @@ export function StudentDetailPage(): JSX.Element {
                                         </dd>
                                     </div>
                                 </dl>
-                            )}
-                        </CardContent>
-                    </Card>
-
-                    <Card className="gap-0">
-                        <CardHeader className="border-border/60 from-primary/10 via-primary/5 border-b bg-linear-to-br to-transparent">
-                            <CardTitle className="flex items-center gap-2 text-base">
-                                <School className="size-4" />
-                                Class attendance summary
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4 pt-4">
-                            {classSummaryLoading ? (
-                                <div className="flex items-center justify-center gap-2 py-6">
-                                    <Spinner />
-                                    <span className="text-muted-foreground text-sm">
-                                        Loading...
-                                    </span>
-                                </div>
-                            ) : classSummaryError ? (
-                                <p className="text-muted-foreground text-sm">
-                                    Class summary is not available for your role.
-                                </p>
-                            ) : (
-                                <dl className="grid grid-cols-2 gap-3 text-sm">
-                                    <div className="rounded-lg border p-3">
-                                        <dt className="text-muted-foreground text-xs">Students</dt>
-                                        <dd className="text-lg font-semibold">
-                                            {classStats.totalStudents}
-                                        </dd>
-                                    </div>
-                                    <div className="rounded-lg border p-3">
-                                        <dt className="text-muted-foreground text-xs">
-                                            Avg attendance
-                                        </dt>
-                                        <dd className="text-lg font-semibold">
-                                            {classStats.averagePercentage}%
-                                        </dd>
-                                    </div>
-                                    <div className="rounded-lg border p-3">
-                                        <dt className="text-muted-foreground text-xs">Present</dt>
-                                        <dd className="text-lg font-semibold">
-                                            {classStats.totalPresent}
-                                        </dd>
-                                    </div>
-                                    <div className="rounded-lg border p-3">
-                                        <dt className="text-muted-foreground text-xs">Absent</dt>
-                                        <dd className="text-lg font-semibold">
-                                            {classStats.totalAbsent}
-                                        </dd>
-                                    </div>
-                                </dl>
-                            )}
-
-                            {(isAdmin || user?.role === Role.TEACHER) && (
-                                <Button
-                                    variant="outline"
-                                    className="w-full justify-between"
-                                    onClick={() =>
-                                        navigate(attendancePage("mark", activeEnrollment.sectionId))
-                                    }
-                                >
-                                    Mark attendance for this class
-                                    <ArrowRight className="size-4" />
-                                </Button>
                             )}
                         </CardContent>
                     </Card>

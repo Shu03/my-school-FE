@@ -41,7 +41,7 @@ export function ExamDetailPage(): JSX.Element {
     const canWrite = isAdmin || hasPermission(user?.permissions, PERMISSIONS.GRADES_WRITE);
     const canReadSummary = isAdmin || hasPermission(user?.permissions, PERMISSIONS.GRADES_READ);
 
-    const { data: exam, isLoading, isError } = useExam(id);
+    const { data: exam, error, isLoading, isError } = useExam(id);
 
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editing, setEditing] = useState<ExamSubject | null>(null);
@@ -71,7 +71,7 @@ export function ExamDetailPage(): JSX.Element {
         return (
             <Alert variant="destructive">
                 <AlertCircle />
-                <AlertDescription>Could not load this exam.</AlertDescription>
+                <AlertDescription>{getExamErrorMessage(error)}</AlertDescription>
             </Alert>
         );
     }

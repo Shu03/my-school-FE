@@ -10,7 +10,6 @@ import { attendancePage, ROUTES } from "@constants/routes.constants";
 import { hasPermission, useAuthStore } from "@features/auth";
 import { HolidaysWidget } from "@features/holidays";
 
-
 import { Stagger, StaggerItem } from "@components/common/Motion";
 
 import { Button } from "@/components/ui/button";
@@ -95,7 +94,9 @@ export function TeacherDashboard(): JSX.Element {
                                     <p className="text-sm font-medium">
                                         {item.examName} · {item.subject}
                                     </p>
-                                    <p className="text-muted-foreground text-xs">{item.className}</p>
+                                    <p className="text-muted-foreground text-xs">
+                                        {item.className}
+                                    </p>
                                 </div>
                                 {item.pending > 0 ? (
                                     <span className="bg-warning/12 text-warning ring-warning/25 inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ring-1">

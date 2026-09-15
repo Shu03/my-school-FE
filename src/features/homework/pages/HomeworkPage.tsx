@@ -11,6 +11,7 @@ import { Role } from "@/types/api";
 import { useCurrentAcademicYear } from "@features/academic-years";
 import { hasPermission, useAuthStore } from "@features/auth";
 import { useClassesList } from "@features/classes";
+import { useCurrentStudentEnrollment } from "@features/students";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,8 @@ export function HomeworkPage(): JSX.Element {
     const [editing, setEditing] = useState<Homework | null>(null);
 
     const { data: currentYear } = useCurrentAcademicYear();
+    const { enrollment: currentEnrollment, isLoading: enrollmentLoading } =
+        useCurrentStudentEnrollment();
     const { data: classes = [] } = useClassesList(
         { academicYearId: currentYear?.id },
         !isStudent && Boolean(currentYear?.id),
@@ -54,11 +57,17 @@ export function HomeworkPage(): JSX.Element {
 
     const {
         data: homework = [],
+        error,
         isLoading,
         isError,
         refetch,
     } = useHomeworkList({
-        sectionId: classFilter === ALL_CLASSES ? undefined : classFilter,
+        sectionId: isStudent
+            ? currentEnrollment?.sectionId
+            : classFilter === ALL_CLASSES
+              ? undefined
+              : classFilter,
+        academicYearId: isStudent ? currentYear?.id : undefined,
     });
 
     const createMutation = useCreateHomework();
@@ -162,11 +171,19 @@ export function HomeworkPage(): JSX.Element {
                         </div>
                     )}
 
-                    {isError ? (
+                    {isStudent && enrollmentLoading ? (
+                        <div className="text-muted-foreground py-10 text-center text-sm">
+                            Loading your class assignments...
+                        </div>
+                    ) : isStudent && !currentEnrollment ? (
+                        <div className="text-muted-foreground py-10 text-center text-sm">
+                            Homework will appear once you are enrolled in a current class.
+                        </div>
+                    ) : isError ? (
                         <Alert variant="destructive">
                             <AlertCircle />
                             <AlertDescription className="flex items-center justify-between gap-4">
-                                <span>Could not load homework. Please try again.</span>
+                                <span>{getHomeworkErrorMessage(error)}</span>
                                 <Button
                                     type="button"
                                     variant="outline"

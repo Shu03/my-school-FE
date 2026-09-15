@@ -1,9 +1,10 @@
 import type { JSX } from "react";
 import { useEffect } from "react";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { motion, useReducedMotion } from "motion/react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,11 +19,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 
-import { paymentSchema, type PaymentFormValues } from "../schemas/payment.schema";
+import { formatCurrency } from "../lib/format";
+import { createPaymentSchema, type PaymentFormValues } from "../schemas/payment.schema";
 
 interface RecordPaymentDialogProps {
     open: boolean;
     isSubmitting: boolean;
+    remainingAmount: number;
     onOpenChange: (open: boolean) => void;
     onSubmit: (values: PaymentFormValues) => Promise<void>;
 }
@@ -34,6 +37,7 @@ function todayInputValue(): string {
 export function RecordPaymentDialog({
     open,
     isSubmitting,
+    remainingAmount,
     onOpenChange,
     onSubmit,
 }: RecordPaymentDialogProps): JSX.Element {
@@ -41,15 +45,24 @@ export function RecordPaymentDialog({
         register,
         handleSubmit,
         reset,
+        control,
         formState: { errors },
     } = useForm<PaymentFormValues>({
-        resolver: zodResolver(paymentSchema),
+        resolver: zodResolver(createPaymentSchema(remainingAmount)),
         defaultValues: {
             amount: 0,
             paidOn: todayInputValue(),
             note: "",
         },
     });
+
+    const enteredAmount = useWatch({ control, name: "amount" });
+    const normalizedEnteredAmount =
+        typeof enteredAmount === "number" && Number.isFinite(enteredAmount) ? enteredAmount : 0;
+    const remainingAfterPayment = Math.max(remainingAmount - normalizedEnteredAmount, 0);
+    const overpaymentAmount = Math.max(normalizedEnteredAmount - remainingAmount, 0);
+    const hasOverpayment = overpaymentAmount > 0;
+    const reduceMotion = useReducedMotion();
 
     useEffect(() => {
         if (!open) {
@@ -68,10 +81,50 @@ export function RecordPaymentDialog({
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Record payment</DialogTitle>
-                    <DialogDescription>Record a payment against this fee record.</DialogDescription>
+                    <DialogDescription>
+                        Record a payment against this fee record. Remaining balance:{" "}
+                        <span className="font-medium">{formatCurrency(remainingAmount)}</span>
+                    </DialogDescription>
                 </DialogHeader>
 
                 <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
+                    <div
+                        className={`rounded-xl border px-4 py-3 ${
+                            hasOverpayment
+                                ? "border-destructive/30 bg-destructive/5"
+                                : "border-primary/20 bg-primary/5"
+                        }`}
+                        aria-live="polite"
+                    >
+                        <div className="flex items-end justify-between gap-4">
+                            <div>
+                                <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                                    {hasOverpayment
+                                        ? "Amount exceeds balance"
+                                        : "After this payment"}
+                                </p>
+                                <motion.p
+                                    key={hasOverpayment ? "overpayment" : remainingAfterPayment}
+                                    initial={reduceMotion ? false : { opacity: 0, y: 6 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className={`mt-1 text-2xl font-semibold tracking-tight ${
+                                        hasOverpayment ? "text-destructive" : "text-primary"
+                                    }`}
+                                >
+                                    {hasOverpayment
+                                        ? `${formatCurrency(overpaymentAmount)} over`
+                                        : formatCurrency(remainingAfterPayment)}
+                                </motion.p>
+                            </div>
+                            <p className="text-muted-foreground max-w-40 text-right text-xs">
+                                {hasOverpayment
+                                    ? "Reduce the payment amount to continue."
+                                    : "will remain unpaid"}
+                            </p>
+                        </div>
+                    </div>
+
                     <div className="space-y-2">
                         <Label htmlFor="amount">Amount</Label>
                         <Input
