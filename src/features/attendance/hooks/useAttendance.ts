@@ -7,38 +7,39 @@ import {
 } from "@tanstack/react-query";
 
 import {
+    deleteAttendanceDay,
+    getAttendanceDay,
     getAttendanceSummary,
-    getClassAttendance,
     getStudentAttendance,
-    markAttendance,
+    saveAttendanceDay,
 } from "../api/attendance.api";
 import type {
-    AttendanceRecord,
+    AttendanceDayView,
     AttendanceSummaryItem,
     AttendanceSummaryParams,
-    BulkMarkResult,
     ClassAttendanceParams,
-    MarkAttendanceRequest,
+    SaveAttendanceDayRequest,
+    StudentAttendanceItem,
     StudentAttendanceParams,
 } from "../types/attendance.types";
 
 /** Query-key factory for the attendance feature. */
 export const attendanceKeys = {
     all: ["attendance"] as const,
-    class: (params: ClassAttendanceParams) => [...attendanceKeys.all, "class", params] as const,
+    day: (params: ClassAttendanceParams) => [...attendanceKeys.all, "day", params] as const,
     student: (studentId: string, params: StudentAttendanceParams) =>
         [...attendanceKeys.all, "student", studentId, params] as const,
     summary: (params: AttendanceSummaryParams) =>
         [...attendanceKeys.all, "summary", params] as const,
 };
 
-export function useClassAttendance(
+export function useAttendanceDay(
     params: ClassAttendanceParams,
     enabled: boolean,
-): UseQueryResult<AttendanceRecord[]> {
-    return useQuery({
-        queryKey: attendanceKeys.class(params),
-        queryFn: () => getClassAttendance(params),
+): UseQueryResult<AttendanceDayView> {
+    return useQuery<AttendanceDayView>({
+        queryKey: attendanceKeys.day(params),
+        queryFn: () => getAttendanceDay(params),
         enabled,
     });
 }
@@ -47,8 +48,8 @@ export function useStudentAttendance(
     studentId: string | null,
     params: StudentAttendanceParams,
     enabled: boolean,
-): UseQueryResult<AttendanceRecord[]> {
-    return useQuery({
+): UseQueryResult<StudentAttendanceItem[]> {
+    return useQuery<StudentAttendanceItem[]>({
         queryKey: attendanceKeys.student(studentId ?? "", params),
         queryFn: () => getStudentAttendance(studentId as string, params),
         enabled: enabled && Boolean(studentId),
@@ -59,23 +60,37 @@ export function useAttendanceSummary(
     params: AttendanceSummaryParams,
     enabled: boolean,
 ): UseQueryResult<AttendanceSummaryItem[]> {
-    return useQuery({
+    return useQuery<AttendanceSummaryItem[]>({
         queryKey: attendanceKeys.summary(params),
         queryFn: () => getAttendanceSummary(params),
         enabled,
     });
 }
 
-export function useMarkAttendance(): UseMutationResult<
-    BulkMarkResult,
+export function useSaveAttendanceDay(): UseMutationResult<
+    AttendanceDayView,
     Error,
-    MarkAttendanceRequest
+    { params: ClassAttendanceParams; data: SaveAttendanceDayRequest }
 > {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: markAttendance,
+        mutationFn: ({
+            params,
+            data,
+        }: {
+            params: ClassAttendanceParams;
+            data: SaveAttendanceDayRequest;
+        }) => saveAttendanceDay(params, data),
         onSuccess: () => {
-            void queryClient.invalidateQueries({ queryKey: attendanceKeys.all });
+            return queryClient.invalidateQueries({ queryKey: attendanceKeys.all });
         },
+    });
+}
+
+export function useDeleteAttendanceDay(): UseMutationResult<void, Error, ClassAttendanceParams> {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: deleteAttendanceDay,
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: attendanceKeys.all }),
     });
 }

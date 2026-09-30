@@ -5,7 +5,6 @@ export interface User {
     firstName: string;
     lastName: string;
     role: Role;
-    permissions?: string[];
     isActive?: boolean;
     teacherProfileId?: string;
     studentProfileId?: string;
@@ -26,8 +25,6 @@ export interface ProfileTeacher {
     id: string;
     employeeCode: string;
     joiningDate: string | null;
-    presetId: string | null;
-    permissionOverrides: string[];
     createdAt: string;
     updatedAt: string;
 }

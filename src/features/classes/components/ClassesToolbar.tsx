@@ -18,6 +18,7 @@ interface AcademicYearOption {
 
 interface ClassesToolbarProps {
     years: AcademicYearOption[];
+    canSelectAcademicYear?: boolean;
     selectedAcademicYearId: string;
     classLevelFilter: string;
     onAcademicYearChange: (academicYearId: string) => void;
@@ -26,6 +27,7 @@ interface ClassesToolbarProps {
 
 export function ClassesToolbar({
     years,
+    canSelectAcademicYear = true,
     selectedAcademicYearId,
     classLevelFilter,
     onAcademicYearChange,
@@ -33,7 +35,7 @@ export function ClassesToolbar({
 }: ClassesToolbarProps): JSX.Element {
     return (
         <div className="flex flex-wrap items-center gap-2">
-            <Select value={selectedAcademicYearId} onValueChange={onAcademicYearChange}>
+            {canSelectAcademicYear && <Select value={selectedAcademicYearId} onValueChange={onAcademicYearChange}>
                 <SelectTrigger className="w-44" aria-label="Select academic year">
                     <SelectValue placeholder="Academic year" />
                 </SelectTrigger>
@@ -44,7 +46,7 @@ export function ClassesToolbar({
                         </SelectItem>
                     ))}
                 </SelectContent>
-            </Select>
+            </Select>}
 
             <Input
                 type="number"

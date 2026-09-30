@@ -8,6 +8,8 @@ import { Plus, Trash2 } from "lucide-react";
 
 import { EXAM_TYPE_LABELS, EXAM_TYPE_LIST } from "@constants/exams.constants";
 
+import { formatSectionLabel } from "@lib/section";
+
 import { useCurrentAcademicYear } from "@features/academic-years";
 import { useClassesList } from "@features/classes";
 import { useSubjectsList } from "@features/subjects";
@@ -173,7 +175,7 @@ export function ExamFormDialog({
                                         <SelectContent>
                                             {classes.map((item) => (
                                                 <SelectItem key={item.id} value={item.id}>
-                                                    {item.name} (Class {item.classLevel})
+                                                    {formatSectionLabel(item.classLevel, item.name)}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>

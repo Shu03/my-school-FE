@@ -19,6 +19,7 @@ import type { Term } from "../types/academic-year.types";
 interface TermsTableProps {
     terms: Term[];
     isLoading: boolean;
+    canEdit?: boolean;
     canDelete: boolean;
     deletingTermId: string | null;
     onEdit: (term: Term) => void;
@@ -28,6 +29,7 @@ interface TermsTableProps {
 export function TermsTable({
     terms,
     isLoading,
+    canEdit = true,
     canDelete,
     deletingTermId,
     onEdit,
@@ -78,14 +80,16 @@ export function TermsTable({
                                 <TableCell>{formatDate(term.endDate)}</TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex items-center justify-end gap-2">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            aria-label={`Edit ${term.name}`}
-                                            onClick={() => onEdit(term)}
-                                        >
-                                            <Pencil className="size-4" />
-                                        </Button>
+                                        {canEdit && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                aria-label={`Edit ${term.name}`}
+                                                onClick={() => onEdit(term)}
+                                            >
+                                                <Pencil className="size-4" />
+                                            </Button>
+                                        )}
                                         {canDelete && (
                                             <Button
                                                 variant="ghost"

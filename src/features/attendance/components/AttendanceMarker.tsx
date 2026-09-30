@@ -4,16 +4,16 @@ import type { JSX } from "react";
 import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 
-import {
-    ATTENDANCE_STATUS,
-    ATTENDANCE_STUDENT_LIMIT,
-    type AttendanceStatus,
-} from "@constants/attendance.constants";
+import { Role } from "@/types/api";
+
+import { formatSectionLabel } from "@lib/section";
 
 import { useCurrentAcademicYear } from "@features/academic-years";
+import { useAuthStore } from "@features/auth";
 import { useClassesList } from "@features/classes";
-import { useStudentsList } from "@features/students";
+import { isClassTeacherForSection, useTeacherAccess } from "@features/request-access";
 
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -26,7 +26,11 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-import { useMarkAttendance } from "../hooks/useAttendance";
+import {
+    useAttendanceDay,
+    useDeleteAttendanceDay,
+    useSaveAttendanceDay,
+} from "../hooks/useAttendance";
 import { getAttendanceErrorMessage } from "../lib/errors";
 import { schoolToday } from "../lib/format";
 
@@ -38,58 +42,75 @@ export function AttendanceMarker({ initialSectionId }: AttendanceMarkerProps): J
     const today = schoolToday();
 
     const [sectionId, setSectionId] = useState(initialSectionId ?? "");
-    const [statuses, setStatuses] = useState<Record<string, AttendanceStatus>>({});
-    const [syncKey, setSyncKey] = useState("");
+    const [date, setDate] = useState(today);
+    const [attendanceDraft, setAttendanceDraft] = useState<{
+        key: string;
+        absentStudentIds: string[];
+    } | null>(null);
+    const [deleteOpen, setDeleteOpen] = useState(false);
 
+    const user = useAuthStore((state) => state.user);
+    const isAdmin = user?.role === Role.ADMIN;
+    const isTeacher = user?.role === Role.TEACHER;
     const { data: currentYear } = useCurrentAcademicYear();
     const { data: classes = [] } = useClassesList(
         { academicYearId: currentYear?.id },
-        Boolean(currentYear?.id),
+        Boolean(currentYear?.id) && isAdmin,
     );
+    const { assignments = [] } = useTeacherAccess();
+    const assignedSections = Array.from(
+        new Map(
+            assignments.map((assignment) => [
+                assignment.sectionId,
+                {
+                    id: assignment.sectionId,
+                    name: assignment.section.name,
+                    classLevel: assignment.section.classLevel,
+                },
+            ]),
+        ).values(),
+    );
+    const sections = isAdmin ? classes : assignedSections;
+    const canEdit = isAdmin || (isTeacher && isClassTeacherForSection(assignments, sectionId));
+    const dayParams = { sectionId, date };
+    const { data: day, isLoading } = useAttendanceDay(dayParams, Boolean(sectionId && date));
+    const saveMutation = useSaveAttendanceDay();
+    const deleteMutation = useDeleteAttendanceDay();
 
-    const { data: studentsData, isLoading } = useStudentsList({
-        sectionId: sectionId || undefined,
-        academicYearId: currentYear?.id,
-        limit: ATTENDANCE_STUDENT_LIMIT,
-    });
-    const students = sectionId ? (studentsData?.data ?? []) : [];
+    const rosterKey = day ? `${day.sectionId}:${day.date}:${day.isTaken}` : "";
+    const absentStudentIds =
+        attendanceDraft?.key === rosterKey
+            ? attendanceDraft.absentStudentIds
+            : (day?.students
+                  .filter((student) => student.status === "ABSENT")
+                  .map((student) => student.studentId) ?? []);
 
-    const markMutation = useMarkAttendance();
-
-    // Initialize every student to PRESENT whenever the loaded roster changes (render-time sync).
-    const rosterKey = `${sectionId}:${students.map((student) => student.id).join(",")}`;
-    if (rosterKey !== syncKey) {
-        setSyncKey(rosterKey);
-        setStatuses(
-            Object.fromEntries(students.map((student) => [student.id, ATTENDANCE_STATUS.PRESENT])),
-        );
-    }
-
-    function setStatus(studentId: string, status: AttendanceStatus): void {
-        setStatuses((current) => ({ ...current, [studentId]: status }));
-    }
-
-    function markAllPresent(): void {
-        setStatuses(
-            Object.fromEntries(students.map((student) => [student.id, ATTENDANCE_STATUS.PRESENT])),
-        );
-    }
+    const minDate = currentYear?.startDate ?? "";
+    const maxDate =
+        currentYear?.endDate && currentYear.endDate < today ? currentYear.endDate : today;
 
     async function handleSubmit(): Promise<void> {
-        if (!sectionId || students.length === 0) {
+        if (!sectionId || !day || !canEdit) {
             return;
         }
 
         try {
-            const result = await markMutation.mutateAsync({
-                sectionId,
-                date: today,
-                records: students.map((student) => ({
-                    studentId: student.id,
-                    status: statuses[student.id] ?? ATTENDANCE_STATUS.PRESENT,
-                })),
+            const result = await saveMutation.mutateAsync({
+                params: dayParams,
+                data: { absentStudentIds },
             });
-            toast.success(`Attendance marked for ${result.marked} students.`);
+            toast.success(result.isTaken ? "Attendance saved." : "Attendance marked.");
+        } catch (error) {
+            toast.error(getAttendanceErrorMessage(error));
+        }
+    }
+
+    async function handleDelete(): Promise<void> {
+        try {
+            await deleteMutation.mutateAsync(dayParams);
+            setAttendanceDraft(null);
+            setDeleteOpen(false);
+            toast.success("Attendance record deleted.");
         } catch (error) {
             toast.error(getAttendanceErrorMessage(error));
         }
@@ -100,21 +121,39 @@ export function AttendanceMarker({ initialSectionId }: AttendanceMarkerProps): J
             <div className="flex flex-wrap items-end gap-3">
                 <div className="space-y-2">
                     <Label>Class</Label>
-                    <Select value={sectionId} onValueChange={setSectionId}>
+                    <Select
+                        value={sectionId}
+                        onValueChange={(value) => {
+                            setSectionId(value);
+                            setAttendanceDraft(null);
+                        }}
+                    >
                         <SelectTrigger className="w-56" aria-label="Select class">
                             <SelectValue placeholder="Select a class" />
                         </SelectTrigger>
                         <SelectContent>
-                            {classes.map((item) => (
+                            {sections.map((item) => (
                                 <SelectItem key={item.id} value={item.id}>
-                                    {item.name} (Class {item.classLevel})
+                                    {formatSectionLabel(item.classLevel, item.name)}
                                 </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
                 </div>
-                <div className="text-muted-foreground text-sm">
-                    Date: <span className="font-medium">{today}</span> (today only)
+                <div className="space-y-2">
+                    <Label htmlFor="attendance-mark-date">Date</Label>
+                    <input
+                        id="attendance-mark-date"
+                        type="date"
+                        value={date}
+                        min={minDate}
+                        max={maxDate}
+                        onChange={(event) => {
+                            setDate(event.target.value);
+                            setAttendanceDraft(null);
+                        }}
+                        className="border-input bg-background h-9 rounded-md border px-3 text-sm"
+                    />
                 </div>
             </div>
 
@@ -131,56 +170,81 @@ export function AttendanceMarker({ initialSectionId }: AttendanceMarkerProps): J
                 </div>
             )}
 
-            {sectionId && !isLoading && students.length === 0 && (
+            {sectionId && !isLoading && day?.students.length === 0 && (
                 <p className="text-muted-foreground py-6 text-center text-sm">
-                    No active students enrolled in this class.
+                    No active students enrolled in this section.
                 </p>
             )}
 
-            {sectionId && !isLoading && students.length > 0 && (
+            {sectionId && !isLoading && day && (
                 <>
-                    <div className="flex items-center justify-between">
-                        <p className="text-muted-foreground text-sm">{students.length} students</p>
-                        <Button type="button" variant="outline" size="sm" onClick={markAllPresent}>
-                            Mark all present
-                        </Button>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="text-muted-foreground text-sm">
+                            {day.isTaken ? (
+                                <>
+                                    Taken
+                                    {day.markedBy &&
+                                        ` by ${day.markedBy.firstName} ${day.markedBy.lastName}`}
+                                    {day.markedAt &&
+                                        ` at ${new Date(day.markedAt).toLocaleString()}`}
+                                </>
+                            ) : (
+                                "Not taken"
+                            )}
+                        </div>
+                        <span className="text-muted-foreground text-sm">
+                            {day.students.length} students
+                        </span>
                     </div>
 
                     <div className="divide-border/60 divide-y rounded-xl border">
-                        {students.map((student) => {
-                            const status = statuses[student.id] ?? ATTENDANCE_STATUS.PRESENT;
+                        {day.students.map((student) => {
+                            const isAbsent = absentStudentIds.includes(student.studentId);
                             return (
                                 <div
-                                    key={student.id}
+                                    key={student.studentId}
                                     className="flex items-center justify-between gap-3 px-4 py-2.5"
                                 >
                                     <div className="text-sm">
                                         <span className="font-medium">
-                                            {student.user.firstName} {student.user.lastName}
+                                            {student.firstName} {student.lastName}
                                         </span>
                                         <span className="text-muted-foreground ml-2 font-mono text-xs">
-                                            {student.admissionNumber}
+                                            {student.rollNumber}
                                         </span>
                                     </div>
                                     <ToggleGroup
                                         type="single"
-                                        value={status}
+                                        value={isAbsent ? "ABSENT" : "PRESENT"}
                                         onValueChange={(value) => {
-                                            if (value) {
-                                                setStatus(student.id, value as AttendanceStatus);
-                                            }
+                                            if (!canEdit || !value) return;
+                                            setAttendanceDraft({
+                                                key: rosterKey,
+                                                absentStudentIds:
+                                                    value === "ABSENT"
+                                                        ? [
+                                                              ...new Set([
+                                                                  ...absentStudentIds,
+                                                                  student.studentId,
+                                                              ]),
+                                                          ]
+                                                        : absentStudentIds.filter(
+                                                              (id) => id !== student.studentId,
+                                                          ),
+                                            });
                                         }}
-                                        aria-label={`Attendance for ${student.user.firstName} ${student.user.lastName}`}
+                                        aria-label={`Attendance for ${student.firstName} ${student.lastName}`}
+                                        disabled={!canEdit}
                                     >
                                         <ToggleGroupItem
-                                            value={ATTENDANCE_STATUS.PRESENT}
+                                            value="PRESENT"
                                             className="data-[state=on]:text-success"
                                         >
                                             <Check />
                                             Present
                                         </ToggleGroupItem>
                                         <ToggleGroupItem
-                                            value={ATTENDANCE_STATUS.ABSENT}
+                                            value="ABSENT"
                                             className="data-[state=on]:text-destructive"
                                         >
                                             <X />
@@ -192,18 +256,44 @@ export function AttendanceMarker({ initialSectionId }: AttendanceMarkerProps): J
                         })}
                     </div>
 
-                    <div className="flex justify-end">
-                        <Button
-                            type="button"
-                            disabled={markMutation.isPending}
-                            onClick={() => void handleSubmit()}
-                        >
-                            {markMutation.isPending && <Spinner />}
-                            Submit attendance
-                        </Button>
-                    </div>
+                    {!canEdit && (
+                        <p className="text-muted-foreground text-sm">
+                            You can view attendance for this section but cannot edit it.
+                        </p>
+                    )}
+                    {canEdit && (
+                        <div className="flex justify-end gap-2">
+                            {day.isTaken && (
+                                <Button
+                                    type="button"
+                                    variant="destructive"
+                                    onClick={() => setDeleteOpen(true)}
+                                >
+                                    Delete attendance
+                                </Button>
+                            )}
+                            <Button
+                                type="button"
+                                disabled={saveMutation.isPending}
+                                onClick={() => void handleSubmit()}
+                            >
+                                {saveMutation.isPending && <Spinner />}
+                                {day.isTaken ? "Update attendance" : "Save attendance"}
+                            </Button>
+                        </div>
+                    )}
                 </>
             )}
+
+            <ConfirmDialog
+                open={deleteOpen}
+                title="Delete attendance?"
+                description="This removes the attendance record for the selected section and date."
+                confirmLabel="Delete"
+                isPending={deleteMutation.isPending}
+                onOpenChange={setDeleteOpen}
+                onConfirm={() => void handleDelete()}
+            />
         </div>
     );
 }

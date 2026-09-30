@@ -82,6 +82,11 @@ export const AttendancePage = lazy(() =>
         default: m.AttendancePage,
     })),
 );
+export const RequestAccessPage = lazy(() =>
+    import("@features/request-access/pages/RequestAccessPage").then((m) => ({
+        default: m.RequestAccessPage,
+    })),
+);
 export const HomeworkPage = lazy(() =>
     import("@features/homework/pages/HomeworkPage").then((m) => ({
         default: m.HomeworkPage,
@@ -120,6 +125,11 @@ export const MyFeesPage = lazy(() =>
 export const MyReportCardPage = lazy(() =>
     import("@features/grades/pages/MyReportCardPage").then((m) => ({
         default: m.MyReportCardPage,
+    })),
+);
+export const AccountsPage = lazy(() =>
+    import("@features/accounts/pages/AccountsPage").then((m) => ({
+        default: m.AccountsPage,
     })),
 );
 

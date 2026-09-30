@@ -1,14 +1,4 @@
-import type { Permission } from "@constants/permissions.constants";
-
 export type TeacherClassRole = "CLASS_TEACHER" | "SUBJECT_TEACHER";
-
-export interface PermissionPreset {
-    id: string;
-    name: string;
-    permissions: Permission[];
-    createdAt: string;
-    updatedAt: string;
-}
 
 export interface TeacherUser {
     id: string;
@@ -25,12 +15,9 @@ export interface TeacherProfile {
     userId: string;
     employeeCode: string;
     joiningDate?: string;
-    presetId?: string | null;
-    permissionOverrides: Permission[];
     createdAt: string;
     updatedAt: string;
     user: TeacherUser;
-    preset: PermissionPreset | null;
 }
 
 export interface TeacherAssignment {
@@ -53,27 +40,9 @@ export interface TeacherAssignment {
     } | null;
 }
 
-export interface CreatePresetRequest {
-    name: string;
-    permissions: Permission[];
-}
-
-export interface UpdatePresetRequest {
-    name?: string;
-    permissions?: Permission[];
-}
-
 export interface UpdateTeacherRequest {
     employeeCode?: string;
     joiningDate?: string;
-}
-
-export interface AssignPresetRequest {
-    presetId: string;
-}
-
-export interface ReplaceOverridesRequest {
-    permissionOverrides: Permission[];
 }
 
 export interface CreateAssignmentRequest {

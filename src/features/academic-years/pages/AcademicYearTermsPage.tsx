@@ -20,6 +20,7 @@ import {
     useAcademicYear,
     useAcademicYearTerms,
     useCreateTerm,
+    useCurrentAcademicYear,
     useDeleteTerm,
     useUpdateTerm,
 } from "../hooks/useAcademicYears";
@@ -37,8 +38,18 @@ export function AcademicYearTermsPage(): JSX.Element {
     const [formOpen, setFormOpen] = useState(false);
     const [editingTerm, setEditingTerm] = useState<Term | null>(null);
 
-    const { data: year } = useAcademicYear(id ?? null);
-    const { data: terms, isLoading } = useAcademicYearTerms(id ?? null);
+    const { data: currentYear, isLoading: currentYearLoading } = useCurrentAcademicYear();
+    const { data: requestedYear, isLoading: requestedYearLoading } = useAcademicYear(
+        id ?? null,
+        isAdmin,
+    );
+    const { data: requestedTerms, isLoading: requestedTermsLoading } = useAcademicYearTerms(
+        id ?? null,
+        isAdmin,
+    );
+    const year = isAdmin ? requestedYear : currentYear;
+    const terms = isAdmin ? requestedTerms : currentYear?.terms;
+    const isLoading = isAdmin ? requestedYearLoading || requestedTermsLoading : currentYearLoading;
 
     const createTermMutation = useCreateTerm();
     const updateTermMutation = useUpdateTerm();
@@ -66,7 +77,7 @@ export function AcademicYearTermsPage(): JSX.Element {
 
     const academicYearId = id;
 
-    if (!year) {
+    if (isLoading || !year) {
         return (
             <div className="flex min-h-60 items-center justify-center">
                 <p className="text-muted-foreground text-sm">Loading academic year details...</p>
@@ -121,13 +132,13 @@ export function AcademicYearTermsPage(): JSX.Element {
 
     return (
         <div className="flex flex-col gap-6">
-            <Link
+            {isAdmin && <Link
                 to={ROUTES.ACADEMIC_YEARS_MANAGE}
                 className="text-muted-foreground hover:text-foreground group inline-flex w-fit items-center gap-1.5 text-sm font-medium transition-colors"
             >
                 <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-0.5" />
                 Back to manage academic years
-            </Link>
+            </Link>}
 
             <div className="bg-card text-card-foreground ring-foreground/10 overflow-hidden rounded-xl shadow-sm ring-1">
                 <div className="border-border/60 from-primary/12 via-primary/5 border-b bg-linear-to-br to-transparent px-6 py-5">
@@ -141,7 +152,7 @@ export function AcademicYearTermsPage(): JSX.Element {
                                 {formatDate(year.endDate)}
                             </p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        {isAdmin && <div className="flex items-center gap-2">
                             <Button
                                 variant="outline"
                                 onClick={() => navigate(ROUTES.ACADEMIC_YEARS_MANAGE)}
@@ -152,13 +163,14 @@ export function AcademicYearTermsPage(): JSX.Element {
                                 <Plus className="size-4" />
                                 Add term
                             </Button>
-                        </div>
+                        </div>}
                     </div>
                 </div>
                 <div className="px-6 py-6">
                     <TermsTable
                         terms={sortedTerms}
                         isLoading={isLoading}
+                        canEdit={isAdmin}
                         canDelete={isAdmin}
                         deletingTermId={
                             deleteTermMutation.isPending
@@ -171,14 +183,14 @@ export function AcademicYearTermsPage(): JSX.Element {
                 </div>
             </div>
 
-            <TermFormDialog
+            {isAdmin && <TermFormDialog
                 open={formOpen}
                 term={editingTerm}
                 year={year}
                 isSubmitting={createTermMutation.isPending || updateTermMutation.isPending}
                 onOpenChange={setFormOpen}
                 onSubmit={handleFormSubmit}
-            />
+            />}
         </div>
     );
 }

@@ -5,9 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { AlertCircle, KeyRound, Mail, Phone, UserRound } from "lucide-react";
 
 import { ROUTES } from "@constants/routes.constants";
-import { ApiError } from "@lib/api/client";
 
 import { Role } from "@/types/api";
+
+import { ApiError } from "@lib/api/client";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";

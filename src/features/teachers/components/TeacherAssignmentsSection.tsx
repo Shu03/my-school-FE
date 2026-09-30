@@ -2,6 +2,8 @@ import { useMemo, useState, type JSX } from "react";
 
 import { BookOpen, Layers3, Plus, Search, Trash2 } from "lucide-react";
 
+import { formatSectionLabel } from "@lib/section";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -106,8 +108,10 @@ export function TeacherAssignmentsSection({
                                 <div className="bg-muted/35 border-border/60 flex items-center gap-2 border-b px-3 py-2.5">
                                     <Layers3 className="text-primary size-4" />
                                     <h3 className="text-sm font-semibold">
-                                        Class {first.section.classLevel} · Section{" "}
-                                        {first.section.name}
+                                        {formatSectionLabel(
+                                            first.section.classLevel,
+                                            first.section.name,
+                                        )}
                                     </h3>
                                     <Badge variant="secondary" className="ml-auto">
                                         {classAssignments.length}

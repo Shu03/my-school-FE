@@ -16,7 +16,7 @@ import { useAuthStore } from "../store/auth.store";
  * and ensure user data is restored after page refresh.
  */
 export function useAuthInitializer(): void {
-    const { login, logout, setAuthInitializing, forcePasswordChange, isAuthenticated } =
+    const { login, logout, setUser, setAuthInitializing, forcePasswordChange, isAuthenticated } =
         useAuthStore();
 
     useEffect(() => {
@@ -30,9 +30,17 @@ export function useAuthInitializer(): void {
                     return;
                 }
 
-                // Skip initialization if already authenticated or in forced password change flow
-                if (isAuthenticated || forcePasswordChange) {
+                if (forcePasswordChange) {
                     setAuthInitializing(false);
+                    return;
+                }
+
+                if (isAuthenticated) {
+                    setAuthInitializing(false);
+                    // Login response omits student/teacher profile ids; only /auth/me has them.
+                    getMe()
+                        .then(setUser)
+                        .catch(() => undefined);
                     return;
                 }
 
@@ -57,5 +65,5 @@ export function useAuthInitializer(): void {
         }
 
         initializeAuth();
-    }, [login, logout, setAuthInitializing, forcePasswordChange, isAuthenticated]);
+    }, [login, logout, setUser, setAuthInitializing, forcePasswordChange, isAuthenticated]);
 }

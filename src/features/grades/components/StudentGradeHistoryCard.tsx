@@ -11,6 +11,7 @@ import type { StudentGradeHistoryEntry } from "../types/grade.types";
 
 interface StudentGradeHistoryCardProps {
     studentId: string;
+    subjectIds?: string[];
 }
 
 const PASS_PERCENTAGE = 35;
@@ -48,13 +49,18 @@ function formatDate(value: string): string {
     });
 }
 
-export function StudentGradeHistoryCard({ studentId }: StudentGradeHistoryCardProps): JSX.Element {
+export function StudentGradeHistoryCard({
+    studentId,
+    subjectIds,
+}: StudentGradeHistoryCardProps): JSX.Element {
     const { data, isLoading } = useStudentGradeHistory(studentId, {});
 
     const reports = useMemo(() => {
         const byExam = new Map<string, ExamReport>();
 
         for (const entry of data?.exams ?? []) {
+            if (subjectIds && !subjectIds.includes(entry.subjectId)) continue;
+
             let report = byExam.get(entry.examId);
             if (!report) {
                 report = {
@@ -81,7 +87,7 @@ export function StudentGradeHistoryCard({ studentId }: StudentGradeHistoryCardPr
                 percentage: report.total > 0 ? (report.obtained / report.total) * 100 : 0,
             }))
             .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    }, [data]);
+    }, [data, subjectIds]);
 
     if (isLoading) {
         return (

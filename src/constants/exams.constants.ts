@@ -47,3 +47,6 @@ export const EXAM_PAGINATION = {
 
 /** Max students loaded when entering grades for an exam. */
 export const GRADE_STUDENT_LIMIT = 100;
+
+/** Anchor id prefix for exam-subject panels on the exam detail page. */
+export const EXAM_SUBJECT_ANCHOR_PREFIX = "subject-";

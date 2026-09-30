@@ -21,6 +21,7 @@ import { ROUTES } from "@constants/routes.constants";
 import { Role } from "@/types/api";
 
 import { useAuthStore } from "@features/auth";
+import { isClassTeacherForSection, useTeacherAccess } from "@features/request-access";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -28,8 +29,8 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { ClassStudentsSection } from "../components/ClassStudentsSection";
 import { ClassAttendanceSummarySection } from "../components/ClassAttendanceSummarySection";
+import { ClassStudentsSection } from "../components/ClassStudentsSection";
 import { ClassSubjectsSection } from "../components/ClassSubjectsSection";
 import { ClassTeacherSection } from "../components/ClassTeacherSection";
 import { useClass, useUpdateClass } from "../hooks/useClasses";
@@ -40,6 +41,7 @@ export function ClassDetailPage(): JSX.Element {
     const { id = "" } = useParams();
     const navigate = useNavigate();
     const user = useAuthStore((s) => s.user);
+    const { assignments } = useTeacherAccess();
 
     const canManage = user?.role === Role.ADMIN;
     const [isEditing, setIsEditing] = useState(false);
@@ -223,9 +225,7 @@ export function ClassDetailPage(): JSX.Element {
                     <div className="flex flex-col gap-6">
                         <ClassAttendanceSummarySection
                             sectionId={schoolClass.id}
-                            canMarkAttendance={
-                                user?.role === Role.ADMIN || user?.role === Role.TEACHER
-                            }
+                            canMarkAttendance={canManage || isClassTeacherForSection(assignments, schoolClass.id)}
                         />
                         <ClassStudentsSection
                             sectionId={schoolClass.id}

@@ -24,20 +24,6 @@ export function getTeacherErrorMessage(error: unknown): string {
     }
 }
 
-export function getPresetDeleteErrorMessage(error: unknown): string {
-    if (error instanceof ApiError && error.serverMessage) {
-        return error.serverMessage;
-    }
-
-    const status = error instanceof ApiError ? error.status : undefined;
-
-    if (status === HTTP_STATUS.BAD_REQUEST) {
-        return "This preset cannot be deleted while it is assigned to teachers.";
-    }
-
-    return getTeacherErrorMessage(error);
-}
-
 export function getAssignmentErrorMessage(error: unknown): string {
     if (error instanceof ApiError && error.serverMessage) {
         return error.serverMessage;

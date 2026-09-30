@@ -1,58 +1,24 @@
-import type { AttendanceStatus } from "@constants/attendance.constants";
+export type AttendanceDayStatus = "PRESENT" | "ABSENT";
 
-export interface AttendanceStudentUser {
-    id: string;
+export interface AttendanceDayStudent {
+    studentId: string;
+    rollNumber: string;
     firstName: string;
     lastName: string;
-    mobileNumber: string;
-    email: string | null;
-    role: "STUDENT";
-    isActive: boolean;
-    isFirstLogin: boolean;
-    createdAt: string;
-    updatedAt: string;
-    createdById: string | null;
+    status: AttendanceDayStatus | null;
 }
 
-export interface AttendanceStudent {
-    id: string;
-    userId: string;
-    admissionNumber: string;
-    dateOfBirth: string | null;
-    createdAt: string;
-    updatedAt: string;
-    user: AttendanceStudentUser;
-}
-
-export interface AttendanceRecord {
-    id: string;
-    studentId: string;
-    sectionId: string;
-    academicYearId: string;
-    date: string;
-    status: AttendanceStatus;
-    markedById: string | null;
-    periodId: string | null;
-    createdAt: string;
-    updatedAt: string;
-    student: AttendanceStudent;
-}
-
-export interface MarkAttendanceRecord {
-    studentId: string;
-    status: AttendanceStatus;
-}
-
-export interface MarkAttendanceRequest {
+export interface AttendanceDayView {
     sectionId: string;
     date: string;
-    records: MarkAttendanceRecord[];
+    isTaken: boolean;
+    markedBy: { id: string; firstName: string; lastName: string } | null;
+    markedAt: string | null;
+    students: AttendanceDayStudent[];
 }
 
-export interface BulkMarkResult {
-    marked: number;
-    date: string;
-    sectionId: string;
+export interface SaveAttendanceDayRequest {
+    absentStudentIds: string[];
 }
 
 export interface ClassAttendanceParams {
@@ -64,6 +30,12 @@ export interface StudentAttendanceParams {
     academicYearId?: string;
     startDate?: string;
     endDate?: string;
+}
+
+export interface StudentAttendanceItem {
+    date: string;
+    sectionId: string;
+    status: AttendanceDayStatus;
 }
 
 export interface AttendanceSummaryParams {

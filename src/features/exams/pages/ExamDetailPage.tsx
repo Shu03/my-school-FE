@@ -1,18 +1,26 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { JSX } from "react";
 
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { AlertCircle, ArrowLeft, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import { EXAM_STATUS, EXAM_TYPE_LABELS } from "@constants/exams.constants";
-import { PERMISSIONS } from "@constants/permissions.constants";
 import { ROUTES } from "@constants/routes.constants";
 
 import { Role } from "@/types/api";
 
-import { hasPermission, useAuthStore } from "@features/auth";
+import { formatSectionLabel } from "@lib/section";
+
+import { useAuthStore } from "@features/auth";
+import {
+    hasApprovedAccess,
+    isClassTeacherForSection,
+    hasSectionAssignment,
+    isSubjectTeacherFor,
+    useTeacherAccess,
+} from "@features/request-access";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -38,8 +46,11 @@ export function ExamDetailPage(): JSX.Element {
 
     const isAdmin = user?.role === Role.ADMIN;
     const isStudent = user?.role === Role.STUDENT;
-    const canWrite = isAdmin || hasPermission(user?.permissions, PERMISSIONS.GRADES_WRITE);
-    const canReadSummary = isAdmin || hasPermission(user?.permissions, PERMISSIONS.GRADES_READ);
+    const {
+        assignments = [],
+        approvedRequests = [],
+        isLoading: isTeacherAccessLoading,
+    } = useTeacherAccess();
 
     const { data: exam, error, isLoading, isError } = useExam(id);
 
@@ -58,7 +69,18 @@ export function ExamDetailPage(): JSX.Element {
         return map;
     }, [exam]);
 
-    if (isLoading) {
+    const { hash } = useLocation();
+    const panelsReady = Boolean(exam) && (isAdmin || isStudent || !isTeacherAccessLoading);
+    useEffect(() => {
+        if (!panelsReady || !hash) {
+            return;
+        }
+        document
+            .getElementById(decodeURIComponent(hash.slice(1)))
+            ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, [panelsReady, hash]);
+
+    if (isLoading || (!isAdmin && !isStudent && isTeacherAccessLoading)) {
         return (
             <div className="flex items-center justify-center gap-2 py-16">
                 <Spinner />
@@ -76,9 +98,26 @@ export function ExamDetailPage(): JSX.Element {
         );
     }
 
+    const canViewExam =
+        isAdmin ||
+        hasSectionAssignment(assignments, exam.sectionId) ||
+        approvedRequests.some(
+            (request) =>
+                request.status === "APPROVED" &&
+                request.type === "MARKS" &&
+                request.sectionId === exam.sectionId,
+        );
+    if (!canViewExam) {
+        return (
+            <Alert variant="destructive">
+                <AlertCircle />
+                <AlertDescription>You do not have access to this exam.</AlertDescription>
+            </Alert>
+        );
+    }
+
     const isActive = exam.status === EXAM_STATUS.ACTIVE;
-    const canEnterGrades = canWrite && isActive && !exam.isFinalized;
-    const canManageSubjects = canWrite && isActive && !exam.isFinalized;
+    const canManageSubjects = isAdmin && isActive && !exam.isFinalized;
     const canRemoveSubject = exam.examSubjects.length > 1;
 
     const excludeSubjectIds = exam.examSubjects.map((examSubject) => examSubject.subjectId);
@@ -147,7 +186,10 @@ export function ExamDetailPage(): JSX.Element {
                                 <div className="text-muted-foreground mt-2 flex flex-wrap items-center gap-2 text-sm">
                                     <Badge variant="secondary">{EXAM_TYPE_LABELS[exam.type]}</Badge>
                                     <span>
-                                        {exam.section.name} (Class {exam.section.classLevel})
+                                        {formatSectionLabel(
+                                            exam.section.classLevel,
+                                            exam.section.name,
+                                        )}
                                     </span>
                                     <span>·</span>
                                     <span>
@@ -186,8 +228,33 @@ export function ExamDetailPage(): JSX.Element {
                     examSubject={examSubject}
                     summary={summaryBySubjectId.get(examSubject.subjectId)}
                     isStudent={isStudent}
-                    canEnterGrades={canEnterGrades}
-                    canReadSummary={canReadSummary}
+                    canEnterGrades={
+                        isActive &&
+                        !exam.isFinalized &&
+                        (isAdmin ||
+                            isSubjectTeacherFor(
+                                assignments,
+                                exam.sectionId,
+                                examSubject.subjectId,
+                            ) ||
+                            hasApprovedAccess(
+                                approvedRequests,
+                                "MARKS",
+                                exam.sectionId,
+                                examSubject.subjectId,
+                            ))
+                    }
+                    canReadSummary={
+                        isAdmin ||
+                        isClassTeacherForSection(assignments, exam.sectionId) ||
+                        isSubjectTeacherFor(assignments, exam.sectionId, examSubject.subjectId) ||
+                        hasApprovedAccess(
+                            approvedRequests,
+                            "MARKS",
+                            exam.sectionId,
+                            examSubject.subjectId,
+                        )
+                    }
                     canManageSubjects={canManageSubjects}
                     onEdit={handleEditClick}
                     onRemove={handleRemove}

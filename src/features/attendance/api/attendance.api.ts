@@ -3,12 +3,12 @@ import { API_ENDPOINTS } from "@constants/apiEndpoints.constants";
 import apiFetch from "@lib/api/client";
 
 import type {
-    AttendanceRecord,
+    AttendanceDayView,
     AttendanceSummaryItem,
     AttendanceSummaryParams,
-    BulkMarkResult,
     ClassAttendanceParams,
-    MarkAttendanceRequest,
+    SaveAttendanceDayRequest,
+    StudentAttendanceItem,
     StudentAttendanceParams,
 } from "../types/attendance.types";
 
@@ -24,27 +24,32 @@ function buildQuery(params: Record<string, string | undefined>): string {
     return searchParams.toString();
 }
 
-export async function markAttendance(data: MarkAttendanceRequest): Promise<BulkMarkResult> {
-    return apiFetch<BulkMarkResult>(API_ENDPOINTS.ATTENDANCE.MARK, {
-        method: "POST",
+export function getAttendanceDay(params: ClassAttendanceParams): Promise<AttendanceDayView> {
+    return apiFetch(API_ENDPOINTS.ATTENDANCE.day(params.sectionId, params.date), {
+        method: "GET",
+    });
+}
+
+export function saveAttendanceDay(
+    params: ClassAttendanceParams,
+    data: SaveAttendanceDayRequest,
+): Promise<AttendanceDayView> {
+    return apiFetch(API_ENDPOINTS.ATTENDANCE.day(params.sectionId, params.date), {
+        method: "PUT",
         body: JSON.stringify(data),
     });
 }
 
-export async function getClassAttendance(
-    params: ClassAttendanceParams,
-): Promise<AttendanceRecord[]> {
-    const queryString = buildQuery({ sectionId: params.sectionId, date: params.date });
-
-    return apiFetch<AttendanceRecord[]>(`${API_ENDPOINTS.ATTENDANCE.BASE}?${queryString}`, {
-        method: "GET",
+export function deleteAttendanceDay(params: ClassAttendanceParams): Promise<void> {
+    return apiFetch(API_ENDPOINTS.ATTENDANCE.day(params.sectionId, params.date), {
+        method: "DELETE",
     });
 }
 
 export async function getStudentAttendance(
     studentId: string,
     params: StudentAttendanceParams,
-): Promise<AttendanceRecord[]> {
+): Promise<StudentAttendanceItem[]> {
     const queryString = buildQuery({
         academicYearId: params.academicYearId,
         startDate: params.startDate,
@@ -55,7 +60,7 @@ export async function getStudentAttendance(
         ? `${API_ENDPOINTS.ATTENDANCE.byStudent(studentId)}?${queryString}`
         : API_ENDPOINTS.ATTENDANCE.byStudent(studentId);
 
-    return apiFetch<AttendanceRecord[]>(endpoint, {
+    return apiFetch<StudentAttendanceItem[]>(endpoint, {
         method: "GET",
     });
 }

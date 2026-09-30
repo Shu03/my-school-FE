@@ -2,12 +2,11 @@ import type { JSX } from "react";
 
 import { Navigate, Outlet } from "react-router-dom";
 
-import type { Permission } from "@constants/permissions.constants";
 import { ROUTES } from "@constants/routes.constants";
 
 import type { Role } from "@/types/api";
 
-import { hasPermission, useAuthStore, useSessionExpiredListener } from "@features/auth";
+import { useAuthStore, useSessionExpiredListener } from "@features/auth";
 
 import { DashboardLayout } from "@layouts";
 
@@ -91,37 +90,6 @@ export function RoleGuard({ allowedRoles }: RoleGuardProps): JSX.Element {
     const user = useAuthStore((s) => s.user);
 
     if (!user || !allowedRoles.includes(user.role)) {
-        return <Navigate to={ROUTES.DASHBOARD} replace />;
-    }
-
-    return <Outlet />;
-}
-
-interface RoleOrPermissionGuardProps {
-    allowedRoles: Role[];
-    permissionRole: Role;
-    requiredPermission: Permission;
-}
-
-export function RoleOrPermissionGuard({
-    allowedRoles,
-    permissionRole,
-    requiredPermission,
-}: RoleOrPermissionGuardProps): JSX.Element {
-    const user = useAuthStore((s) => s.user);
-
-    if (!user) {
-        return <Navigate to={ROUTES.DASHBOARD} replace />;
-    }
-
-    if (allowedRoles.includes(user.role)) {
-        return <Outlet />;
-    }
-
-    const canAccessViaPermission =
-        user.role === permissionRole && hasPermission(user.permissions, requiredPermission);
-
-    if (!canAccessViaPermission) {
         return <Navigate to={ROUTES.DASHBOARD} replace />;
     }
 

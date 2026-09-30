@@ -4,6 +4,8 @@ import { Pencil, Plus } from "lucide-react";
 
 import { ENROLLMENT_STATUS } from "@constants/students.constants";
 
+import { formatSectionLabel } from "@lib/section";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
@@ -64,8 +66,10 @@ export function EnrollmentsSection({
                         >
                             <div className="flex flex-wrap items-center gap-2 text-sm">
                                 <span className="font-medium">
-                                    {enrollment.section.name} (Class {enrollment.section.classLevel}
-                                    )
+                                    {formatSectionLabel(
+                                        enrollment.section.classLevel,
+                                        enrollment.section.name,
+                                    )}
                                 </span>
                                 <span className="text-muted-foreground">
                                     {enrollment.academicYear.name}

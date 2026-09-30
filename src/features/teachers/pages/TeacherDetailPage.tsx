@@ -6,7 +6,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { AlertCircle, ArrowLeft, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
-import type { Permission } from "@constants/permissions.constants";
 import { ROUTES } from "@constants/routes.constants";
 
 import { Role } from "@/types/api";
@@ -20,15 +19,10 @@ import { Spinner } from "@/components/ui/spinner";
 
 import { AssignmentFormDialog } from "../components/AssignmentFormDialog";
 import { TeacherAssignmentsSection } from "../components/TeacherAssignmentsSection";
-import { TeacherPermissionsCard } from "../components/TeacherPermissionsCard";
 import { TeacherProfileDialog } from "../components/TeacherProfileDialog";
 import {
-    useAssignPreset,
     useCreateAssignment,
     useDeleteAssignment,
-    usePresetsList,
-    useRemovePreset,
-    useReplaceOverrides,
     useTeacher,
     useTeacherAssignments,
     useUpdateTeacher,
@@ -54,12 +48,7 @@ export function TeacherDetailPage(): JSX.Element {
     const { data: assignments = [], isLoading: assignmentsLoading } = useTeacherAssignments(
         canView ? id : null,
     );
-    const { data: presets = [] } = usePresetsList(canManage);
-
     const updateTeacherMutation = useUpdateTeacher();
-    const assignPresetMutation = useAssignPreset();
-    const removePresetMutation = useRemovePreset();
-    const replaceOverridesMutation = useReplaceOverrides();
     const createAssignmentMutation = useCreateAssignment();
     const deleteAssignmentMutation = useDeleteAssignment();
 
@@ -77,36 +66,6 @@ export function TeacherDetailPage(): JSX.Element {
         } catch (error) {
             toast.error(getTeacherErrorMessage(error));
         }
-    }
-
-    function handleAssignPreset(presetId: string): void {
-        assignPresetMutation.mutate(
-            { id, presetId },
-            {
-                onSuccess: () => toast.success("Preset assigned successfully."),
-                onError: (error) => toast.error(getTeacherErrorMessage(error)),
-            },
-        );
-    }
-
-    function handleRemovePreset(): void {
-        removePresetMutation.mutate(
-            { id },
-            {
-                onSuccess: () => toast.success("Preset removed successfully."),
-                onError: (error) => toast.error(getTeacherErrorMessage(error)),
-            },
-        );
-    }
-
-    function handleSaveOverrides(permissions: Permission[]): void {
-        replaceOverridesMutation.mutate(
-            { id, data: { permissionOverrides: permissions } },
-            {
-                onSuccess: () => toast.success("Permission overrides saved."),
-                onError: (error) => toast.error(getTeacherErrorMessage(error)),
-            },
-        );
     }
 
     async function handleAssignmentSubmit(values: AssignmentFormValues): Promise<void> {
@@ -197,18 +156,6 @@ export function TeacherDetailPage(): JSX.Element {
                     {teacher.user.email && <div>Email: {teacher.user.email}</div>}
                 </CardContent>
             </Card>
-
-            <TeacherPermissionsCard
-                teacher={teacher}
-                presets={presets}
-                canManage={canManage}
-                isAssigningPreset={assignPresetMutation.isPending}
-                isRemovingPreset={removePresetMutation.isPending}
-                isSavingOverrides={replaceOverridesMutation.isPending}
-                onAssignPreset={handleAssignPreset}
-                onRemovePreset={handleRemovePreset}
-                onSaveOverrides={handleSaveOverrides}
-            />
 
             <TeacherAssignmentsSection
                 assignments={assignments}

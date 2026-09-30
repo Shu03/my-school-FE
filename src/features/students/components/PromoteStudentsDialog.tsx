@@ -3,6 +3,8 @@ import type { JSX } from "react";
 
 import { TriangleAlert } from "lucide-react";
 
+import { formatSectionLabel } from "@lib/section";
+
 import { useCurrentAcademicYear } from "@features/academic-years";
 import { useClassesList } from "@features/classes";
 
@@ -95,7 +97,7 @@ export function PromoteStudentsDialog({
                             <SelectContent>
                                 {classes.map((item) => (
                                     <SelectItem key={item.id} value={item.id}>
-                                        {item.name} (Class {item.classLevel})
+                                        {formatSectionLabel(item.classLevel, item.name)}
                                     </SelectItem>
                                 ))}
                             </SelectContent>

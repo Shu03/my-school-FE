@@ -1,7 +1,7 @@
 import type { JSX } from "react";
 import { useEffect } from "react";
 
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, useReducedMotion } from "motion/react";
@@ -21,6 +21,8 @@ import { Spinner } from "@/components/ui/spinner";
 
 import { formatCurrency } from "../lib/format";
 import { createPaymentSchema, type PaymentFormValues } from "../schemas/payment.schema";
+
+import { FeeDatePicker } from "./FeeDatePicker";
 
 interface RecordPaymentDialogProps {
     open: boolean;
@@ -140,9 +142,23 @@ export function RecordPaymentDialog({
 
                     <div className="space-y-2">
                         <Label htmlFor="paidOn">Paid on</Label>
-                        <Input id="paidOn" type="date" {...register("paidOn")} />
+                        <Controller
+                            control={control}
+                            name="paidOn"
+                            render={({ field }) => (
+                                <FeeDatePicker
+                                    id="paidOn"
+                                    label="Paid on"
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    error={errors.paidOn?.message}
+                                />
+                            )}
+                        />
                         {errors.paidOn && (
-                            <p className="text-destructive text-xs">{errors.paidOn.message}</p>
+                            <p id="paidOn-error" className="text-destructive text-xs">
+                                {errors.paidOn.message}
+                            </p>
                         )}
                     </div>
 

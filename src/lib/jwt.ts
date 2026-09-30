@@ -6,7 +6,6 @@
 interface JWTPayload {
     sub?: string;
     role?: string;
-    permissions?: string[];
     type?: "access" | "refresh" | "first_login";
     exp?: number;
     iat?: number;

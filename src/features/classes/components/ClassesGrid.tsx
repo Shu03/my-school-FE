@@ -59,18 +59,20 @@ export function ClassesGrid({
 
     return (
         <Stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-            <StaggerItem>
-                <CreateClassCard
-                    isCreating={isCreating}
-                    academicYearId={createAcademicYearId}
-                    academicYearName={createAcademicYearName}
-                    canCreate={canCreate}
-                    isSubmitting={isCreateSubmitting}
-                    onStart={onStartCreate}
-                    onCancel={onCancelCreate}
-                    onSubmit={onCreateSubmit}
-                />
-            </StaggerItem>
+            {canCreate && (
+                <StaggerItem>
+                    <CreateClassCard
+                        isCreating={isCreating}
+                        academicYearId={createAcademicYearId}
+                        academicYearName={createAcademicYearName}
+                        canCreate={canCreate}
+                        isSubmitting={isCreateSubmitting}
+                        onStart={onStartCreate}
+                        onCancel={onCancelCreate}
+                        onSubmit={onCreateSubmit}
+                    />
+                </StaggerItem>
+            )}
 
             {Array.from(
                 classes.reduce<Map<number, SchoolClass[]>>((groups, section) => {

@@ -2,6 +2,8 @@ import type { JSX } from "react";
 
 import { CalendarDays, Pencil, Trash2 } from "lucide-react";
 
+import { EXAM_SUBJECT_ANCHOR_PREFIX } from "@constants/exams.constants";
+
 import {
     ExamGradesSummarySection,
     GradeEntrySection,
@@ -78,7 +80,7 @@ export function ExamSubjectPanel({
     canRemove,
 }: ExamSubjectPanelProps): JSX.Element {
     return (
-        <Card>
+        <Card id={`${EXAM_SUBJECT_ANCHOR_PREFIX}${examSubject.subjectId}`} className="scroll-mt-4">
             <CardHeader>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>

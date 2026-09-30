@@ -1,10 +1,8 @@
 import type { JSX } from "react";
 
-import { PERMISSIONS } from "@constants/permissions.constants";
-
 import { Role } from "@/types/api";
 
-import { hasPermission, useAuthStore } from "@features/auth";
+import { useAuthStore } from "@features/auth";
 
 import {
     Dialog,
@@ -31,8 +29,7 @@ export function ClassWorkspaceDialog({
 }: ClassWorkspaceDialogProps): JSX.Element {
     const user = useAuthStore((state) => state.user);
     const isAdmin = user?.role === Role.ADMIN;
-    const canManageSubjects =
-        isAdmin || hasPermission(user?.permissions, PERMISSIONS.SUBJECT_MANAGE);
+    const canManageSubjects = isAdmin;
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>

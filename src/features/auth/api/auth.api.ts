@@ -1,8 +1,6 @@
 import { API_ENDPOINTS } from "@constants/apiEndpoints.constants";
 
 import apiFetch from "@lib/api/client";
-import { getAccessToken } from "@lib/api/tokenStorage";
-import { parseJWTPayload } from "@lib/jwt";
 
 import type {
     ChangePasswordRequest,
@@ -61,15 +59,12 @@ export async function getMe(): Promise<User> {
     const me = await apiFetch<MeResponse>(API_ENDPOINTS.AUTH.ME, {
         method: "GET",
     });
-    const permissions = parseJWTPayload(getAccessToken())?.permissions;
-
     return {
         id: me.id,
         firstName: me.firstName,
         lastName: me.lastName,
         role: me.role,
         isActive: me.isActive,
-        permissions,
         teacherProfileId: me.teacherProfile?.id,
         studentProfileId: me.studentProfile?.id,
     };

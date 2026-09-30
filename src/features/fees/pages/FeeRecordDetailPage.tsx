@@ -6,12 +6,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { AlertCircle, ArrowLeft, Plus } from "lucide-react";
 import { toast } from "sonner";
 
-import { PERMISSIONS } from "@constants/permissions.constants";
 import { ROUTES } from "@constants/routes.constants";
 
 import { Role } from "@/types/api";
 
-import { hasPermission, useAuthStore } from "@features/auth";
+import { useAuthStore } from "@features/auth";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -33,8 +32,7 @@ export function FeeRecordDetailPage(): JSX.Element {
 
     const isAdmin = user?.role === Role.ADMIN;
     const isStudent = user?.role === Role.STUDENT;
-    const canRecordPayment =
-        !isStudent && (isAdmin || hasPermission(user?.permissions, PERMISSIONS.FEES_MANAGE));
+    const canRecordPayment = isAdmin && !isStudent;
 
     const [paymentOpen, setPaymentOpen] = useState(false);
 

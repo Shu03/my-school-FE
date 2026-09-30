@@ -4,11 +4,9 @@ import type { JSX } from "react";
 import { AlertCircle, BookText, Plus } from "lucide-react";
 import { toast } from "sonner";
 
-import { PERMISSIONS } from "@constants/permissions.constants";
-
 import { Role } from "@/types/api";
 
-import { hasPermission, useAuthStore } from "@features/auth";
+import { useAuthStore } from "@features/auth";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -29,7 +27,7 @@ import type { Subject } from "../types/subject.types";
 export function SubjectsPage(): JSX.Element {
     const user = useAuthStore((s) => s.user);
     const isAdmin = user?.role === Role.ADMIN;
-    const canManage = isAdmin || hasPermission(user?.permissions, PERMISSIONS.SUBJECT_MANAGE);
+    const canManage = isAdmin;
 
     const [classLevelFilter, setClassLevelFilter] = useState("");
     const [search, setSearch] = useState("");

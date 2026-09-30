@@ -213,14 +213,6 @@ function UserDetailsBody({
                         <Field label="Joining date">
                             {formatDate(user.teacherProfile.joiningDate)}
                         </Field>
-                        <Field label="Permission preset">
-                            {user.teacherProfile.presetId ?? "None"}
-                        </Field>
-                        <Field label="Permission overrides" span>
-                            {user.teacherProfile.permissionOverrides.length > 0
-                                ? user.teacherProfile.permissionOverrides.join(", ")
-                                : "None"}
-                        </Field>
                     </Section>
                 )}
 

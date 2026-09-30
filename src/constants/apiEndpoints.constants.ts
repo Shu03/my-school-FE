@@ -2,6 +2,7 @@
  * Backend API endpoint paths, relative to the configured API base URL.
  */
 export const API_ENDPOINTS = {
+    DASHBOARD: "/dashboard",
     AUTH: {
         LOGIN: "/auth/login",
         REFRESH: "/auth/refresh",
@@ -37,15 +38,22 @@ export const API_ENDPOINTS = {
     },
     TEACHERS: {
         BASE: "/teachers",
-        PRESETS: "/teachers/presets",
-        presetById: (presetId: string) => `/teachers/presets/${presetId}`,
         byId: (id: string) => `/teachers/${id}`,
-        assignPreset: (id: string) => `/teachers/${id}/assign-preset`,
-        removePreset: (id: string) => `/teachers/${id}/remove-preset`,
-        permissions: (id: string) => `/teachers/${id}/permissions`,
         assignments: (id: string) => `/teachers/${id}/assignments`,
         assignmentById: (id: string, assignmentId: string) =>
             `/teachers/${id}/assignments/${assignmentId}`,
+    },
+    REQUEST_ACCESS: {
+        BASE: "/request-access",
+        MINE: "/request-access/mine",
+        GRANTS: "/request-access/grants",
+        byId: (id: string) => `/request-access/${id}`,
+        cancel: (id: string) => `/request-access/${id}/cancel`,
+        approve: (id: string) => `/request-access/${id}/approve`,
+        reject: (id: string) => `/request-access/${id}/reject`,
+        revoke: (id: string) => `/request-access/${id}/revoke`,
+        sectionSubject: (sectionId: string, subjectId: string) =>
+            `/request-access/sections/${sectionId}/subjects/${subjectId}`,
     },
     STUDENTS: {
         BASE: "/students",
@@ -62,8 +70,7 @@ export const API_ENDPOINTS = {
         holidayById: (id: string) => `/school/holidays/${id}`,
     },
     ATTENDANCE: {
-        BASE: "/attendance",
-        MARK: "/attendance/mark",
+        day: (sectionId: string, date: string) => `/attendance/sections/${sectionId}/days/${date}`,
         SUMMARY: "/attendance/summary",
         byStudent: (studentId: string) => `/attendance/student/${studentId}`,
     },
@@ -99,5 +106,14 @@ export const API_ENDPOINTS = {
         recordById: (id: string) => `/fees/records/${id}`,
         recordPayments: (id: string) => `/fees/records/${id}/payments`,
         studentHistory: (studentId: string) => `/fees/student/${studentId}`,
+    },
+    ACCOUNTS: {
+        SUMMARY: "/accounts/summary",
+        DEPOSITS: "/accounts/deposits",
+        depositById: (id: string) => `/accounts/deposits/${id}`,
+        WITHDRAWALS: "/accounts/withdrawals",
+        withdrawalById: (id: string) => `/accounts/withdrawals/${id}`,
+        BILLS: "/accounts/bills",
+        billById: (id: string) => `/accounts/bills/${id}`,
     },
 } as const;

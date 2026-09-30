@@ -1,12 +1,19 @@
 import { useState } from "react";
 import type { JSX } from "react";
 
+import { Link } from "react-router-dom";
+
 import { toast } from "sonner";
 
 import { GRADE_STUDENT_LIMIT } from "@constants/exams.constants";
+import { HTTP_STATUS } from "@constants/httpStatus.constants";
+import { ROUTES } from "@constants/routes.constants";
+
+import { ApiError } from "@lib/api/client";
 
 import { useStudentsList } from "@features/students";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
@@ -39,20 +46,27 @@ export function GradeEntrySection({
 }: GradeEntrySectionProps): JSX.Element {
     const [marks, setMarks] = useState<Record<string, string>>({});
     const [syncKey, setSyncKey] = useState("");
+    const [accessDenied, setAccessDenied] = useState(false);
 
-    const { data: studentsData, isLoading: isLoadingStudents } = useStudentsList({
+    const { data: studentsData, isLoading: isLoadingStudents, error: studentsError } = useStudentsList({
         sectionId: classId,
         academicYearId,
         limit: GRADE_STUDENT_LIMIT,
     });
     const students = studentsData?.data ?? [];
 
-    const { data: existingGrades = [], isLoading: isLoadingGrades } = useExamSubjectGrades(
+    const { data: existingGrades = [], isLoading: isLoadingGrades, error: gradesError } = useExamSubjectGrades(
         examId,
         subjectId,
     );
 
     const enterMutation = useEnterGrades(examId, subjectId);
+    const hasReadAccessError = [studentsError, gradesError].some(
+        (error) => error instanceof ApiError && error.status === HTTP_STATUS.FORBIDDEN,
+    );
+    const readAccessError = [studentsError, gradesError].find(
+        (error) => error instanceof ApiError && error.status === HTTP_STATUS.FORBIDDEN,
+    );
 
     // Prefill marks from existing grades whenever the roster or grade set changes (render-time sync).
     const dataKey = `${students.map((student) => student.id).join(",")}|${existingGrades
@@ -105,6 +119,9 @@ export function GradeEntrySection({
             const result = await enterMutation.mutateAsync({ records });
             toast.success(`Grades saved for ${result.entered} students.`);
         } catch (error) {
+            if (error instanceof ApiError && error.status === HTTP_STATUS.FORBIDDEN) {
+                setAccessDenied(true);
+            }
             toast.error(getGradeErrorMessage(error));
         }
     }
@@ -118,6 +135,23 @@ export function GradeEntrySection({
         );
     }
 
+    if (hasReadAccessError) {
+        return (
+            <Alert variant="destructive">
+                <AlertDescription className="flex flex-wrap items-center justify-between gap-3">
+                    <span>{getGradeErrorMessage(readAccessError)}</span>
+                    <Button asChild variant="outline" size="sm">
+                        <Link
+                            to={`${ROUTES.REQUEST_ACCESS}?type=MARKS&sectionId=${encodeURIComponent(classId)}&subjectId=${encodeURIComponent(subjectId)}`}
+                        >
+                            Request access
+                        </Link>
+                    </Button>
+                </AlertDescription>
+            </Alert>
+        );
+    }
+
     if (students.length === 0) {
         return (
             <p className="text-muted-foreground py-6 text-center text-sm">
@@ -128,6 +162,20 @@ export function GradeEntrySection({
 
     return (
         <div className="flex flex-col gap-4">
+            {accessDenied && (
+                <Alert variant="destructive">
+                    <AlertDescription className="flex flex-wrap items-center justify-between gap-3">
+                        <span>Additional marks access is required for this subject.</span>
+                        <Button asChild variant="outline" size="sm">
+                            <Link
+                                to={`${ROUTES.REQUEST_ACCESS}?type=MARKS&sectionId=${encodeURIComponent(classId)}&subjectId=${encodeURIComponent(subjectId)}`}
+                            >
+                                Request access
+                            </Link>
+                        </Button>
+                    </AlertDescription>
+                </Alert>
+            )}
             <div className="overflow-hidden rounded-xl border">
                 <Table>
                     <TableHeader className="bg-muted/40 [&_th]:text-muted-foreground [&_th]:text-xs [&_th]:font-semibold [&_th]:tracking-wider [&_th]:uppercase">

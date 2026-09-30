@@ -1,17 +1,28 @@
 import { useState } from "react";
 import type { JSX } from "react";
 
+import { Link } from "react-router-dom";
+
 import { AlertCircle, NotebookPen, Plus } from "lucide-react";
 import { toast } from "sonner";
 
-import { PERMISSIONS } from "@constants/permissions.constants";
+import { HTTP_STATUS } from "@constants/httpStatus.constants";
+import { ROUTES } from "@constants/routes.constants";
 
 import { Role } from "@/types/api";
 
+import { ApiError } from "@lib/api/client";
+import { formatSectionLabel } from "@lib/section";
+
 import { useCurrentAcademicYear } from "@features/academic-years";
-import { hasPermission, useAuthStore } from "@features/auth";
+import { useAuthStore } from "@features/auth";
 import { useClassesList } from "@features/classes";
-import { useCurrentStudentEnrollment } from "@features/students";
+import {
+    hasApprovedAccess,
+    isClassTeacherForSection,
+    isSubjectTeacherFor,
+    useTeacherAccess,
+} from "@features/request-access";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -40,20 +51,71 @@ const ALL_CLASSES = "all";
 export function HomeworkPage(): JSX.Element {
     const user = useAuthStore((s) => s.user);
     const isStudent = user?.role === Role.STUDENT;
-    const canManage =
-        user?.role === Role.ADMIN || hasPermission(user?.permissions, PERMISSIONS.HOMEWORK_MANAGE);
 
     const [classFilter, setClassFilter] = useState<string>(ALL_CLASSES);
     const [formOpen, setFormOpen] = useState(false);
     const [editing, setEditing] = useState<Homework | null>(null);
 
     const { data: currentYear } = useCurrentAcademicYear();
-    const { enrollment: currentEnrollment, isLoading: enrollmentLoading } =
-        useCurrentStudentEnrollment();
     const { data: classes = [] } = useClassesList(
         { academicYearId: currentYear?.id },
         !isStudent && Boolean(currentYear?.id),
     );
+    const { assignments = [], approvedRequests = [] } = useTeacherAccess();
+    const teacherSectionIds = new Set([
+        ...assignments.map((assignment) => assignment.sectionId),
+        ...approvedRequests
+            .filter((request) => request.type === "HOMEWORK")
+            .map((request) => request.sectionId),
+    ]);
+    const teacherSections = classes.filter((item) => teacherSectionIds.has(item.id));
+    const allowedSections = user?.role === Role.ADMIN ? classes : teacherSections;
+
+    function canManageHomework(item: Homework): boolean {
+        if (user?.role === Role.ADMIN) return true;
+        if (user?.role !== Role.TEACHER || !user.id) return false;
+        if (isClassTeacherForSection(assignments, item.sectionId)) return true;
+        if (isSubjectTeacherFor(assignments, item.sectionId, item.subjectId)) return true;
+        return (
+            hasApprovedAccess(approvedRequests, "HOMEWORK", item.sectionId, item.subjectId) &&
+            item.createdBy?.userId === user.id
+        );
+    }
+
+    function canChooseHomeworkSubject(sectionId: string, subjectId: string): boolean {
+        if (user?.role === Role.ADMIN || isClassTeacherForSection(assignments, sectionId))
+            return true;
+        return (
+            isSubjectTeacherFor(assignments, sectionId, subjectId) ||
+            hasApprovedAccess(approvedRequests, "HOMEWORK", sectionId, subjectId)
+        );
+    }
+
+    const canCreate =
+        user?.role === Role.ADMIN ||
+        assignments.some((assignment) => assignment.role === "CLASS_TEACHER") ||
+        assignments.some((assignment) => assignment.role === "SUBJECT_TEACHER") ||
+        approvedRequests.some((request) => request.type === "HOMEWORK");
+    const [accessRequest, setAccessRequest] = useState<{
+        sectionId: string;
+        subjectId: string;
+    } | null>(null);
+
+    function setAccessRequestFromError(
+        error: unknown,
+        item: Homework | null,
+        values?: HomeworkFormValues,
+    ): void {
+        if (
+            user?.role === Role.TEACHER &&
+            error instanceof ApiError &&
+            error.status === HTTP_STATUS.FORBIDDEN
+        ) {
+            const sectionId = values?.sectionId ?? item?.sectionId;
+            const subjectId = values?.subjectId ?? item?.subjectId;
+            if (sectionId && subjectId) setAccessRequest({ sectionId, subjectId });
+        }
+    }
 
     const {
         data: homework = [],
@@ -62,12 +124,8 @@ export function HomeworkPage(): JSX.Element {
         isError,
         refetch,
     } = useHomeworkList({
-        sectionId: isStudent
-            ? currentEnrollment?.sectionId
-            : classFilter === ALL_CLASSES
-              ? undefined
-              : classFilter,
-        academicYearId: isStudent ? currentYear?.id : undefined,
+        // Backend scopes student results to their own section.
+        sectionId: isStudent || classFilter === ALL_CLASSES ? undefined : classFilter,
     });
 
     const createMutation = useCreateHomework();
@@ -94,6 +152,7 @@ export function HomeworkPage(): JSX.Element {
             await deleteMutation.mutateAsync({ id: item.id });
             toast.success("Homework deleted successfully.");
         } catch (error) {
+            setAccessRequestFromError(error, item);
             toast.error(getHomeworkErrorMessage(error));
         }
     }
@@ -125,6 +184,7 @@ export function HomeworkPage(): JSX.Element {
             setFormOpen(false);
             setEditing(null);
         } catch (error) {
+            setAccessRequestFromError(error, editing, values);
             toast.error(getHomeworkErrorMessage(error));
         }
     }
@@ -143,7 +203,7 @@ export function HomeworkPage(): JSX.Element {
                                 Assignments for classes and subjects.
                             </p>
                         </div>
-                        {canManage && (
+                        {canCreate && (
                             <Button onClick={handleCreate}>
                                 <Plus className="size-4" />
                                 Assign homework
@@ -161,9 +221,9 @@ export function HomeworkPage(): JSX.Element {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value={ALL_CLASSES}>All classes</SelectItem>
-                                    {classes.map((item) => (
+                                    {allowedSections.map((item) => (
                                         <SelectItem key={item.id} value={item.id}>
-                                            {item.name} (Class {item.classLevel})
+                                            {formatSectionLabel(item.classLevel, item.name)}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -171,15 +231,7 @@ export function HomeworkPage(): JSX.Element {
                         </div>
                     )}
 
-                    {isStudent && enrollmentLoading ? (
-                        <div className="text-muted-foreground py-10 text-center text-sm">
-                            Loading your class assignments...
-                        </div>
-                    ) : isStudent && !currentEnrollment ? (
-                        <div className="text-muted-foreground py-10 text-center text-sm">
-                            Homework will appear once you are enrolled in a current class.
-                        </div>
-                    ) : isError ? (
+                    {isError ? (
                         <Alert variant="destructive">
                             <AlertCircle />
                             <AlertDescription className="flex items-center justify-between gap-4">
@@ -198,7 +250,7 @@ export function HomeworkPage(): JSX.Element {
                         <HomeworkList
                             homework={homework}
                             isLoading={isLoading}
-                            canManage={canManage}
+                            canManage={canManageHomework}
                             deletingHomeworkId={
                                 deleteMutation.isPending
                                     ? (deleteMutation.variables?.id ?? null)
@@ -215,9 +267,26 @@ export function HomeworkPage(): JSX.Element {
                 open={formOpen}
                 homework={editing}
                 isSubmitting={createMutation.isPending || updateMutation.isPending}
+                sections={allowedSections}
+                canChooseSubject={canChooseHomeworkSubject}
                 onOpenChange={setFormOpen}
                 onSubmit={handleFormSubmit}
             />
+            {accessRequest && (
+                <Alert variant="destructive">
+                    <AlertCircle />
+                    <AlertDescription className="flex flex-wrap items-center justify-between gap-3">
+                        <span>Additional access is required for this section and subject.</span>
+                        <Button asChild variant="outline" size="sm">
+                            <Link
+                                to={`${ROUTES.REQUEST_ACCESS}?type=HOMEWORK&sectionId=${encodeURIComponent(accessRequest.sectionId)}&subjectId=${encodeURIComponent(accessRequest.subjectId)}`}
+                            >
+                                Request access
+                            </Link>
+                        </Button>
+                    </AlertDescription>
+                </Alert>
+            )}
         </div>
     );
 }

@@ -5,11 +5,10 @@ import { AlertCircle, Megaphone, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import { ANNOUNCEMENT_PAGINATION } from "@constants/announcements.constants";
-import { PERMISSIONS } from "@constants/permissions.constants";
 
 import { Role } from "@/types/api";
 
-import { hasPermission, useAuthStore } from "@features/auth";
+import { useAuthStore } from "@features/auth";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -29,9 +28,7 @@ import type { Announcement } from "../types/announcement.types";
 
 export function AnnouncementsPage(): JSX.Element {
     const user = useAuthStore((s) => s.user);
-    const canManage =
-        user?.role === Role.ADMIN ||
-        hasPermission(user?.permissions, PERMISSIONS.ANNOUNCEMENTS_MANAGE);
+    const canManage = user?.role === Role.ADMIN;
 
     const [page, setPage] = useState<number>(ANNOUNCEMENT_PAGINATION.DEFAULT_PAGE);
     const [limit, setLimit] = useState<number>(ANNOUNCEMENT_PAGINATION.DEFAULT_LIMIT);

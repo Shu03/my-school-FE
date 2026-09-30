@@ -6,8 +6,6 @@ export interface TeacherProfile {
     userId: string;
     employeeCode: string;
     joiningDate: string | null;
-    presetId: string | null;
-    permissionOverrides: string[];
     createdAt: string;
     updatedAt: string;
 }

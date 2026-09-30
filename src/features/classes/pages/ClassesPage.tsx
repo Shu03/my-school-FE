@@ -6,7 +6,10 @@ import { useLocation } from "react-router-dom";
 import { AlertCircle, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 
+import { Role } from "@/types/api";
+
 import { useAcademicYearsList, useCurrentAcademicYear } from "@features/academic-years";
+import { useAuthStore } from "@features/auth";
 import { useSubjectsList } from "@features/subjects";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -19,6 +22,8 @@ import { useClassesList, useCreateClass } from "../hooks/useClasses";
 import { getClassErrorMessage } from "../lib/errors";
 
 export function ClassesPage(): JSX.Element {
+    const user = useAuthStore((state) => state.user);
+    const isAdmin = user?.role === Role.ADMIN;
     const location = useLocation();
     const returnState = location.state as {
         openClassNumber?: number;
@@ -33,12 +38,16 @@ export function ClassesPage(): JSX.Element {
         returnState?.openClassNumber ?? null,
     );
 
-    const { data: years = [] } = useAcademicYearsList();
+    const { data: yearList = [] } = useAcademicYearsList(isAdmin);
     const { data: currentYear } = useCurrentAcademicYear();
+    const years = useMemo(
+        () => (isAdmin ? yearList : currentYear ? [currentYear] : []),
+        [currentYear, isAdmin, yearList],
+    );
 
     const effectiveAcademicYearId = useMemo(
-        () => selectedAcademicYearId ?? currentYear?.id ?? years[0]?.id ?? "",
-        [currentYear?.id, selectedAcademicYearId, years],
+        () => (isAdmin ? selectedAcademicYearId ?? currentYear?.id ?? years[0]?.id : currentYear?.id) ?? "",
+        [currentYear?.id, isAdmin, selectedAcademicYearId, years],
     );
 
     const classesParams = {
@@ -123,6 +132,7 @@ export function ClassesPage(): JSX.Element {
 
             <ClassesToolbar
                 years={years}
+                canSelectAcademicYear={isAdmin}
                 selectedAcademicYearId={effectiveAcademicYearId}
                 classLevelFilter={classLevelFilter}
                 onAcademicYearChange={(value) => setSelectedAcademicYearId(value)}
@@ -151,7 +161,7 @@ export function ClassesPage(): JSX.Element {
                     isCreating={isCreating}
                     createAcademicYearId={effectiveAcademicYearId}
                     createAcademicYearName={yearNameById[effectiveAcademicYearId] ?? ""}
-                    canCreate={Boolean(effectiveAcademicYearId)}
+                    canCreate={isAdmin && Boolean(effectiveAcademicYearId)}
                     isCreateSubmitting={createClassMutation.isPending}
                     subjectCountByClass={subjectCountByClass}
                     subjectsLoading={subjectsLoading}

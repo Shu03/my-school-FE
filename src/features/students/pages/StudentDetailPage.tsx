@@ -15,15 +15,17 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { ATTENDANCE_STATUS } from "@constants/attendance.constants";
-import { PERMISSIONS } from "@constants/permissions.constants";
 import { ENROLLMENT_STATUS } from "@constants/students.constants";
 
 import { Role } from "@/types/api";
 
 import { useStudentAttendance } from "@features/attendance";
-import { hasPermission, useAuthStore } from "@features/auth";
+import { useAuthStore } from "@features/auth";
 import { StudentGradeHistoryCard } from "@features/grades";
+import {
+    isClassTeacherForSection,
+    useTeacherAccess,
+} from "@features/request-access";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -72,11 +74,11 @@ function getMonthBounds(month: string): { startDate: string; endDate: string } {
 }
 
 function summarizeOwnAttendance(
-    statuses: Array<typeof ATTENDANCE_STATUS.PRESENT | typeof ATTENDANCE_STATUS.ABSENT>,
+    statuses: Array<"PRESENT" | "ABSENT">,
 ): AttendanceCardStats {
     const totalDays = statuses.length;
-    const present = statuses.filter((status) => status === ATTENDANCE_STATUS.PRESENT).length;
-    const absent = statuses.filter((status) => status === ATTENDANCE_STATUS.ABSENT).length;
+    const present = statuses.filter((status) => status === "PRESENT").length;
+    const absent = statuses.filter((status) => status === "ABSENT").length;
 
     return {
         totalDays,
@@ -95,10 +97,7 @@ export function StudentDetailPage(): JSX.Element {
     const isOwnProfile = user?.role === Role.STUDENT && user.studentProfileId === id;
     const canView = isAdmin || isOwnProfile || user?.role === Role.TEACHER;
     const canManage = isAdmin;
-    const canViewGrades =
-        isAdmin ||
-        isOwnProfile ||
-        (user?.role === Role.TEACHER && hasPermission(user.permissions, PERMISSIONS.GRADES_READ));
+    const { assignments = [], approvedRequests = [] } = useTeacherAccess();
 
     const [profileOpen, setProfileOpen] = useState(false);
     const [enrollOpen, setEnrollOpen] = useState(false);
@@ -151,6 +150,53 @@ export function StudentDetailPage(): JSX.Element {
     const activeEnrollment =
         student?.enrollments.find((enrollment) => enrollment.status === ENROLLMENT_STATUS.ACTIVE) ??
         null;
+    const canViewGrades =
+        isAdmin ||
+        isOwnProfile ||
+        (user?.role === Role.TEACHER &&
+            activeEnrollment !== null &&
+            (isClassTeacherForSection(assignments, activeEnrollment.sectionId) ||
+                assignments.some(
+                    (assignment) =>
+                        assignment.sectionId === activeEnrollment.sectionId &&
+                        assignment.role === "SUBJECT_TEACHER",
+                ) ||
+                approvedRequests.some(
+                    (request) =>
+                        request.status === "APPROVED" &&
+                        request.type === "MARKS" &&
+                        request.sectionId === activeEnrollment.sectionId &&
+                        request.subjectId !== null,
+                )));
+    const teacherGradeSubjectIds = activeEnrollment
+        ? Array.from(
+              new Set([
+                  ...assignments
+                      .filter(
+                          (assignment) =>
+                              assignment.sectionId === activeEnrollment.sectionId &&
+                              assignment.role === "SUBJECT_TEACHER",
+                      )
+                      .map((assignment) => assignment.subjectId)
+                      .filter((subjectId): subjectId is string => Boolean(subjectId)),
+                  ...approvedRequests
+                      .filter(
+                          (request) =>
+                              request.status === "APPROVED" &&
+                              request.type === "MARKS" &&
+                              request.sectionId === activeEnrollment.sectionId,
+                      )
+                      .map((request) => request.subjectId)
+                      .filter((subjectId): subjectId is string => Boolean(subjectId)),
+              ]),
+          )
+        : [];
+    const canViewAllGrades =
+        isAdmin ||
+        isOwnProfile ||
+        (user?.role === Role.TEACHER &&
+            activeEnrollment !== null &&
+            isClassTeacherForSection(assignments, activeEnrollment.sectionId));
 
     const month = new Date().toISOString().slice(0, 7);
     const { startDate, endDate } = getMonthBounds(month);
@@ -341,7 +387,10 @@ export function StudentDetailPage(): JSX.Element {
                         <CardTitle className="text-lg">Grades</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <StudentGradeHistoryCard studentId={id} />
+                        <StudentGradeHistoryCard
+                            studentId={id}
+                            subjectIds={canViewAllGrades ? undefined : teacherGradeSubjectIds}
+                        />
                     </CardContent>
                 </Card>
             )}

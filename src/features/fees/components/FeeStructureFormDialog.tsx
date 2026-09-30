@@ -26,6 +26,8 @@ import { toDateInputValue } from "../lib/format";
 import { feeStructureSchema, type FeeStructureFormValues } from "../schemas/fee-structure.schema";
 import type { FeeStructure } from "../types/fee.types";
 
+import { FeeDatePicker } from "./FeeDatePicker";
+
 interface FeeStructureFormDialogProps {
     open: boolean;
     structure: FeeStructure | null;
@@ -133,9 +135,23 @@ export function FeeStructureFormDialog({
 
                     <div className="space-y-2">
                         <Label htmlFor="dueDate">Due date</Label>
-                        <Input id="dueDate" type="date" {...register("dueDate")} />
+                        <Controller
+                            control={control}
+                            name="dueDate"
+                            render={({ field }) => (
+                                <FeeDatePicker
+                                    id="dueDate"
+                                    label="Due date"
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    error={errors.dueDate?.message}
+                                />
+                            )}
+                        />
                         {errors.dueDate && (
-                            <p className="text-destructive text-xs">{errors.dueDate.message}</p>
+                            <p id="dueDate-error" className="text-destructive text-xs">
+                                {errors.dueDate.message}
+                            </p>
                         )}
                     </div>
 

@@ -2,14 +2,15 @@ import { useMemo } from "react";
 import type { JSX } from "react";
 
 import { useNavigate } from "react-router-dom";
+
 import { ArrowRight, CalendarDays, Check, School, Users, X } from "lucide-react";
 
 import { attendancePage } from "@constants/routes.constants";
 
 import { useAttendanceSummary } from "@features/attendance";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 
 interface ClassAttendanceSummarySectionProps {

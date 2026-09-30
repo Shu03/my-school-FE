@@ -14,13 +14,14 @@ import {
     type ExamStatus,
     type ExamType,
 } from "@constants/exams.constants";
-import { PERMISSIONS } from "@constants/permissions.constants";
 import { examDetail } from "@constants/routes.constants";
 
 import { Role } from "@/types/api";
 
+import { formatSectionLabel } from "@lib/section";
+
 import { useCurrentAcademicYear } from "@features/academic-years";
-import { hasPermission, useAuthStore } from "@features/auth";
+import { useAuthStore } from "@features/auth";
 import { useClassesList } from "@features/classes";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -55,7 +56,7 @@ export function ExamsPage(): JSX.Element {
     const user = useAuthStore((s) => s.user);
     const isAdmin = user?.role === Role.ADMIN;
     const isStudent = user?.role === Role.STUDENT;
-    const canManage = isAdmin || hasPermission(user?.permissions, PERMISSIONS.GRADES_WRITE);
+    const canManage = isAdmin;
 
     const [classFilter, setClassFilter] = useState<string>(ALL);
     const [typeFilter, setTypeFilter] = useState<string>(ALL);
@@ -211,7 +212,7 @@ export function ExamsPage(): JSX.Element {
                                     <SelectItem value={ALL}>All classes</SelectItem>
                                     {classes.map((item) => (
                                         <SelectItem key={item.id} value={item.id}>
-                                            {item.name} (Class {item.classLevel})
+                                            {formatSectionLabel(item.classLevel, item.name)}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>

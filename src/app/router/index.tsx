@@ -1,6 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import { PERMISSIONS } from "@constants/permissions.constants";
 import { ROUTES } from "@constants/routes.constants";
 
 import { Role } from "@/types/api";
@@ -10,7 +9,6 @@ import {
     PublicOnlyRoute,
     RoleGuard,
     ChangePasswordRoute,
-    RoleOrPermissionGuard,
 } from "./guards";
 import {
     ChangePasswordPage,
@@ -40,6 +38,8 @@ import {
     FeeRecordDetailPage,
     MyFeesPage,
     MyReportCardPage,
+    AccountsPage,
+    RequestAccessPage,
 } from "./lazy";
 import { NotFoundPage } from "./NotFoundPage";
 
@@ -122,6 +122,19 @@ export const router = createBrowserRouter([
                     </Lazy>
                 ),
             },
+            {
+                element: <RoleGuard allowedRoles={[Role.ADMIN, Role.TEACHER]} />,
+                children: [
+                    {
+                        path: ROUTES.REQUEST_ACCESS,
+                        element: (
+                            <Lazy>
+                                <RequestAccessPage />
+                            </Lazy>
+                        ),
+                    },
+                ],
+            },
 
             {
                 path: ROUTES.ANNOUNCEMENTS,
@@ -155,13 +168,7 @@ export const router = createBrowserRouter([
             },
 
             {
-                element: (
-                    <RoleOrPermissionGuard
-                        allowedRoles={[Role.ADMIN, Role.STUDENT]}
-                        permissionRole={Role.TEACHER}
-                        requiredPermission={PERMISSIONS.FEES_MANAGE}
-                    />
-                ),
+                element: <RoleGuard allowedRoles={[Role.ADMIN, Role.STUDENT]} />,
                 children: [
                     {
                         path: ROUTES.FEE_DETAIL,
@@ -233,6 +240,14 @@ export const router = createBrowserRouter([
                             </Lazy>
                         ),
                     },
+                    {
+                        path: ROUTES.ACCOUNTS,
+                        element: (
+                            <Lazy>
+                                <AccountsPage />
+                            </Lazy>
+                        ),
+                    },
                 ],
             },
 
@@ -264,27 +279,13 @@ export const router = createBrowserRouter([
                 ],
             },
             {
-                element: (
-                    <RoleOrPermissionGuard
-                        allowedRoles={[Role.ADMIN]}
-                        permissionRole={Role.TEACHER}
-                        requiredPermission={PERMISSIONS.ACADEMIC_YEAR_MANAGE}
-                    />
-                ),
+                element: <RoleGuard allowedRoles={[Role.ADMIN, Role.TEACHER]} />,
                 children: [
                     {
                         path: ROUTES.ACADEMIC_YEARS,
                         element: (
                             <Lazy>
                                 <AcademicYearsPage />
-                            </Lazy>
-                        ),
-                    },
-                    {
-                        path: ROUTES.ACADEMIC_YEARS_MANAGE,
-                        element: (
-                            <Lazy>
-                                <ManageAcademicYearsPage />
                             </Lazy>
                         ),
                     },
@@ -299,13 +300,20 @@ export const router = createBrowserRouter([
                 ],
             },
             {
-                element: (
-                    <RoleOrPermissionGuard
-                        allowedRoles={[Role.ADMIN]}
-                        permissionRole={Role.TEACHER}
-                        requiredPermission={PERMISSIONS.SECTION_MANAGE}
-                    />
-                ),
+                element: <RoleGuard allowedRoles={[Role.ADMIN]} />,
+                children: [
+                    {
+                        path: ROUTES.ACADEMIC_YEARS_MANAGE,
+                        element: (
+                            <Lazy>
+                                <ManageAcademicYearsPage />
+                            </Lazy>
+                        ),
+                    },
+                ],
+            },
+            {
+                element: <RoleGuard allowedRoles={[Role.ADMIN, Role.TEACHER]} />,
                 children: [
                     {
                         path: ROUTES.CLASSES,
@@ -326,13 +334,7 @@ export const router = createBrowserRouter([
                 ],
             },
             {
-                element: (
-                    <RoleOrPermissionGuard
-                        allowedRoles={[Role.ADMIN]}
-                        permissionRole={Role.TEACHER}
-                        requiredPermission={PERMISSIONS.SUBJECT_MANAGE}
-                    />
-                ),
+                element: <RoleGuard allowedRoles={[Role.ADMIN, Role.TEACHER]} />,
                 children: [
                     {
                         path: ROUTES.SUBJECTS,
@@ -345,13 +347,7 @@ export const router = createBrowserRouter([
                 ],
             },
             {
-                element: (
-                    <RoleOrPermissionGuard
-                        allowedRoles={[Role.ADMIN]}
-                        permissionRole={Role.TEACHER}
-                        requiredPermission={PERMISSIONS.FEES_MANAGE}
-                    />
-                ),
+                element: <RoleGuard allowedRoles={[Role.ADMIN]} />,
                 children: [
                     {
                         path: ROUTES.FEES,

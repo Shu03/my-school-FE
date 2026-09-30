@@ -37,10 +37,11 @@ export const academicYearsKeys = {
     terms: (id: string) => [...academicYearsKeys.all, "terms", id] as const,
 };
 
-export function useAcademicYearsList(): UseQueryResult<AcademicYear[]> {
+export function useAcademicYearsList(enabled = true): UseQueryResult<AcademicYear[]> {
     return useQuery({
         queryKey: academicYearsKeys.lists(),
         queryFn: listAcademicYears,
+        enabled,
     });
 }
 
@@ -51,19 +52,22 @@ export function useCurrentAcademicYear(): UseQueryResult<AcademicYearWithTerms> 
     });
 }
 
-export function useAcademicYear(id: string | null): UseQueryResult<AcademicYearWithTerms> {
+export function useAcademicYear(
+    id: string | null,
+    enabled = true,
+): UseQueryResult<AcademicYearWithTerms> {
     return useQuery({
         queryKey: academicYearsKeys.detail(id ?? ""),
         queryFn: () => getAcademicYearById(id as string),
-        enabled: Boolean(id),
+        enabled: Boolean(id) && enabled,
     });
 }
 
-export function useAcademicYearTerms(id: string | null): UseQueryResult<Term[]> {
+export function useAcademicYearTerms(id: string | null, enabled = true): UseQueryResult<Term[]> {
     return useQuery({
         queryKey: academicYearsKeys.terms(id ?? ""),
         queryFn: () => listTermsByAcademicYear(id as string),
-        enabled: Boolean(id),
+        enabled: Boolean(id) && enabled,
     });
 }
 

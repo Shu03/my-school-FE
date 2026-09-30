@@ -11,6 +11,8 @@ import { STUDENT_PAGINATION } from "@constants/students.constants";
 
 import { Role } from "@/types/api";
 
+import { formatSectionLabel } from "@lib/section";
+
 import { useCurrentAcademicYear } from "@features/academic-years";
 import { useAuthStore } from "@features/auth";
 import { useClassesList } from "@features/classes";
@@ -166,7 +168,7 @@ export function StudentsPage(): JSX.Element {
                                 <SelectItem value={ALL_CLASSES}>All classes</SelectItem>
                                 {classes.map((item) => (
                                     <SelectItem key={item.id} value={item.id}>
-                                        {item.name} (Class {item.classLevel})
+                                        {formatSectionLabel(item.classLevel, item.name)}
                                     </SelectItem>
                                 ))}
                             </SelectContent>

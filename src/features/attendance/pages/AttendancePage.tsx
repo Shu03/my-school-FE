@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { AttendanceMarker } from "../components/AttendanceMarker";
 import { AttendanceOverviewView } from "../components/AttendanceOverviewView";
+import { StudentAttendanceView } from "../components/StudentAttendanceView";
 
 export function AttendancePage(): JSX.Element {
     const user = useAuthStore((s) => s.user);
@@ -45,32 +46,38 @@ export function AttendancePage(): JSX.Element {
                         Attendance
                     </h1>
                     <p className="text-muted-foreground mt-1 text-sm">
-                        Mark and review daily student attendance.
+                        {isStudent
+                            ? "Every school day of the year, at a glance."
+                            : "Mark and review daily student attendance."}
                     </p>
                 </div>
 
                 <div className="px-6 py-6">
-                    <Tabs
-                        value={activeTab}
-                        onValueChange={(value) => setActiveTab(value as "mark" | "overview")}
-                    >
-                        <TabsList className="h-10 w-full">
-                            {canMark && <TabsTrigger value="mark">Mark</TabsTrigger>}
-                            <TabsTrigger value="overview">
-                                {isStudent ? "My Attendance" : "Overview"}
-                            </TabsTrigger>
-                        </TabsList>
+                    {isStudent ? (
+                        <StudentAttendanceView />
+                    ) : (
+                        <Tabs
+                            value={activeTab}
+                            onValueChange={(value) => setActiveTab(value as "mark" | "overview")}
+                        >
+                            <TabsList className="h-10 w-full">
+                                {canMark && (
+                                    <TabsTrigger value="mark">Daily attendance</TabsTrigger>
+                                )}
+                                <TabsTrigger value="overview">Overview</TabsTrigger>
+                            </TabsList>
 
-                        {canMark && (
-                            <TabsContent value="mark" className="pt-4">
-                                <AttendanceMarker initialSectionId={initialSectionId} />
+                            {canMark && (
+                                <TabsContent value="mark" className="pt-4">
+                                    <AttendanceMarker initialSectionId={initialSectionId} />
+                                </TabsContent>
+                            )}
+
+                            <TabsContent value="overview" className="pt-4">
+                                <AttendanceOverviewView />
                             </TabsContent>
-                        )}
-
-                        <TabsContent value="overview" className="pt-4">
-                            <AttendanceOverviewView />
-                        </TabsContent>
-                    </Tabs>
+                        </Tabs>
+                    )}
                 </div>
             </div>
         </div>

@@ -1,3 +1,5 @@
+import { EXAM_SUBJECT_ANCHOR_PREFIX } from "./exams.constants";
+
 /**
  * Application route paths.
  * Single source of truth for navigation targets.
@@ -21,6 +23,7 @@ export const ROUTES = {
     TEACHERS: "/teachers",
     TEACHER_DETAIL: "/teachers/:id",
     ATTENDANCE: "/attendance",
+    REQUEST_ACCESS: "/request-access",
     HOMEWORK: "/homework",
     ANNOUNCEMENTS: "/announcements",
     EXAMS: "/exams",
@@ -29,6 +32,7 @@ export const ROUTES = {
     FEE_DETAIL: "/fees/records/:id",
     MY_FEES: "/my-fees",
     MY_REPORT_CARD: "/report-card",
+    ACCOUNTS: "/accounts",
     SETTINGS: "/settings",
     NOT_FOUND: "*",
 } as const;
@@ -63,6 +67,11 @@ export function classDetail(id: string): string {
 /** Build the detail path for a specific exam. */
 export function examDetail(id: string): string {
     return `/exams/${id}`;
+}
+
+/** Build the exam detail path scrolled to one subject's panel (marks entry). */
+export function examSubjectDetail(examId: string, subjectId: string): string {
+    return `${examDetail(examId)}#${EXAM_SUBJECT_ANCHOR_PREFIX}${subjectId}`;
 }
 
 /** Build the detail path for a specific fee record. */

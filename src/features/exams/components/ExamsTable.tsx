@@ -4,6 +4,8 @@ import { CheckCircle2, Lock, LockOpen, Pencil, Trash2 } from "lucide-react";
 
 import { EXAM_STATUS, EXAM_TYPE_LABELS } from "@constants/exams.constants";
 
+import { formatSectionLabel } from "@lib/section";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -105,7 +107,10 @@ export function ExamsTable({
                                         </Badge>
                                     </TableCell>
                                     <TableCell>
-                                        {exam.section.name} (Class {exam.section.classLevel})
+                                        {formatSectionLabel(
+                                            exam.section.classLevel,
+                                            exam.section.name,
+                                        )}
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex flex-wrap gap-1">

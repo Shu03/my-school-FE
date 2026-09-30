@@ -15,16 +15,17 @@ import {
     Megaphone,
     Wallet,
     Award,
+    Landmark,
+    KeyRound,
 } from "lucide-react";
 
 import { APP_BRAND } from "@constants/app.constants";
-import { PERMISSIONS } from "@constants/permissions.constants";
 import { ROUTES } from "@constants/routes.constants";
 
 import { Role } from "@/types/api";
 
 import type { User } from "@features/auth";
-import { hasPermission, useAuthStore } from "@features/auth";
+import { useAuthStore } from "@features/auth";
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -38,37 +39,15 @@ interface NavItem {
 }
 
 function canAccessAcademicYears(user: User | null): boolean {
-    if (!user) {
-        return false;
-    }
-
-    return (
-        user.role === Role.ADMIN ||
-        (user.role === Role.TEACHER &&
-            hasPermission(user.permissions, PERMISSIONS.ACADEMIC_YEAR_MANAGE))
-    );
+    return user?.role === Role.ADMIN || user?.role === Role.TEACHER;
 }
 
 function canAccessClasses(user: User | null): boolean {
-    if (!user) {
-        return false;
-    }
-
-    return (
-        user.role === Role.ADMIN ||
-        (user.role === Role.TEACHER && hasPermission(user.permissions, PERMISSIONS.SECTION_MANAGE))
-    );
+    return user?.role === Role.ADMIN || user?.role === Role.TEACHER;
 }
 
 function canAccessFees(user: User | null): boolean {
-    if (!user) {
-        return false;
-    }
-
-    return (
-        user.role === Role.ADMIN ||
-        (user.role === Role.TEACHER && hasPermission(user.permissions, PERMISSIONS.FEES_MANAGE))
-    );
+    return user?.role === Role.ADMIN;
 }
 
 const navItems: NavItem[] = [
@@ -94,6 +73,12 @@ const navItems: NavItem[] = [
         roles: [Role.ADMIN, Role.TEACHER, Role.STUDENT],
     },
     { label: "Homework", path: ROUTES.HOMEWORK, icon: NotebookPen },
+    {
+        label: "Request Access",
+        path: ROUTES.REQUEST_ACCESS,
+        icon: KeyRound,
+        roles: [Role.ADMIN, Role.TEACHER],
+    },
     { label: "Announcements", path: ROUTES.ANNOUNCEMENTS, icon: Megaphone },
     {
         label: "Exams",
@@ -114,6 +99,7 @@ const navItems: NavItem[] = [
         canView: canAccessFees,
     },
     { label: "My Fees", path: ROUTES.MY_FEES, icon: Wallet, roles: [Role.STUDENT] },
+    { label: "Accounts", path: ROUTES.ACCOUNTS, icon: Landmark, roles: [Role.ADMIN] },
 ];
 
 interface SidebarProps {

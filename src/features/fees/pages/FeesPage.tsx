@@ -7,13 +7,14 @@ import { AlertCircle, Plus, Receipt, Wallet } from "lucide-react";
 import { toast } from "sonner";
 
 import { FEE_STATUS_LABELS, FEE_STATUS_LIST, type FeeStatus } from "@constants/fees.constants";
-import { PERMISSIONS } from "@constants/permissions.constants";
 import { feeDetail } from "@constants/routes.constants";
 
 import { Role } from "@/types/api";
 
+import { formatSectionLabel } from "@lib/section";
+
 import { useCurrentAcademicYear } from "@features/academic-years";
-import { hasPermission, useAuthStore } from "@features/auth";
+import { useAuthStore } from "@features/auth";
 import { useClassesList } from "@features/classes";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -48,7 +49,7 @@ export function FeesPage(): JSX.Element {
     const navigate = useNavigate();
     const user = useAuthStore((s) => s.user);
     const isAdmin = user?.role === Role.ADMIN;
-    const canManage = isAdmin || hasPermission(user?.permissions, PERMISSIONS.FEES_MANAGE);
+    const canManage = isAdmin;
 
     const { data: currentYear } = useCurrentAcademicYear();
 
@@ -179,7 +180,7 @@ export function FeesPage(): JSX.Element {
                                             <SelectItem value={ALL}>All classes</SelectItem>
                                             {classes.map((item) => (
                                                 <SelectItem key={item.id} value={item.id}>
-                                                    {item.name} (Class {item.classLevel})
+                                                    {formatSectionLabel(item.classLevel, item.name)}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>

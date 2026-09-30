@@ -4,6 +4,8 @@ import { Controller, useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { formatSectionLabel } from "@lib/section";
+
 import { useCurrentAcademicYear } from "@features/academic-years";
 import { useClassesList } from "@features/classes";
 
@@ -101,7 +103,7 @@ export function EnrollStudentDialog({
                                     <SelectContent>
                                         {classes.map((item) => (
                                             <SelectItem key={item.id} value={item.id}>
-                                                {item.name} (Class {item.classLevel})
+                                                {formatSectionLabel(item.classLevel, item.name)}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>

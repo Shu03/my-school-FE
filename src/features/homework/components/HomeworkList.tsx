@@ -2,6 +2,8 @@ import type { JSX } from "react";
 
 import { CalendarClock, GraduationCap, NotebookPen, Pencil, Trash2 } from "lucide-react";
 
+import { formatSectionLabel } from "@lib/section";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
@@ -13,7 +15,7 @@ import type { Homework } from "../types/homework.types";
 interface HomeworkListProps {
     homework: Homework[];
     isLoading: boolean;
-    canManage: boolean;
+    canManage: (homework: Homework) => boolean;
     deletingHomeworkId: string | null;
     onEdit: (homework: Homework) => void;
     onDelete: (homework: Homework) => void;
@@ -68,7 +70,7 @@ export function HomeworkList({
                                 <Badge variant="secondary" className="font-mono">
                                     {item.subject.code}
                                 </Badge>
-                                {canManage && (
+                                {canManage(item) && (
                                     <div className="-mt-1 -mr-1 flex items-center gap-1">
                                         <Button
                                             variant="ghost"
@@ -111,7 +113,7 @@ export function HomeworkList({
                         <CardFooter className="border-border/60 text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-2 border-t pt-4 text-xs">
                             <span className="flex items-center gap-1.5">
                                 <GraduationCap className="size-3.5" />
-                                {item.section.name} (Class {item.section.classLevel})
+                                {formatSectionLabel(item.section.classLevel, item.section.name)}
                             </span>
                             <span
                                 className={

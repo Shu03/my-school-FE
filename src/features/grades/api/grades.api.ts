@@ -8,6 +8,7 @@ import type {
     ExamGradesSummary,
     Grade,
     StudentGradeHistory,
+    StudentGradeHistoryEntry,
     StudentGradesParams,
 } from "../types/grade.types";
 
@@ -54,7 +55,9 @@ export async function getStudentGradeHistory(
         ? `${API_ENDPOINTS.GRADES.studentHistory(studentId)}?${queryString}`
         : API_ENDPOINTS.GRADES.studentHistory(studentId);
 
-    return apiFetch<StudentGradeHistory>(endpoint, {
+    const response = await apiFetch<StudentGradeHistory | StudentGradeHistoryEntry[]>(endpoint, {
         method: "GET",
     });
+
+    return Array.isArray(response) ? { studentId, exams: response } : response;
 }

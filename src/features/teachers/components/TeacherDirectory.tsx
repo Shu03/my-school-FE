@@ -1,6 +1,6 @@
 import { useDeferredValue, useMemo, useState, type JSX } from "react";
 
-import { CalendarDays, Mail, Phone, Search, ShieldCheck, UserRoundSearch, X } from "lucide-react";
+import { CalendarDays, Mail, Phone, Search, UserRoundSearch, X } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,11 +14,10 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
-import type { PermissionPreset, TeacherProfile } from "../types/teacher.types";
+import type { TeacherProfile } from "../types/teacher.types";
 
 interface TeacherDirectoryProps {
     teachers: TeacherProfile[];
-    presets: PermissionPreset[];
     isLoading: boolean;
     selectedTeacherId: string | null;
     onSelect: (teacher: TeacherProfile) => void;
@@ -32,14 +31,12 @@ function getInitials(teacher: TeacherProfile): string {
 
 export function TeacherDirectory({
     teachers,
-    presets,
     isLoading,
     selectedTeacherId,
     onSelect,
 }: TeacherDirectoryProps): JSX.Element {
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState<StatusFilter>("all");
-    const [presetId, setPresetId] = useState("all");
     const deferredSearch = useDeferredValue(search.trim().toLowerCase());
 
     const filteredTeachers = useMemo(
@@ -52,21 +49,16 @@ export function TeacherDirectory({
                     teacher.employeeCode.toLowerCase().includes(deferredSearch);
                 const matchesStatus =
                     status === "all" || teacher.user.isActive === (status === "active");
-                const matchesPreset =
-                    presetId === "all" ||
-                    (presetId === "none" ? !teacher.presetId : teacher.presetId === presetId);
-
-                return matchesSearch && matchesStatus && matchesPreset;
+                return matchesSearch && matchesStatus;
             }),
-        [deferredSearch, presetId, status, teachers],
+        [deferredSearch, status, teachers],
     );
 
-    const hasFilters = Boolean(search) || status !== "all" || presetId !== "all";
+    const hasFilters = Boolean(search) || status !== "all";
 
     function clearFilters(): void {
         setSearch("");
         setStatus("all");
-        setPresetId("all");
     }
 
     return (
@@ -94,7 +86,7 @@ export function TeacherDirectory({
                     ) : null}
                 </div>
 
-                <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(14rem,1fr)_10rem_12rem]">
+                <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-[minmax(14rem,1fr)_10rem]">
                     <label className="relative sm:col-span-2 xl:col-span-1">
                         <span className="sr-only">Search teachers</span>
                         <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
@@ -116,20 +108,6 @@ export function TeacherDirectory({
                             <SelectItem value="all">All statuses</SelectItem>
                             <SelectItem value="active">Active</SelectItem>
                             <SelectItem value="inactive">Inactive</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <Select value={presetId} onValueChange={setPresetId}>
-                        <SelectTrigger className="w-full" aria-label="Filter by permission preset">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All presets</SelectItem>
-                            <SelectItem value="none">No preset</SelectItem>
-                            {presets.map((preset) => (
-                                <SelectItem key={preset.id} value={preset.id}>
-                                    {preset.name}
-                                </SelectItem>
-                            ))}
                         </SelectContent>
                     </Select>
                 </div>
@@ -159,7 +137,7 @@ export function TeacherDirectory({
                     </h3>
                     <p className="text-muted-foreground mt-1 max-w-sm text-sm">
                         {hasFilters
-                            ? "Try a different name, employee code, status, or permission preset."
+                            ? "Try a different name, employee code, or status."
                             : "Teacher profiles will appear here after accounts are created."}
                     </p>
                     {hasFilters ? (
@@ -238,13 +216,6 @@ export function TeacherDirectory({
                                         <Mail className="text-muted-foreground size-3.5 shrink-0" />
                                         <span className="truncate font-medium">
                                             {teacher.user.email ?? "Email not provided"}
-                                        </span>
-                                    </span>
-                                    <span className="flex min-w-0 items-center gap-2">
-                                        <ShieldCheck className="text-muted-foreground size-3.5 shrink-0" />
-                                        <span className="text-muted-foreground">Preset</span>
-                                        <span className="ml-auto max-w-[55%] truncate font-medium">
-                                            {teacher.preset?.name ?? "Not assigned"}
                                         </span>
                                     </span>
                                     <span className="flex items-center gap-2">

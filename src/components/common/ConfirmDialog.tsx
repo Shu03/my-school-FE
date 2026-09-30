@@ -19,6 +19,7 @@ interface ConfirmDialogProps {
     description: ReactNode;
     confirmLabel: string;
     isPending?: boolean;
+    confirmDisabled?: boolean;
     onOpenChange: (open: boolean) => void;
     onConfirm: () => void;
 }
@@ -29,6 +30,7 @@ export function ConfirmDialog({
     description,
     confirmLabel,
     isPending = false,
+    confirmDisabled = false,
     onOpenChange,
     onConfirm,
 }: ConfirmDialogProps): JSX.Element {
@@ -49,7 +51,7 @@ export function ConfirmDialog({
                     <Button
                         type="button"
                         variant="destructive"
-                        disabled={isPending}
+                        disabled={isPending || confirmDisabled}
                         onClick={onConfirm}
                     >
                         {isPending ? <Spinner /> : null}

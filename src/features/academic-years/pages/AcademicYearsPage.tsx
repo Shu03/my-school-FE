@@ -177,14 +177,14 @@ export function AcademicYearsPage(): JSX.Element {
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
-                            <Button variant="outline" onClick={handleOpenManageAcademicYears}>
+                            {isAdmin && <Button variant="outline" onClick={handleOpenManageAcademicYears}>
                                 <CalendarRange className="size-4" />
                                 Manage academic years
-                            </Button>
-                            <Button onClick={handleCreateTerm} disabled={!currentYear}>
+                            </Button>}
+                            {isAdmin && <Button onClick={handleCreateTerm} disabled={!currentYear}>
                                 <Plus className="size-4" />
                                 Add term
-                            </Button>
+                            </Button>}
                         </div>
                     </div>
                 </div>
@@ -195,7 +195,7 @@ export function AcademicYearsPage(): JSX.Element {
                             <AlertDescription className="flex items-center justify-between gap-4">
                                 <span>{getAcademicYearErrorMessage(currentYearError)}</span>
                                 <div className="flex items-center gap-2">
-                                    <Button
+                                    {isAdmin && <Button
                                         type="button"
                                         variant="outline"
                                         size="sm"
@@ -203,7 +203,7 @@ export function AcademicYearsPage(): JSX.Element {
                                     >
                                         <Settings2 className="size-4" />
                                         Manage
-                                    </Button>
+                                    </Button>}
                                     <Button
                                         type="button"
                                         variant="outline"
@@ -219,6 +219,7 @@ export function AcademicYearsPage(): JSX.Element {
                         <TermsTable
                             terms={sortedTerms}
                             isLoading={isLoading}
+                            canEdit={isAdmin}
                             canDelete={isAdmin}
                             deletingTermId={
                                 deleteTermMutation.isPending
@@ -243,10 +244,10 @@ export function AcademicYearsPage(): JSX.Element {
                                     : "Manage holidays for the current academic year."}
                             </p>
                         </div>
-                        <Button onClick={() => setHolidayFormOpen(true)} disabled={!currentYear}>
+                        {isAdmin && <Button onClick={() => setHolidayFormOpen(true)} disabled={!currentYear}>
                             <Plus className="size-4" />
                             Add holiday
-                        </Button>
+                        </Button>}
                     </div>
                 </div>
                 <div className="px-6 py-6">
@@ -273,7 +274,7 @@ export function AcademicYearsPage(): JSX.Element {
                 </div>
             </div>
 
-            {currentYear && (
+            {isAdmin && currentYear && (
                 <TermFormDialog
                     open={formOpen}
                     term={editingTerm}
@@ -284,7 +285,7 @@ export function AcademicYearsPage(): JSX.Element {
                 />
             )}
 
-            {currentYear && (
+            {isAdmin && currentYear && (
                 <HolidayFormDialog
                     open={holidayFormOpen}
                     yearName={currentYear.name}
